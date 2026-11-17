@@ -11,7 +11,7 @@ Registro de progresso da adaptação deste fork para o PET-SD UFG 2025–2027
 | E1 Identidade e textos | feito | `feat: identidade do PET-SD centralizada em config` | `npm run lint && npm run typecheck && npm run test:ui`; abrir `npm run dev` e ver marca, rodapé e FAQ | logo oficial (TODO(pet-sd)); links de Forms vazios |
 | E2 Domínio e regras | feito | `feat: regras e cadastro do PET-SD` | `npm run test:ui` (testes de CH, soma do mês, migração v2→v3 e cópias 1.0–1.3) | confirmar modalidades e prazo |
 | E3 Folha oficial | feito | `feat: folha oficial no modelo do PET-SD` | `npm run test:e2e` (folha extensa: Carta paisagem, cabeçalho repetido, assinaturas e instruções no fim); aba "Folha oficial" → "Imprimir / salvar PDF" | ver "Diferenças que restam" |
-| E4 Testes e validação visual | não iniciado | | | |
+| E4 Testes e validação visual | feito | `test: cobertura do PET-SD e validação visual` | `npm run test:ui` (24) e `npm run test:e2e` (26); capturas em `docs/validation/pet-sd-20261117/` | diferenças listadas no README da validação |
 | E5 Documentação e limpeza | não iniciado | | | |
 | E6 Fechamento | não iniciado | | | |
 

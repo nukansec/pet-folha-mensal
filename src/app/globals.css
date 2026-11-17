@@ -1810,7 +1810,7 @@ body {
   white-space: pre-line;
 }
 .pet-sheet-empty-row td {
-  height: 6mm;
+  height: 5mm;
 }
 .pet-sheet-activities .pet-sheet-total td {
   font-weight: 700;
@@ -1824,8 +1824,8 @@ body {
 .pet-sheet-signature {
   font-weight: 700;
   font-size: 12pt;
-  margin: 9mm 0 0;
-  min-height: 14mm;
+  margin: 7mm 0 0;
+  min-height: 12mm;
 }
 .pet-sheet-instructions {
   margin-top: 10mm;
