@@ -58,7 +58,7 @@ export function getMonthYearLabel(monthKey: string): string {
 /**
  * Normaliza e limpa a descrição da atividade removendo sufixo redundante de modalidade
  * Ex: "Reunião de Alinhamento (Síncrona virtual)" -> "Reunião de Alinhamento"
- * "Reunião do GAT 04 (Mangaba)" -> "Reunião do GAT 04 (Mangaba)" (preserva parênteses legítimos)
+ * "Reunião do GAT 01 (frente de TI)" -> "Reunião do GAT 01 (frente de TI)" (preserva parênteses legítimos)
  */
 export function cleanActivityDescription(desc: string): string {
   if (!desc) return "";
@@ -73,7 +73,7 @@ export function cleanActivityDescription(desc: string): string {
 /**
  * Formata a descrição da atividade para a Folha de Frequência oficial (PDF/Impressão),
  * garantindo que a modalidade oficial selecionada esteja sempre anexada ao final entre parênteses.
- * Ex: "Reunião do GAT 04 (Mangaba)" + "Síncrona virtual" -> "Reunião do GAT 04 (Mangaba) (Síncrona virtual)"
+ * Ex: "Reunião do GAT 01" + "Assíncrona" -> "Reunião do GAT 01 (Assíncrona)"
  */
 export function formatActivityForSheet(
   desc: string,

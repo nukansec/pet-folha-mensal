@@ -68,18 +68,6 @@ export type ModalityType =
   | 'Síncrona presencial'
   | 'Assíncrona virtual';
 
-export interface FormReport {
-  group: string;
-  role: string;
-  activityType: string;
-  // Respostas das etapas seguintes do Forms (chaves em FORM_EXTRA_KEYS).
-  extra?: Record<string, string>;
-  confirmation?: {
-    at: string;
-    snapshot: string;
-  };
-}
-
 export interface Activity {
   id: string;
   date: string; // YYYY-MM-DD
@@ -88,7 +76,6 @@ export interface Activity {
   modality: ModalityType;
   description: string;
   hours: number;
-  formReport?: FormReport;
 }
 
 export interface UserProfile {

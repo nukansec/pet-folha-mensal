@@ -1,4 +1,3 @@
-import { isFormReport } from "./form-report";
 import type { BackupAttachment } from "./attachments";
 import {
   Activity,
@@ -557,7 +556,7 @@ export function exportUserData(
   attachments?: BackupAttachment[],
 ): string {
   const activities = getActivitiesForMonth(user.id, monthKey);
-  const includesReports = attachments !== undefined || activities.some((activity) => activity.formReport !== undefined);
+  const includesReports = attachments !== undefined;
   const data = {
     version: includesReports ? "1.2" : "1.0",
     attachments: includesReports ? (attachments ?? []) : undefined,
@@ -661,8 +660,6 @@ export function inspectUserData(jsonStr: string): RestoreResult {
       ].includes(record.modality)
     )
       return restoreFailure("INVALID_BACKUP");
-    if (data.version === "1.2" && record.formReport !== undefined && !isFormReport(record.formReport))
-      return restoreFailure("INVALID_BACKUP");
     ids.add(record.id);
     activities.push({
       id: record.id,
@@ -672,7 +669,6 @@ export function inspectUserData(jsonStr: string): RestoreResult {
       description: record.description,
       modality: record.modality,
       hours: calcPetHours(record.start, record.end),
-      ...(data.version === "1.2" && record.formReport && { formReport: record.formReport }),
     });
   }
   const user: UserProfile = {

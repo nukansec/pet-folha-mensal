@@ -1,17 +1,18 @@
 "use client";
 
 import { ExternalLink, X } from "lucide-react";
+import { PROGRAM } from "@/config/program";
 import { Modal } from "./Modal";
 
 interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-export const FEEDBACK_FORM_URL =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfIxvavW_gq0xCUb6qx7VKK-I9tYino158tsCrNCO6IZ1Wf-A/viewform";
 
+// Sem link configurado, o modal não abre e o botão "Avaliar" não aparece.
 export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
-  if (!isOpen) return null;
+  const url = PROGRAM.links.feedbackForm;
+  if (!isOpen || !url) return null;
   return (
     <Modal isOpen={isOpen} onClose={onClose} label="Avaliação e sugestões">
       <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-6">
@@ -26,7 +27,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
         </p>
         <a
           className="primary-button w-full"
-          href={FEEDBACK_FORM_URL}
+          href={url}
           target="_blank"
           rel="noreferrer"
         >

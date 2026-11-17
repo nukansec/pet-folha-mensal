@@ -1,52 +1,12 @@
 // Dates are publication dates in São Paulo, not the build or the visitor's date.
 export const RELEASES = [
   {
-    date: "2026-11-08",
-    title: "Formulário completo e tela sem rolagem",
+    date: "2026-11-17",
+    title: "Folha no modelo do PET-SD",
     changes: [
-      "O link do formulário agora preenche todas as etapas: modalidade, horários, atendimento, declaração e cópia por e-mail.",
-      "No computador, a tela de lançamentos cabe na janela e só a lista de atividades rola.",
-      "Comprovantes em PDF e fotos grandes saem mais leves no PDF final.",
-    ],
-  },
-  {
-    date: "2026-11-07",
-    title: "Formulário também no botão Concluir",
-    changes: [
-      "Ao concluir o mês, você também pode abrir o formulário das atividades.",
-      "Reduzimos os espaços vazios e deixamos mais visível a opção de folha selecionada.",
-    ],
-  },
-  {
-    date: "2026-11-07",
-    title: "Seu relatório começa na atividade",
-    changes: [
-      "Prepare a primeira etapa do Google Forms com os dados da atividade e revise antes de abrir.",
-      "Marque os envios que você concluiu e acompanhe as pendências do mês.",
-    ],
-  },
-  {
-    date: "2026-11-07",
-    title: "Mais espaço para registrar o mês",
-    changes: [
-      "Se as atividades não couberem em uma página, o PDF continua nas páginas seguintes. Os espaços para assinar ficam só na última página da folha de frequência.",
-      "Na tela em que você registra as atividades, há um link para o formulário do PET. Preencha um formulário para cada atividade.",
-    ],
-  },
-  {
-    date: "2026-11-04",
-    title: "Comprovantes junto da folha",
-    changes: [
-      "Anexe PDFs e imagens quando seu GAT solicitar. Eles aparecem depois da frequência no PDF.",
-      "A cópia de segurança também leva os arquivos originais para outro aparelho.",
-    ],
-  },
-  {
-    date: "2026-11-02",
-    title: "Sua folha continua neste navegador",
-    changes: [
-      "A interface foi reorganizada para facilitar os lançamentos e a conferência da folha.",
-      "Continue com o perfil salvo e escolha o mês. Guarde a cópia de segurança para levar os dados a outro aparelho.",
+      "A folha segue o modelo “Registro de Frequência e Atividades – PET-SD”, em papel Carta na horizontal.",
+      "Cada atividade tem Unidade/Local e Descrição, e a CH é a duração exata (ex.: 1h30).",
+      "Os GATs, perfis e modalidades vêm do regimento e do projeto institucional do PET-SD/UFG.",
     ],
   },
 ];

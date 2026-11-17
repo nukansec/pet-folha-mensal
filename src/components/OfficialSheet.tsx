@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Activity, UserProfile } from '@/types';
+import { PROGRAM } from '@/config/program';
 import { formatDateBR, formatActivityForSheet, sortActivitiesChronologically } from '@/lib/pet-calculator';
 
 interface OfficialSheetProps {
@@ -43,8 +44,8 @@ export function OfficialSheet({
         <div className="w-[36%] text-center flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/logo-horizontal.png"
-            alt="PET-Saúde Clima"
+            src={PROGRAM.sheet.headerImage}
+            alt={PROGRAM.sheet.headerImageAlt}
             className="h-11 sm:h-12 max-w-full object-contain"
           />
         </div>

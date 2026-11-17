@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Download, FileText, ClipboardList, X, ArrowRight } from "lucide-react";
-import { ACTIVITY_FORM_URL } from "@/lib/form-report";
+import { PROGRAM } from "@/config/program";
 import { Modal } from "./Modal";
 
 interface ExitModalProps {
@@ -93,7 +93,7 @@ function Conclusion({
           <div>
             <h3>Folha para assinatura</h3>
             <p>
-              Salve o PDF completo em A4 na horizontal para assinar.
+              Salve o PDF completo em papel Carta na horizontal para assinar.
             </p>
             {pdfTriggered && (
               <p role="status">
@@ -109,18 +109,20 @@ function Conclusion({
             Imprimir / salvar PDF
           </button>
         </div>
-        <div className="conclusion-option">
-          <ClipboardList size={24} aria-hidden="true" />
-          <div>
-            <h3>Formulário de atividades</h3>
-            <p>Preencha um formulário por atividade. Você pode preparar os dados na lista de atividades.</p>
+        {PROGRAM.links.activityForm && (
+          <div className="conclusion-option">
+            <ClipboardList size={24} aria-hidden="true" />
+            <div>
+              <h3>Formulário de atividades</h3>
+              <p>Registre as atividades do mês no formulário do programa.</p>
+            </div>
+            <a className="secondary-button" href={PROGRAM.links.activityForm}
+              target="_blank" rel="noopener noreferrer"
+              aria-label="Abrir formulário de atividades">
+              Abrir formulário
+            </a>
           </div>
-          <a className="secondary-button" href={ACTIVITY_FORM_URL}
-            target="_blank" rel="noopener noreferrer"
-            aria-label="Abrir formulário de atividades">
-            Abrir formulário
-          </a>
-        </div>
+        )}
         <p className="local-note">
           Salve a cópia para proteger seus dados e continuar em outro aparelho.
         </p>

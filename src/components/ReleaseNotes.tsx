@@ -17,6 +17,7 @@ export function ReleaseNotes() {
       <ul className="release-changes">
         {latest.changes.map((change) => <li key={change}>{change}</li>)}
       </ul>
+      {history.length > 0 && (
       <details className="release-history">
         <summary>Ver histórico de atualizações</summary>
         <ol>
@@ -29,6 +30,7 @@ export function ReleaseNotes() {
           ))}
         </ol>
       </details>
+      )}
     </section>
   );
 }

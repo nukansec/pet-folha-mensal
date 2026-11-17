@@ -8,7 +8,7 @@ Registro de progresso da adaptação deste fork para o PET-SD UFG 2025–2027
 | Épico | Status | Commits | Como verificar | Pendências |
 |---|---|---|---|---|
 | E0 Reconhecimento e linha de base | feito | `docs: inventário da adaptação para o PET-SD` | ler este arquivo | respostas às dúvidas abaixo |
-| E1 Identidade e textos | não iniciado | | | |
+| E1 Identidade e textos | feito | `feat: identidade do PET-SD centralizada em config` | `npm run lint && npm run typecheck && npm run test:ui`; abrir `npm run dev` e ver marca, rodapé e FAQ | logo oficial (TODO(pet-sd)); links de Forms vazios |
 | E2 Domínio e regras | não iniciado | | | |
 | E3 Folha oficial | não iniciado | | | |
 | E4 Testes e validação visual | não iniciado | | | |

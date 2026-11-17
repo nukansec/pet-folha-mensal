@@ -1,8 +1,6 @@
 "use client";
 
-const repository = "https://github.com/vvvvvdal/pet-folha-mensal";
-const template =
-  "/templates/PET%20-%20Folha%20de%20Frequ%C3%AAncia%20-%20Modelo%20Vazio.pdf";
+import { PROGRAM } from "@/config/program";
 
 export function SiteFooter({
   compact = false,
@@ -13,41 +11,48 @@ export function SiteFooter({
   onHelp: () => void;
   onFeedback: () => void;
 }) {
+  const [first, second] = PROGRAM.credits.authors;
   return (
     <footer className="site-footer screen-only compact">
       <div className="footer-inner">
         <div className="footer-bottom">
           <p>
-            © {new Date().getFullYear()} PET-Saúde Clima ·{" "}
+            {PROGRAM.acronym}/{PROGRAM.campus} · Adaptado do{" "}
             <a
-              href="https://www.linkedin.com/in/vvvvvdal/"
+              href={PROGRAM.credits.upstreamRepository}
               target="_blank"
               rel="noreferrer"
             >
-              Felipe Vidal
+              projeto original
+            </a>{" "}
+            de{" "}
+            <a href={first.url} target="_blank" rel="noreferrer">
+              {first.name}
             </a>
             {" e "}
-            <a
-              href="https://www.linkedin.com/in/robert-taveira/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Robert Taveira
+            <a href={second.url} target="_blank" rel="noreferrer">
+              {second.name}
             </a>
           </p>
           <nav className="footer-utilities" aria-label="Links do rodapé">
             {!compact && (
               <>
-                <a href={repository} target="_blank" rel="noreferrer">
-                  Projeto
+                <a
+                  href={PROGRAM.links.repository}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Código-fonte
                 </a>
-                <a href={template} target="_blank" rel="noreferrer">
+                <a href={PROGRAM.sheet.blankTemplateDocx} download>
                   Modelo em branco
                 </a>
               </>
             )}
             <button onClick={onHelp}>Ajuda</button>
-            <button onClick={onFeedback}>Avaliar</button>
+            {PROGRAM.links.feedbackForm && (
+              <button onClick={onFeedback}>Avaliar</button>
+            )}
           </nav>
         </div>
       </div>
