@@ -13,7 +13,7 @@ Registro de progresso da adaptação deste fork para o PET-SD UFG 2025–2027
 | E3 Folha oficial | feito | `feat: folha oficial no modelo do PET-SD` | `npm run test:e2e` (folha extensa: Carta paisagem, cabeçalho repetido, assinaturas e instruções no fim); aba "Folha oficial" → "Imprimir / salvar PDF" | ver "Diferenças que restam" |
 | E4 Testes e validação visual | feito | `test: cobertura do PET-SD e validação visual` | `npm run test:ui` (24) e `npm run test:e2e` (26); capturas em `docs/validation/pet-sd-20261117/` | diferenças listadas no README da validação |
 | E5 Documentação e limpeza | feito | `docs: documentação do fork PET-SD` | ler `README.md`, `AGENTS.md`, `docs/`; `git grep -i clima` só acha Créditos, este registro e fixtures de teste | — |
-| E6 Fechamento | não iniciado | | | |
+| E6 Fechamento | feito | `fix: teste do seletor de mês no celular e robustez da migração`, `docs: relatório final da adaptação para o PET-SD` | CI completo em clone limpo: lint, test:ui (25), typecheck, build, test:e2e (26) | ver "Antes de publicar" |
 
 ## Linha de base (antes de qualquer mudança, commit `8d6c9f9`)
 
@@ -187,3 +187,115 @@ em branco ao lado foi exportado pelo Word a partir desse `.docx`.
 | Instituições | pedido do Brunno: MS, UFG, SMS Goiânia | faixa de logos da ficha: + SES/Governo de Goiás; projeto: + SES e SMS Cidade de Goiás; regimento: + Ministério da Educação | faixa do modelo intacta; texto do app com MS, UFG e SMS Goiânia |
 | Frequência mínima | regimento: "100% (setenta e cinco por cento)" | — | não usada no app; registrada |
 | Carga | regimento: 32 h/mês | edital: 8 h semanais | meta mensal de 32 h; nota de 8 h/semana |
+
+## Relatório final
+
+### a) O que foi feito, por épico
+
+| Épico | Commit | Resumo |
+|---|---|---|
+| E0 | `4351a21` | linha de base (tudo verde), inventário, extração das fontes, perguntas |
+| E1 | `4872d4c` | `src/config/program.ts`; marca, ícone, rodapé, FAQ e textos lendo da config; faixa de logos da ficha; remoção do Forms do Clima e das imagens do Clima |
+| E2 | `ff366a6` | CH exata em minutos; campos Unidade/Local e Descrição; 13 GATs, 5 perfis, 2 modalidades e 7 modelos genéricos; chaves `_v3` com migração do `_v2`; cópia 1.3 |
+| E3 | `6a8c194` | `OfficialSheet` no modelo PET-SD (Carta paisagem, faixa repetida, 8 colunas, total, nota, assinaturas, instruções); modelo em branco .docx/.pdf gerado do oficial; e2e atualizado |
+| E4 | `401615b` | script de capturas, validação visual em `docs/validation/pet-sd-20261117/`, ajuste para o modelo em branco caber em 2 páginas |
+| E5 | `911a9e5` | README, AGENTS, GEMINI, CONTRIBUTING, docs e ADR reescritos; remoção do fluxo pessoal do autor original e dos scripts legados; LICENSE com o copyright do fork |
+| E6 | `af1083a` + este commit | CI completo em clone limpo; correção do teste do seletor de mês no celular; correções da revisão de código; relatório |
+
+### b) Por que das decisões não triviais
+
+- **Config central (ADR 0001).** Um único arquivo com o que identifica o programa
+  evita sobras do Clima e facilita outro PET reaproveitar o app. Custo: mais
+  conflito ao puxar do upstream.
+- **Remover o pré-preenchimento do Forms (D3)** em vez de só escondê-lo: o código
+  dependia dos IDs de campo e das opções do formulário do Clima (inclusive nomes
+  de pessoas); desligado, seria código morto com dados de terceiros.
+- **Somar minutos, não horas (D4).** `1/3 h` não tem representação exata em ponto
+  flutuante; somar inteiros garante que três atividades de 20 min deem 1 h.
+- **Chaves `_v3` com migração copiando, sem apagar (D11).** Mudaram os campos e os
+  nomes de perfis e modalidades; copiar e manter o `_v2` torna a migração
+  reversível e segura se algo falhar no meio.
+- **Faixa de logos numa tabela externa com `<thead>`.** É o jeito portátil de o
+  Chromium repetir um cabeçalho em cada página impressa, como o header do Word.
+- **Modelo em branco gerado por script (python-docx)** a partir da ficha oficial,
+  para herdar a formatação exata; o script limpa também `customXML` (ID do Google
+  Docs) e `docProps/custom.xml` (ID do Grammarly), que não aparecem no Word.
+- **Validação em clone limpo** no E6, para provar que o repositório não depende de
+  nada que só existe na sua máquina.
+
+### Achados do E6
+
+- **Teste instável que já existia na `main`.** Em clone limpo, o teste "seletor de
+  mês … funciona pelo teclado" falhava sempre no projeto mobile (também na `main`,
+  3/3). Causa: no celular emulado, o Enter abre a lista nativa do `<select>`, que
+  ficava aberta e recebia as teclas da iteração seguinte. O teste agora fecha a
+  lista com Escape (8/8 em repetição). Na cópia de trabalho ele passava por acaso
+  de tempo. A troca de mês também ficou síncrona sem rascunho pendente (defensivo).
+- **Revisão de código somente leitura (Gemini Argon high).** Das alegações, foram
+  confirmadas e corrigidas: perfis `_v3` malformados abortavam a migração; o nome do
+  GAT do programa anterior vazava para o perfil migrado; atividade só com sufixo de
+  modalidade virava texto vazio; a regex de horário aceitava 1 dígito; a folha não
+  calculava o total sem a prop. Não alteradas (comportamento herdado do original ou
+  fora do fluxo real): restauração não confere se a data está no mês da cópia;
+  excluir o último perfil no painel não encerra a sessão; o download alternativo da
+  cópia não zera o indicador de alterações.
+
+### c) Como reproduzir e verificar
+
+```bash
+git clone https://github.com/nukansec/pet-folha-mensal && cd pet-folha-mensal
+git switch feat/adaptacao-pet-sd
+npm ci && npx playwright install chromium
+npm run lint && npm run test:ui && npm run typecheck && npm run build && npm run test:e2e
+git grep -niE "clima|mangaba|araticum" -- ':!package-lock.json'   # só Créditos, este registro e fixtures
+npm run dev   # http://localhost:5000 → Primeiro acesso → lançar → Folha oficial → Imprimir
+```
+
+### d) Descrição pronta de PR
+
+**Título:** feat: adaptação para o PET-Saúde: Informação e Saúde Digital (PET-SD UFG)
+
+**O quê**
+- Dados do programa centralizados em `src/config/program.ts` (13 GATs, 5 perfis da
+  ficha, modalidades, meta de 32 h, prazo, links opcionais, textos da folha).
+- CH passa a ser a duração exata (`1h30`), somada em minutos.
+- Atividades ganham Unidade/Local e Descrição; chaves do navegador sobem para `_v3`
+  com migração não destrutiva do `_v2`; cópia de segurança 1.3 (lê 1.0–1.2).
+- Folha oficial reescrita como o "Registro de Frequência e Atividades – PET-SD"
+  (Carta paisagem); modelo em branco .docx/.pdf gerado do modelo oficial.
+- Remove o pré-preenchimento do Forms do Clima, imagens, modelos e documentos do
+  programa anterior e do fluxo pessoal do autor original; docs reescritas.
+
+**Por quê**
+O fork atende o PET-SD UFG, que tem outra ficha, outra regra de CH e outros GATs.
+
+**Como testar**
+`npm ci && npm run lint && npm run test:ui && npm run typecheck && npm run build && npm run test:e2e`;
+depois `npm run dev`, criar perfil, lançar atividades (ex.: 16:30–18:00 deve dar
+1h30), abrir "Folha oficial" e imprimir em PDF.
+
+**Onde revisar com atenção**
+- `src/lib/storage.ts`: `migrateFromV2`, `normalizeActivity`, `inspectUserData`.
+- `src/components/OfficialSheet.tsx` e o bloco "Folha oficial PET-SD" em
+  `src/app/globals.css`: comparar com o modelo (ver `docs/validation/pet-sd-20261117/`).
+- `src/config/program.ts`: textos, prazo e modalidades (há `TODO(pet-sd)`).
+- `public/templates/`: conferir que o modelo em branco não traz dado pessoal.
+
+### e) Dúvidas, divergências e TODO(pet-sd) restantes
+
+- Dúvidas: seção "Dúvidas para o Brunno" acima (7 itens, nenhum respondido até o fim da sessão).
+- Divergências: seção "Divergências entre fontes" acima.
+- `TODO(pet-sd)` no código: selo provisório em `src/app/icon.svg` e
+  `src/components/Brand.tsx`; prazo e links de formulários em `src/config/program.ts`.
+- A paleta de cores (verde) é herdada do projeto original; a faixa de logos e o
+  selo usam azul. Vale decidir com a coordenação.
+
+### f) Antes de publicar
+
+1. `git push -u origin feat/adaptacao-pet-sd` (só para o `origin`, seu fork; nunca para `upstream`).
+2. Abrir PR para a `main` do fork com a descrição acima e conferir o CI verde.
+3. Criar o projeto na Vercel a partir do fork e configurar `ADMIN_PIN_HASH` e
+   `ADMIN_SESSION_SECRET` (como gerar: `docs/deployment-vercel.md`).
+4. Aprovar a identidade visual (selo, cores, faixa de logos) com a coordenação do
+   GAT antes de divulgar, como pede o regimento.
+5. Responder às dúvidas acima e ajustar `src/config/program.ts`.
