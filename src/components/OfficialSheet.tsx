@@ -3,13 +3,13 @@
 import React from 'react';
 import { Activity, UserProfile } from '@/types';
 import { PROGRAM } from '@/config/program';
-import { formatDateBR, formatActivityForSheet, sortActivitiesChronologically } from '@/lib/pet-calculator';
+import { formatDateBR, formatTotalHours, sortActivitiesChronologically } from '@/lib/pet-calculator';
 
 interface OfficialSheetProps {
   user?: UserProfile;
   monthLabel?: string;
   activities?: Activity[];
-  totalHours?: number;
+  totalMinutes?: number;
   isBlankTemplate?: boolean;
 }
 
@@ -17,7 +17,7 @@ export function OfficialSheet({
   user,
   monthLabel = 'Setembro/2026',
   activities = [],
-  totalHours = 0,
+  totalMinutes = 0,
   isBlankTemplate = false
 }: OfficialSheetProps) {
   const sortedActivities = React.useMemo(
@@ -121,7 +121,7 @@ export function OfficialSheet({
                   {act.end}
                 </td>
                 <td className="border border-black px-2 py-1 text-left align-middle font-normal break-words">
-                  {formatActivityForSheet(act.description, act.modality)}
+                  {act.description} ({act.modality})
                 </td>
               </tr>
             ))}
@@ -142,7 +142,7 @@ export function OfficialSheet({
         {/* Total de Horas (exibido apenas quando preenchido para validação das 32h) */}
         {!isBlankTemplate && (
           <div className="text-[10pt] font-bold text-black mt-1 mb-2">
-            TOTAL: {totalHours} {totalHours === 1 ? "hora" : "horas"}
+            TOTAL: {formatTotalHours(totalMinutes)}
           </div>
         )}
 

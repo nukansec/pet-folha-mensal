@@ -144,7 +144,7 @@ export function ProfileModal({
             </div>
 
             <div className="field">
-              <label htmlFor="profilemodal-field-3">Função no PET</label>
+              <label htmlFor="profilemodal-field-3">Perfil</label>
               <select
                 id="profilemodal-field-3"
                 value={role}

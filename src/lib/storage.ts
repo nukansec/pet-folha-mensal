@@ -8,34 +8,84 @@ import {
   DEFAULT_ROLES,
   ActivityTemplate,
 } from "@/types";
+import { PROGRAM } from "@/config/program";
 import {
   calcPetHours,
+  calcPetMinutes,
   cleanActivityDescription,
   sortActivitiesChronologically,
 } from "./pet-calculator";
 
-const PROFILES_KEY = "pet_folha_profiles_v2";
-const ACTIVE_PROFILE_ID_KEY = "pet_folha_active_profile_id_v2";
-const ACTIVITIES_PREFIX = "pet_folha_activities_v2_";
-const GATS_KEY = "pet_folha_config_gats_v2";
-const ROLES_KEY = "pet_folha_config_roles_v2";
-const TEMPLATES_KEY = "pet_folha_config_templates_v2";
+// Sufixo _v3: atividades ganharam Unidade/Local e Descrição; modalidades e
+// perfis mudaram de nome. Os dados _v2 são copiados uma vez (migrateFromV2) e
+// as chaves antigas não são apagadas.
+const PROFILES_KEY = "pet_folha_profiles_v3";
+const ACTIVE_PROFILE_ID_KEY = "pet_folha_active_profile_id_v3";
+const ACTIVITIES_PREFIX = "pet_folha_activities_v3_";
+const GATS_KEY = "pet_folha_config_gats_v3";
+const ROLES_KEY = "pet_folha_config_roles_v3";
+const TEMPLATES_KEY = "pet_folha_config_templates_v3";
+const MIGRATION_KEY = "pet_folha_migrated_from_v2";
+const V2_PROFILES_KEY = "pet_folha_profiles_v2";
+const V2_ACTIVE_PROFILE_ID_KEY = "pet_folha_active_profile_id_v2";
+const V2_ACTIVITIES_PREFIX = "pet_folha_activities_v2_";
 
 export const DEFAULT_PROFILES: UserProfile[] = [];
 
-export const DEFAULT_TEMPLATES: ActivityTemplate[] = [
-  {
-    id: "tpl-1",
-    name: "Reunião do GAT {gatNumber} ({gatName})",
-    modality: "Síncrona virtual",
-    isGatSpecific: true,
-  },
-  {
-    id: "tpl-2",
-    name: "Reunião geral do PET",
-    modality: "Síncrona presencial",
-  },
-];
+export const DEFAULT_TEMPLATES: ActivityTemplate[] = PROGRAM.templates.map(
+  (template) => ({ ...template }),
+);
+
+/** Nomes antigos de modalidade (formato _v2 e cópias 1.0–1.2). */
+const LEGACY_MODALITIES: Record<string, string> = {
+  "Síncrona virtual": PROGRAM.modalities[0],
+  "Síncrona presencial": PROGRAM.modalities[0],
+  "Assíncrona virtual": PROGRAM.modalities[1] ?? PROGRAM.modalities[0],
+};
+
+/** Nomes antigos de perfil (formato _v2 e cópias 1.0–1.2). */
+const LEGACY_ROLES: Record<string, string> = {
+  Estudante: "Monitor(a)",
+  "Orientador de Serviço": "Orientador(a) de serviço",
+  Preceptor: "Preceptor(a)",
+  Tutor: "Tutor(a)",
+  "Coordenador de GAT": "Coordenador(a)",
+};
+
+const text = (value: unknown): string =>
+  typeof value === "string" ? value : "";
+
+export function normalizeModality(value: unknown): string {
+  const name = text(value).trim();
+  if (!name) return PROGRAM.modalities[0];
+  return LEGACY_MODALITIES[name] ?? name;
+}
+
+export function normalizeRole(value: unknown): string {
+  const name = text(value).trim();
+  return LEGACY_ROLES[name] ?? name;
+}
+
+/** Completa um registro salvo ou importado no formato atual. */
+export function normalizeActivity(raw: unknown): Activity {
+  const record =
+    typeof raw === "object" && raw !== null
+      ? (raw as Record<string, unknown>)
+      : {};
+  const start = text(record.start);
+  const end = text(record.end);
+  return {
+    id: text(record.id),
+    date: text(record.date),
+    start,
+    end,
+    modality: normalizeModality(record.modality),
+    description: cleanActivityDescription(text(record.description)),
+    local: text(record.local),
+    descricao: text(record.descricao),
+    hours: calcPetHours(start, end),
+  };
+}
 
 // ============================================================
 // FUNÇÕES DE NORMALIZAÇÃO E ANTI-DUPLICIDADE
@@ -46,7 +96,7 @@ export function normalizeName(name: string): string {
     .trim()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[̀-ͯ]/g, "")
     .replace(/\s+/g, " ");
 }
 
@@ -70,11 +120,137 @@ function removeLegacyPin(
 }
 
 // ============================================================
+// MIGRAÇÃO DO FORMATO _v2
+// ============================================================
+
+// Fingerprints dos cinco perfis de exemplo distribuídos pela versão original
+// (commit 208e663). Na migração, só são copiados se tiverem sido usados.
+const LEGACY_EXAMPLES = new Set([
+  "eb49f6bb",
+  "c5c2db38",
+  "85a70284",
+  "759ff299",
+  "78136f57",
+]);
+
+function isUntouchedLegacyExample(
+  profile: Record<string, unknown>,
+  activityKeys: string[],
+  activeId: string | null,
+): boolean {
+  if (profile.id === activeId) return false;
+  // Um campo extra ou qualquer chave de atividades indica uso do perfil.
+  if (
+    Object.keys(profile).some(
+      (key) =>
+        !["id", "name", "role", "gatNumber", "gatName", "createdAt", "email"].includes(key),
+    )
+  )
+    return false;
+  if (activityKeys.some((key) => key.startsWith(`${V2_ACTIVITIES_PREFIX}${profile.id}_`)))
+    return false;
+  const signature = JSON.stringify([
+    profile.id, profile.name, profile.role, profile.gatNumber,
+    profile.gatName, profile.createdAt, profile.email,
+  ]);
+  let hash = 2166136261;
+  for (let i = 0; i < signature.length; i++) {
+    hash = Math.imul(hash ^ signature.charCodeAt(i), 16777619);
+  }
+  return LEGACY_EXAMPLES.has((hash >>> 0).toString(16));
+}
+
+/**
+ * Copia perfis e atividades do formato _v2 para o _v3 uma única vez.
+ * Não apaga chaves _v2 e não sobrescreve chaves _v3 existentes.
+ * GATs, perfis e modelos personalizados no _v2 pertenciam ao programa anterior
+ * e não são copiados: o _v3 começa com os padrões de src/config/program.ts.
+ */
+export function migrateFromV2(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    if (localStorage.getItem(MIGRATION_KEY)) return false;
+    const keys = Array.from({ length: localStorage.length }, (_, i) =>
+      localStorage.key(i),
+    ).filter((key): key is string => typeof key === "string");
+    const activityKeys = keys.filter((key) => key.startsWith(V2_ACTIVITIES_PREFIX));
+    if (!keys.includes(V2_PROFILES_KEY) && activityKeys.length === 0) return false;
+
+    const activeId = localStorage.getItem(V2_ACTIVE_PROFILE_ID_KEY);
+    let legacyProfiles: unknown = [];
+    try {
+      legacyProfiles = JSON.parse(localStorage.getItem(V2_PROFILES_KEY) || "[]");
+    } catch {
+      legacyProfiles = [];
+    }
+    const migratedProfiles: UserProfile[] = (
+      Array.isArray(legacyProfiles) ? legacyProfiles : []
+    )
+      .filter(
+        (item): item is Record<string, unknown> =>
+          typeof item === "object" && item !== null &&
+          typeof item.id === "string" && typeof item.name === "string",
+      )
+      .filter((item) => !isUntouchedLegacyExample(item, activityKeys, activeId))
+      .map((item) => {
+        const profile = removeLegacyPin(item as unknown as UserProfile);
+        return { ...profile, role: normalizeRole(profile.role) };
+      });
+
+    let current: unknown = [];
+    try {
+      current = JSON.parse(localStorage.getItem(PROFILES_KEY) || "[]");
+    } catch {
+      current = [];
+    }
+    localStorage.setItem(
+      PROFILES_KEY,
+      JSON.stringify(
+        deduplicateProfiles([
+          ...(Array.isArray(current) ? (current as UserProfile[]) : []),
+          ...migratedProfiles,
+        ]),
+      ),
+    );
+    if (
+      activeId &&
+      !localStorage.getItem(ACTIVE_PROFILE_ID_KEY) &&
+      migratedProfiles.some((profile) => profile.id === activeId)
+    )
+      localStorage.setItem(ACTIVE_PROFILE_ID_KEY, activeId);
+
+    for (const key of activityKeys) {
+      const target = ACTIVITIES_PREFIX + key.slice(V2_ACTIVITIES_PREFIX.length);
+      if (localStorage.getItem(target) !== null) continue;
+      let records: unknown;
+      try {
+        records = JSON.parse(localStorage.getItem(key) || "[]");
+      } catch {
+        continue;
+      }
+      if (!Array.isArray(records)) continue;
+      const activities = records
+        .filter((item) => typeof item === "object" && item !== null)
+        .map(normalizeActivity);
+      localStorage.setItem(
+        target,
+        JSON.stringify(sortActivitiesChronologically(activities)),
+      );
+    }
+    localStorage.setItem(MIGRATION_KEY, new Date().toISOString());
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ============================================================
 // GESTÃO DE PERFIS (USUÁRIOS)
 // ============================================================
 
 export function getStoredProfiles(): UserProfile[] {
   if (typeof window === "undefined") return DEFAULT_PROFILES;
+  migrateFromV2();
   try {
     const data = localStorage.getItem(PROFILES_KEY);
     if (!data) {
@@ -106,47 +282,9 @@ export function saveProfiles(profiles: UserProfile[]): void {
   localStorage.setItem(PROFILES_KEY, JSON.stringify(clean));
 }
 
-// Fingerprints dos cinco exemplos distribuídos em 208e663. A filtragem é só
-// de apresentação: perfis e atividades nunca são apagados ou regravados aqui.
-const LEGACY_EXAMPLES = new Set([
-  "eb49f6bb",
-  "c5c2db38",
-  "85a70284",
-  "759ff299",
-  "78136f57",
-]);
-
+/** Perfis oferecidos na entrada. Exemplos antigos sem uso ficam fora na migração. */
 export function getProfilesForAccess(profiles: UserProfile[]): UserProfile[] {
-  if (typeof window === "undefined") return profiles;
-  try {
-    const activeId = localStorage.getItem(ACTIVE_PROFILE_ID_KEY);
-    const activityKeys = Array.from({ length: localStorage.length }, (_, i) =>
-      localStorage.key(i),
-    );
-    return profiles.filter((profile) => {
-      if (profile.id === activeId) return true;
-      // Um campo extra ou qualquer chave de atividades indica uso do perfil.
-      if (
-        Object.keys(profile).some((key) => ![
-          "id", "name", "role", "gatNumber", "gatName", "createdAt", "email",
-        ].includes(key))
-      ) return true;
-      if (
-        activityKeys.some((key) => key?.startsWith(`${ACTIVITIES_PREFIX}${profile.id}_`))
-      ) return true;
-      const signature = JSON.stringify([
-        profile.id, profile.name, profile.role, profile.gatNumber,
-        profile.gatName, profile.createdAt, profile.email,
-      ]);
-      let hash = 2166136261;
-      for (let i = 0; i < signature.length; i++) {
-        hash = Math.imul(hash ^ signature.charCodeAt(i), 16777619);
-      }
-      return !LEGACY_EXAMPLES.has((hash >>> 0).toString(16));
-    });
-  } catch {
-    return profiles;
-  }
+  return profiles;
 }
 
 export function getActiveProfile(): UserProfile | null {
@@ -326,7 +464,7 @@ export function updateGatInfo(oldNumber: string, updatedGat: GATInfo): void {
 }
 
 // ============================================================
-// GESTÃO DINÂMICA DE FUNÇÕES / ROLES (ADMIN)
+// GESTÃO DINÂMICA DE PERFIS / ROLES (ADMIN)
 // ============================================================
 
 export function getStoredRoles(): string[] {
@@ -360,7 +498,7 @@ export function updateRoleName(oldRole: string, newRole: string): void {
 }
 
 // ============================================================
-// GESTÃO DINÂMICA DE TEMPLATES DE ATIVIDADES (ADMIN)
+// GESTÃO DINÂMICA DE MODELOS DE ATIVIDADES (ADMIN)
 // ============================================================
 
 export function getStoredTemplates(): ActivityTemplate[] {
@@ -370,71 +508,21 @@ export function getStoredTemplates(): ActivityTemplate[] {
     if (!raw) return DEFAULT_TEMPLATES;
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_TEMPLATES;
-
-    // Migração de schema legado caso existam templates salvos anteriormente sem 'name'
-    const migrated: ActivityTemplate[] = parsed.map(
-      (item: unknown, idx: number) => {
-        const legacy =
-          typeof item === "object" && item !== null
-            ? (item as Record<string, unknown>)
-            : {};
-        const storedName = [
-          legacy.name,
-          legacy.descriptionTemplate,
-          legacy.description,
-        ].find(
-          (value): value is string =>
-            typeof value === "string" && value.trim().length > 0,
-        );
-        const name = storedName || `Atividade Modelo ${idx + 1}`;
-
-        const isGatSpecific =
-          Boolean(legacy.isGatSpecific) ||
-          name.includes("{gatNumber}") ||
-          name.includes("{gatLabel}") ||
-          name.toLowerCase().includes("reunião do gat");
-
-        const modality =
-          legacy.modality === "Síncrona presencial" ||
-          legacy.modality === "Assíncrona virtual"
-            ? legacy.modality
-            : "Síncrona virtual";
-
-        return {
-          id:
-            typeof legacy.id === "string" && legacy.id
-              ? legacy.id
-              : `tpl-${idx + 1}`,
-          name:
-            isGatSpecific && !name.includes("{gatNumber}")
-              ? "Reunião do GAT {gatNumber} ({gatName})"
-              : name,
-          modality,
-          isGatSpecific,
-        };
-      },
-    );
-
-    const filtered = migrated.filter((item) => {
-      const name = item.name.toLowerCase();
-      if (
-        name.includes("redcap") ||
-        name.includes("sustentabilidade") ||
-        name.includes("cavernas como arquivo") ||
-        name.includes("conselho federal de psicologia") ||
-        name.includes("síntese analítica")
-      ) {
-        return false;
-      }
-      return true;
+    return parsed.map((item: unknown, idx: number) => {
+      const stored =
+        typeof item === "object" && item !== null
+          ? (item as Record<string, unknown>)
+          : {};
+      const name = text(stored.name).trim() || `Atividade modelo ${idx + 1}`;
+      return {
+        id: text(stored.id) || `tpl-${idx + 1}`,
+        name,
+        modality: normalizeModality(stored.modality),
+        local: text(stored.local),
+        isGatSpecific:
+          Boolean(stored.isGatSpecific) || name.includes("{gatNumber}"),
+      };
     });
-
-    const result = filtered.length > 0 ? filtered : DEFAULT_TEMPLATES;
-    if (result.length !== parsed.length) {
-      localStorage.setItem(TEMPLATES_KEY, JSON.stringify(result));
-    }
-
-    return result;
   } catch {
     return DEFAULT_TEMPLATES;
   }
@@ -449,42 +537,38 @@ export function saveTemplates(templates: ActivityTemplate[]): void {
 // GERAÇÃO E CARREGAMENTO DE ATIVIDADES
 // ============================================================
 
+/** Exemplos fictícios para conhecer a folha; o participante substitui pelos reais. */
 export function generateSeedActivities(
   gatNumber: string,
   gatName: string,
-  monthKey: string = "2026-09",
+  monthKey: string,
 ): Activity[] {
   const templates = getStoredTemplates();
-
   const defaultSlots = [
-    { day: 8, start: "19:00", end: "21:00" },
-    { day: 10, start: "10:00", end: "12:00" },
-    { day: 11, start: "13:30", end: "17:30" },
-    { day: 21, start: "15:00", end: "19:20" },
-    { day: 17, start: "19:00", end: "20:07" },
-    { day: 16, start: "20:00", end: "21:27" },
-    { day: 22, start: "15:00", end: "16:00" },
-    { day: 22, start: "19:00", end: "20:40" },
+    { day: 3, start: "11:00", end: "13:00" },
+    { day: 4, start: "14:00", end: "15:30" },
+    { day: 5, start: "13:00", end: "14:00" },
+    { day: 10, start: "18:00", end: "20:00" },
+    { day: 12, start: "09:00", end: "11:00" },
+    { day: 17, start: "08:00", end: "12:00" },
+    { day: 19, start: "16:30", end: "18:00" },
   ];
-
   const generated = templates.map((tpl, index) => {
     const slot = defaultSlots[index % defaultSlots.length];
-    const dayStr = String(slot.day).padStart(2, "0");
-    const date = `${monthKey}-${dayStr}`;
-    const description = cleanActivityDescription(
-      tpl.name.replace("{gatNumber}", gatNumber).replace("{gatName}", gatName),
-    );
-    return {
+    return normalizeActivity({
       id: `act-seed-${index + 1}-${Date.now().toString(36).slice(-3)}`,
-      date,
+      date: `${monthKey}-${String(slot.day).padStart(2, "0")}`,
       start: slot.start,
       end: slot.end,
       modality: tpl.modality,
-      description,
-      hours: calcPetHours(slot.start, slot.end),
-    };
+      description: tpl.name
+        .replaceAll("{gatNumber}", gatNumber)
+        .replaceAll("{gatName}", gatName),
+      local: tpl.local,
+      descricao:
+        "Exemplo fictício. Substitua pela descrição da atividade realizada.",
+    });
   });
-
   return sortActivitiesChronologically(generated);
 }
 
@@ -493,20 +577,19 @@ export function getActivitiesForMonth(
   monthKey: string,
 ): Activity[] {
   if (typeof window === "undefined") return [];
+  migrateFromV2();
   const key = `${ACTIVITIES_PREFIX}${profileId}_${monthKey}`;
   try {
     const raw = localStorage.getItem(key);
-    if (!raw) {
-      // Apenas o perfil inicial de demonstração (felipe-vidal) recebe atividades semente automaticamente
-      if (monthKey === "2026-09" && profileId === "felipe-vidal") {
-        const initialActs = generateSeedActivities("04", "Mangaba", "2026-09");
-        saveActivitiesForMonth(profileId, monthKey, initialActs);
-        return initialActs;
-      }
-      return [];
-    }
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? sortActivitiesChronologically(parsed) : [];
+    return Array.isArray(parsed)
+      ? sortActivitiesChronologically(
+          parsed
+            .filter((item) => typeof item === "object" && item !== null)
+            .map(normalizeActivity),
+        )
+      : [];
   } catch {
     return [];
   }
@@ -519,8 +602,8 @@ export function loadSampleActivitiesForUser(
   const profiles = getStoredProfiles();
   const user = profiles.find((p) => p.id === profileId);
   const gats = getStoredGats();
-  const gatNumber = user?.gatNumber || "04";
-  const gatName = user?.gatName || gats[gatNumber]?.name || "PET";
+  const gatNumber = user?.gatNumber || PROGRAM.defaultGat;
+  const gatName = user?.gatName || gats[gatNumber]?.name || PROGRAM.acronym;
   const samples = generateSeedActivities(gatNumber, gatName, monthKey);
   saveActivitiesForMonth(profileId, monthKey, samples);
   return samples;
@@ -550,16 +633,21 @@ export function saveActivitiesForMonth(
 // EXPORTAÇÃO / IMPORTAÇÃO LOCAL
 // ============================================================
 
+/** 1.3: atividades com local e descricao. 1.0–1.2 continuam restaurando. */
+export const BACKUP_VERSION = "1.3";
+const SUPPORTED_VERSIONS = ["1.0", "1.1", "1.2", "1.3"];
+
 export function exportUserData(
   user: UserProfile,
   monthKey: string,
   attachments?: BackupAttachment[],
 ): string {
   const activities = getActivitiesForMonth(user.id, monthKey);
-  const includesReports = attachments !== undefined;
+  // Sem comprovantes informados, a cópia não leva o campo e a restauração
+  // preserva os comprovantes já salvos neste navegador.
   const data = {
-    version: includesReports ? "1.2" : "1.0",
-    attachments: includesReports ? (attachments ?? []) : undefined,
+    version: BACKUP_VERSION,
+    attachments,
     exportedAt: new Date().toISOString(),
     user: removeLegacyPin(user),
     monthKey,
@@ -593,7 +681,7 @@ const restoreMessages: Record<RestoreCode, string> = {
   INVALID_BACKUP:
     "A cópia está incompleta ou contém registros inválidos. Selecione outra cópia. Seus registros não foram alterados.",
   UNSUPPORTED_VERSION:
-    "Esta versão de cópia não é compatível. Use uma cópia no formato 1.0, 1.1 ou 1.2. Seus registros não foram alterados.",
+    "Esta versão de cópia não é compatível. Use uma cópia no formato 1.0 a 1.3. Seus registros não foram alterados.",
   PROFILE_CONFLICT:
     "Já existe um perfil com este nome e outra identificação neste navegador. Continue com o perfil local ou peça ajuda antes de restaurar.",
   STORAGE_FAILED:
@@ -615,6 +703,8 @@ const validDate = (value: unknown): value is string =>
   new Date(value).toISOString().slice(0, 10) === value;
 const validTime = (value: unknown): value is string =>
   typeof value === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+const optionalText = (value: unknown, max: number) =>
+  value === undefined || (typeof value === "string" && value.length <= max);
 
 // Validate the shared fields before any browser write. Files are validated separately.
 export function inspectUserData(jsonStr: string): RestoreResult {
@@ -626,9 +716,15 @@ export function inspectUserData(jsonStr: string): RestoreResult {
   }
   if (!data || typeof data !== "object")
     return restoreFailure("INVALID_BACKUP");
-  if (data.version !== undefined && data.version !== "1.0" && data.version !== "1.1" && data.version !== "1.2")
+  if (data.version !== undefined && !SUPPORTED_VERSIONS.includes(data.version))
     return restoreFailure("UNSUPPORTED_VERSION");
   if (["1.1", "1.2"].includes(data.version) && !Array.isArray(data.attachments))
+    return restoreFailure("INVALID_BACKUP");
+  if (
+    data.version === "1.3" &&
+    data.attachments !== undefined &&
+    !Array.isArray(data.attachments)
+  )
     return restoreFailure("INVALID_BACKUP");
   const profile = data.user;
   if (
@@ -651,42 +747,37 @@ export function inspectUserData(jsonStr: string): RestoreResult {
       !validDate(record.date) ||
       !validTime(record.start) ||
       !validTime(record.end) ||
-      record.end <= record.start ||
+      calcPetMinutes(record.start, record.end) <= 0 ||
       !nonempty(record.description) ||
-      ![
-        "Síncrona virtual",
-        "Síncrona presencial",
-        "Assíncrona virtual",
-      ].includes(record.modality)
+      !nonempty(record.modality) ||
+      record.modality.length > 120 ||
+      !optionalText(record.local, 300) ||
+      !optionalText(record.descricao, 4000)
     )
       return restoreFailure("INVALID_BACKUP");
     ids.add(record.id);
-    activities.push({
-      id: record.id,
-      date: record.date,
-      start: record.start,
-      end: record.end,
-      description: record.description,
-      modality: record.modality,
-      hours: calcPetHours(record.start, record.end),
-    });
+    // Cópias 1.2 podiam trazer "formReport" (Forms do programa anterior): ignorado.
+    activities.push(normalizeActivity(record));
   }
   const user: UserProfile = {
     id: profile.id,
     name: profile.name.trim(),
-    role: profile.role,
+    role: normalizeRole(profile.role),
     gatNumber: profile.gatNumber,
     createdAt: profile.createdAt,
   };
   if (typeof profile.gatName === "string") user.gatName = profile.gatName;
   if (typeof profile.email === "string") user.email = profile.email;
+  const hasAttachments =
+    ["1.1", "1.2"].includes(data.version) ||
+    (data.version === "1.3" && Array.isArray(data.attachments));
   return {
     success: true,
     code: "RESTORED",
     user,
     monthKey: data.monthKey,
     activities: sortActivitiesChronologically(activities),
-    ...(["1.1", "1.2"].includes(data.version) && { attachmentData: data.attachments }),
+    ...(hasAttachments && { attachmentData: data.attachments }),
   };
 }
 
@@ -768,7 +859,7 @@ export function getRestoreDiagnostic(code: RestoreCode): string {
     ? code
     : "INVALID_BACKUP";
   return JSON.stringify(
-    { operation: "restore_backup", code: safeCode, supportedSchema: "1.2" },
+    { operation: "restore_backup", code: safeCode, supportedSchema: BACKUP_VERSION },
     null,
     2,
   );

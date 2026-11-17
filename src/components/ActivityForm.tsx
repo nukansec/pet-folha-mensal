@@ -2,9 +2,11 @@
 
 import { useState, type FormEvent } from "react";
 import { Activity, ModalityType, ActivityTemplate } from "@/types";
+import { PROGRAM } from "@/config/program";
 import {
-  calcPetHours,
+  calcPetMinutes,
   cleanActivityDescription,
+  formatDuration,
   getCurrentMonth,
   getDefaultActivityDate,
 } from "@/lib/pet-calculator";
@@ -22,10 +24,22 @@ interface ActivityFormProps {
   onDirtyChange?: (dirty: boolean) => void;
 }
 
+export function fillTemplateName(
+  name: string,
+  gatNumber: string,
+  gatName?: string,
+) {
+  return cleanActivityDescription(
+    name
+      .replaceAll("{gatNumber}", gatNumber)
+      .replaceAll("{gatName}", gatName || `GAT ${gatNumber}`),
+  );
+}
+
 export function ActivityForm({
   onSave,
-  defaultGatNumber = "04",
-  defaultGatName = "Mangaba",
+  defaultGatNumber = PROGRAM.defaultGat,
+  defaultGatName,
   templates = [],
   monthKey = getCurrentMonth(),
   onDirtyChange,
@@ -33,11 +47,15 @@ export function ActivityForm({
   const [date, setDate] = useState(() => getDefaultActivityDate(monthKey));
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
-  const [modality, setModality] = useState<ModalityType>("Síncrona virtual");
+  const [modality, setModality] = useState<ModalityType>(
+    PROGRAM.modalities[0],
+  );
+  const [local, setLocal] = useState("");
   const [description, setDescription] = useState("");
+  const [descricao, setDescricao] = useState("");
   const [error, setError] = useState("");
   const [templateId, setTemplateId] = useState("");
-  const hours = calcPetHours(start, end);
+  const minutes = calcPetMinutes(start, end);
   const [year, month] = monthKey.split("-").map(Number);
   const lastDate = `${monthKey}-${new Date(year, month, 0).getDate()}`;
   function dirty() {
@@ -46,13 +64,13 @@ export function ActivityForm({
   }
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (!date.startsWith(monthKey) || !description.trim() || hours <= 0) {
+    if (!date.startsWith(monthKey) || !description.trim() || minutes <= 0) {
       setError(
         !date.startsWith(monthKey)
           ? "Escolha uma data no mês desta folha."
           : !description.trim()
-            ? "Descreva a atividade realizada."
-            : "A saída deve ser posterior à entrada.",
+            ? "Informe a atividade desenvolvida."
+            : "O fim deve ser posterior ao início.",
       );
       return;
     }
@@ -61,10 +79,13 @@ export function ActivityForm({
       start,
       end,
       modality,
+      local: local.trim(),
       description: cleanActivityDescription(description),
+      descricao: descricao.trim(),
     });
     if (saved !== false) {
       setDescription("");
+      setDescricao("");
       setTemplateId("");
       setError("");
       onDirtyChange?.(false);
@@ -94,13 +115,14 @@ export function ActivityForm({
                   );
                   if (template) {
                     setDescription(
-                      cleanActivityDescription(
-                        template.name
-                          .replaceAll("{gatNumber}", defaultGatNumber)
-                          .replaceAll("{gatName}", defaultGatName),
+                      fillTemplateName(
+                        template.name,
+                        defaultGatNumber,
+                        defaultGatName,
                       ),
                     );
                     setModality(template.modality);
+                    if (template.local) setLocal(template.local);
                     dirty();
                   }
                 }}
@@ -108,9 +130,11 @@ export function ActivityForm({
                 <option value="">Modelo rápido</option>
                 {templates.map((template) => (
                   <option key={template.id} value={template.id}>
-                    {template.name
-                      .replaceAll("{gatNumber}", defaultGatNumber)
-                      .replaceAll("{gatName}", defaultGatName)}
+                    {fillTemplateName(
+                      template.name,
+                      defaultGatNumber,
+                      defaultGatName,
+                    )}
                   </option>
                 ))}
               </select>
@@ -139,19 +163,21 @@ export function ActivityForm({
               id="activity-modality"
               value={modality}
               onChange={(event) => {
-                setModality(event.target.value as ModalityType);
+                setModality(event.target.value);
                 dirty();
               }}
             >
-              <option>Síncrona virtual</option>
-              <option>Síncrona presencial</option>
-              <option>Assíncrona virtual</option>
+              {Array.from(new Set([...PROGRAM.modalities, modality])).map(
+                (item) => (
+                  <option key={item}>{item}</option>
+                ),
+              )}
             </select>
           </div>
         </div>
         <div className="time-fields">
           <div className="field">
-            <label htmlFor="activity-start">Entrada</label>
+            <label htmlFor="activity-start">Início</label>
             <input
               id="activity-start"
               type="time"
@@ -165,7 +191,7 @@ export function ActivityForm({
             />
           </div>
           <div className="field">
-            <label htmlFor="activity-end">Saída</label>
+            <label htmlFor="activity-end">Fim</label>
             <input
               id="activity-end"
               type="time"
@@ -180,23 +206,51 @@ export function ActivityForm({
           </div>
           <div
             className="hours-preview"
-            title="Cada hora do relógio iniciada conta. Ex.: 13h30 às 17h30 = 5h."
+            title="CH exata entre início e fim. Ex.: 16h30 às 18h00 = 1h30."
           >
-            <span>Horas PET</span>
-            <strong>{hours}h</strong>
+            <span>CH</span>
+            <strong>{formatDuration(minutes)}</strong>
+          </div>
+        </div>
+        <div className="pair-fields">
+          <div className="field">
+            <label htmlFor="activity-local">Unidade/Local</label>
+            <input
+              id="activity-local"
+              placeholder="Ex.: unidade de saúde, sala, on-line ou -"
+              maxLength={300}
+              value={local}
+              onChange={(event) => {
+                setLocal(event.target.value);
+                dirty();
+              }}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="activity-description">Atividade desenvolvida</label>
+            <input
+              id="activity-description"
+              required
+              placeholder="Ex.: Reunião semanal do GAT"
+              value={description}
+              onChange={(event) => {
+                setDescription(event.target.value);
+                setTemplateId("");
+                dirty();
+              }}
+            />
           </div>
         </div>
         <div className="field">
-          <label htmlFor="activity-description">Atividade realizada</label>
+          <label htmlFor="activity-descricao">Descrição</label>
           <textarea
-            id="activity-description"
-            required
+            id="activity-descricao"
             rows={2}
-            placeholder="Descreva o que você realizou"
-            value={description}
+            maxLength={4000}
+            placeholder="Pautas, conteúdos estudados ou produtos da atividade"
+            value={descricao}
             onChange={(event) => {
-              setDescription(event.target.value);
-              setTemplateId("");
+              setDescricao(event.target.value);
               dirty();
             }}
           />

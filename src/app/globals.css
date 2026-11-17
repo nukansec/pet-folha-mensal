@@ -1575,6 +1575,17 @@ body {
   color: var(--muted);
   margin-top: 4px;
 }
+.record-detail {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.records-table small.record-detail {
+  display: -webkit-box;
+}
 .record-hours {
   font-variant-numeric: tabular-nums;
   font-weight: 600;

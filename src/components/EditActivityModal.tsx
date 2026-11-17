@@ -3,7 +3,13 @@
 import { Modal } from "./Modal";
 import React, { useState, useEffect } from "react";
 import { Activity, ModalityType, ActivityTemplate } from "@/types";
-import { calcPetHours, cleanActivityDescription } from "@/lib/pet-calculator";
+import { PROGRAM } from "@/config/program";
+import {
+  calcPetMinutes,
+  cleanActivityDescription,
+  formatDuration,
+} from "@/lib/pet-calculator";
+import { fillTemplateName } from "./ActivityForm";
 import { X, Calendar, Clock, Check, Edit3 } from "lucide-react";
 import { useDialog } from "@/context/DialogContext";
 
@@ -26,8 +32,8 @@ export function EditActivityModal({
   onClose,
   activity,
   onSave,
-  defaultGatNumber = "04",
-  defaultGatName = "Mangaba",
+  defaultGatNumber = PROGRAM.defaultGat,
+  defaultGatName,
   templates = [],
   monthKey,
 }: EditActivityModalProps) {
@@ -36,8 +42,10 @@ export function EditActivityModal({
   const [date, setDate] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
-  const [modality, setModality] = useState<ModalityType>("Síncrona virtual");
+  const [modality, setModality] = useState<ModalityType>(PROGRAM.modalities[0]);
   const [description, setDescription] = useState("");
+  const [local, setLocal] = useState("");
+  const [descricao, setDescricao] = useState("");
 
   useEffect(() => {
     if (activity) {
@@ -47,29 +55,31 @@ export function EditActivityModal({
       setEnd(activity.end);
       setModality(activity.modality);
       setDescription(cleanActivityDescription(activity.description));
+      setLocal(activity.local ?? "");
+      setDescricao(activity.descricao ?? "");
     }
   }, [activity, isOpen]);
 
   if (!isOpen || !activity) return null;
 
-  const previewHours = calcPetHours(start, end);
+  const previewMinutes = calcPetMinutes(start, end);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!description.trim()) {
       await alert({
-        title: "Descrição Obrigatória",
-        message: "Por favor, informe a descrição detalhada da atividade.",
+        title: "Atividade obrigatória",
+        message: "Informe a atividade desenvolvida.",
         variant: "warning",
       });
       return;
     }
 
-    if (previewHours <= 0) {
+    if (previewMinutes <= 0) {
       await alert({
         title: "Horário Inválido",
-        message: "O horário de saída deve ser posterior ao horário de entrada.",
+        message: "O fim deve ser posterior ao início.",
         variant: "warning",
       });
       return;
@@ -92,7 +102,9 @@ export function EditActivityModal({
         start,
         end,
         modality,
+        local: local.trim(),
         description: cleanDesc,
+        descricao: descricao.trim(),
       },
       activity.id,
     );
@@ -123,7 +135,7 @@ export function EditActivityModal({
             <div>
               <h3 className="text-base font-bold text-ink">Editar Atividade</h3>
               <p className="text-xs text-muted">
-                Atualize os horários, modalidade ou descrição do registro
+                Atualize horários, local, modalidade ou descrição do registro
               </p>
             </div>
           </div>
@@ -149,24 +161,11 @@ export function EditActivityModal({
                 if (!tplId) return;
                 const found = templates.find((t) => t.id === tplId);
                 if (found) {
-                  const rawName =
-                    found.name ||
-                    (
-                      found as ActivityTemplate & {
-                        descriptionTemplate?: string;
-                      }
-                    ).descriptionTemplate ||
-                    "";
-                  const finalTitle = cleanActivityDescription(
-                    rawName
-                      .replace("{gatNumber}", defaultGatNumber)
-                      .replace(
-                        "{gatName}",
-                        defaultGatName || `GAT ${defaultGatNumber}`,
-                      ),
+                  setDescription(
+                    fillTemplateName(found.name, defaultGatNumber, defaultGatName),
                   );
-                  setDescription(finalTitle);
                   setModality(found.modality);
+                  if (found.local) setLocal(found.local);
                 }
                 e.target.value = "";
               }}
@@ -176,30 +175,17 @@ export function EditActivityModal({
               <option value="" disabled>
                 Selecionar modelo...
               </option>
-              {templates.map((tpl) => {
-                const tplName =
-                  tpl?.name ||
-                  (tpl as ActivityTemplate & { descriptionTemplate?: string })
-                    ?.descriptionTemplate ||
-                  "Atividade";
-                const isGat =
-                  Boolean(tpl?.isGatSpecific) ||
-                  tplName.includes("{gatNumber}");
-                const label = isGat
-                  ? `Reunião do GAT ${defaultGatNumber} (${tpl.modality})`
-                  : `${tplName} (${tpl.modality})`;
-                return (
-                  <option key={tpl.id} value={tpl.id}>
-                    {label}
-                  </option>
-                );
-              })}
+              {templates.map((tpl) => (
+                <option key={tpl.id} value={tpl.id}>
+                  {fillTemplateName(tpl.name, defaultGatNumber, defaultGatName)} ({tpl.modality})
+                </option>
+              ))}
             </select>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Row 1: Data + Entrada + Saída + Duração */}
+          {/* Row 1: Data + Início + Fim + CH */}
           <div className="grid grid-cols-2 sm:grid-cols-[1.25fr_1fr_1fr_auto] gap-3 items-end">
             {/* Data */}
             <div>
@@ -227,13 +213,13 @@ export function EditActivityModal({
               </div>
             </div>
 
-            {/* Entrada */}
+            {/* Início */}
             <div>
               <label
                 htmlFor="editactivitymodal-wrapped-2"
                 className="block text-xs font-semibold text-body mb-1.5"
               >
-                Entrada
+                Início
               </label>
               <div className="relative flex items-center">
                 <input
@@ -253,13 +239,13 @@ export function EditActivityModal({
               </div>
             </div>
 
-            {/* Saída */}
+            {/* Fim */}
             <div>
               <label
                 htmlFor="editactivitymodal-wrapped-3"
                 className="block text-xs font-semibold text-body mb-1.5"
               >
-                Saída
+                Fim
               </label>
               <div className="relative flex items-center">
                 <input
@@ -284,9 +270,9 @@ export function EditActivityModal({
               className="col-span-2 sm:col-span-1 min-h-[44px] px-4 py-1 rounded-xl bg-canvas border border-line flex flex-col items-center justify-center leading-tight"
               aria-live="polite"
             >
-              <span className="text-[11px] font-medium text-muted">Duração</span>
+              <span className="text-[11px] font-medium text-muted">CH</span>
               <span className="text-sm font-bold text-accent whitespace-nowrap">
-                {previewHours} {previewHours === 1 ? "hora" : "horas"}
+                {formatDuration(previewMinutes)}
               </span>
             </div>
           </div>
@@ -296,78 +282,81 @@ export function EditActivityModal({
             <legend className="block text-xs font-semibold text-body mb-1.5">
               Modalidade
             </legend>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <button
-                type="button"
-                aria-pressed={modality === "Síncrona virtual"}
-                onClick={() => setModality("Síncrona virtual")}
-                className={`min-h-[42px] px-3 py-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                  modality === "Síncrona virtual"
-                    ? "bg-[#00A3E0]/15 border-info/50 text-info  font-semibold"
-                    : "bg-canvas border-line text-muted hover:text-body"
-                }`}
-              >
-                <span
-                  className={`size-2 rounded-full ${modality === "Síncrona virtual" ? "bg-[#00A3E0]" : "bg-line"}`}
-                />
-                <span>Síncrona Virtual</span>
-              </button>
-
-              <button
-                type="button"
-                aria-pressed={modality === "Síncrona presencial"}
-                onClick={() => setModality("Síncrona presencial")}
-                className={`min-h-[42px] px-3 py-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                  modality === "Síncrona presencial"
-                    ? "bg-info/10 border-info/50 text-info  font-semibold"
-                    : "bg-canvas border-line text-muted hover:text-body"
-                }`}
-              >
-                <span
-                  className={`size-2 rounded-full ${modality === "Síncrona presencial" ? "bg-info" : "bg-line"}`}
-                />
-                <span>Síncrona Presencial</span>
-              </button>
-
-              <button
-                type="button"
-                aria-pressed={modality === "Assíncrona virtual"}
-                onClick={() => setModality("Assíncrona virtual")}
-                className={`min-h-[42px] px-3 py-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                  modality === "Assíncrona virtual"
-                    ? "bg-info/10 border-info/50 text-info  font-semibold"
-                    : "bg-canvas border-line text-muted hover:text-body"
-                }`}
-              >
-                <span
-                  className={`size-2 rounded-full ${modality === "Assíncrona virtual" ? "bg-info" : "bg-line"}`}
-                />
-                <span>Assíncrona Virtual</span>
-              </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {Array.from(new Set([...PROGRAM.modalities, modality])).map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  aria-pressed={modality === item}
+                  onClick={() => setModality(item)}
+                  className={`min-h-[42px] px-3 py-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                    modality === item
+                      ? "bg-info/10 border-info/50 text-info font-semibold"
+                      : "bg-canvas border-line text-muted hover:text-body"
+                  }`}
+                >
+                  <span
+                    className={`size-2 rounded-full ${modality === item ? "bg-info" : "bg-line"}`}
+                  />
+                  <span>{item}</span>
+                </button>
+              ))}
             </div>
           </fieldset>
 
-          {/* Row 3: Descrição */}
+          {/* Row 3: Local + Atividade desenvolvida */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label
+                htmlFor="editactivitymodal-local"
+                className="block text-xs font-semibold text-body mb-1.5"
+              >
+                Unidade/Local
+              </label>
+              <input
+                id="editactivitymodal-local"
+                value={local}
+                maxLength={300}
+                onChange={(e) => setLocal(e.target.value)}
+                placeholder="Ex.: unidade de saúde, sala, on-line ou -"
+                className="w-full min-h-[44px] px-3 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-accent transition-colors"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="editactivitymodal-field-1"
+                className="block text-xs font-semibold text-body mb-1.5"
+              >
+                Atividade desenvolvida
+              </label>
+              <input
+                id="editactivitymodal-field-1"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+                placeholder="Ex.: Reunião semanal do GAT"
+                className="w-full min-h-[44px] px-3 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-accent transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Row 4: Descrição */}
           <div>
             <label
-              htmlFor="editactivitymodal-field-1"
+              htmlFor="editactivitymodal-descricao"
               className="block text-xs font-semibold text-body mb-1.5"
             >
-              Descrição da Atividade
+              Descrição
             </label>
             <textarea
-              id="editactivitymodal-field-1"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              id="editactivitymodal-descricao"
+              value={descricao}
+              maxLength={4000}
+              onChange={(e) => setDescricao(e.target.value)}
               rows={4}
-              required
-              placeholder="Ex: Reunião do GAT 04, Oficina formativa..."
+              placeholder="Pautas, conteúdos estudados ou produtos da atividade"
               className="w-full px-3.5 py-2.5 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-accent transition-colors resize-y min-h-[110px] max-h-[40vh] [field-sizing:content]"
             />
-            <p className="text-[11px] text-muted mt-1">
-              O tipo da atividade selecionado acima é incluído automaticamente
-              na Folha oficial.
-            </p>
           </div>
 
           {/* Footer Actions */}

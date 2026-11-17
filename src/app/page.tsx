@@ -37,6 +37,9 @@ import {
 import { restoreWithAttachments } from "@/lib/attachment-backup";
 import {
   calcPetHours,
+  calcPetMinutes,
+  formatDuration,
+  sumActivityMinutes,
   getMonthYearLabel,
   formatDateBR,
   cleanActivityDescription,
@@ -285,10 +288,10 @@ export default function Home() {
     if (!activeUser) return false;
     if (
       !data.date.startsWith(monthKey) ||
-      calcPetHours(data.start, data.end) <= 0
+      calcPetMinutes(data.start, data.end) <= 0
     ) {
       setStorageError(
-        "Confira a data e os horários: a atividade deve pertencer ao mês selecionado e a saída deve ser posterior à entrada.",
+        "Confira a data e os horários: a atividade deve pertencer ao mês selecionado e o fim deve ser posterior ao início.",
       );
       return false;
     }
@@ -323,7 +326,7 @@ export default function Home() {
     const confirmed = await confirm({
       title: "Excluir Atividade?",
       message: act
-        ? `Deseja realmente remover o registro "${cleanActivityDescription(act.description)}" de ${formatDateBR(act.date)} (${act.hours}h)?`
+        ? `Deseja realmente remover o registro "${cleanActivityDescription(act.description)}" de ${formatDateBR(act.date)} (${formatDuration(calcPetMinutes(act.start, act.end))})?`
         : "Deseja realmente remover esta atividade da sua folha mensal?",
       confirmText: "Sim, excluir",
       cancelText: "Cancelar",
@@ -679,7 +682,8 @@ export default function Home() {
     );
   }
 
-  const totalHours = activities.reduce((sum, act) => sum + act.hours, 0);
+  // Soma em minutos inteiros: CH exata sem erro de ponto flutuante.
+  const totalMinutes = sumActivityMinutes(activities);
   const monthLabel = getMonthYearLabel(monthKey);
 
   return (
@@ -722,7 +726,7 @@ export default function Home() {
             </div>
             {activeTab === "dashboard" && (
               <StatsGrid
-                totalHours={totalHours}
+                totalMinutes={totalMinutes}
                 activitiesCount={activities.length}
                 targetHours={PROGRAM.monthlyTargetHours}
               />
@@ -765,7 +769,7 @@ export default function Home() {
                 <ActivityTable
                   key={JSON.stringify([activeUser.id, monthKey])}
                   activities={activities}
-                  totalHours={totalHours}
+                  totalMinutes={totalMinutes}
                   editingId={editingActivity ? editingActivity.id : null}
                   onEdit={(act) => setEditingActivity(act)}
                   onDelete={handleDeleteActivity}
@@ -868,7 +872,7 @@ export default function Home() {
                     user={activeUser}
                     monthLabel={monthLabel}
                     activities={activities}
-                    totalHours={totalHours}
+                    totalMinutes={totalMinutes}
                     isBlankTemplate={showBlankTemplate}
                   />
                 </div>
@@ -990,7 +994,7 @@ export default function Home() {
           user={activeUser}
           monthLabel={monthLabel}
           activities={activities}
-          totalHours={totalHours}
+          totalMinutes={totalMinutes}
           isBlankTemplate={showBlankTemplate}
         />
       </div>

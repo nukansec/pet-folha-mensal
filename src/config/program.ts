@@ -27,20 +27,21 @@ export interface ProgramTemplate {
   isGatSpecific?: boolean;
 }
 
-const GAT_TITLES: Array<[string, string]> = [
-  ["2", "Sistema de alerta com IA para violências interpessoais e autoprovocadas"],
-  ["2 e 3", "Assistente Farmácia Viva: solução computacional para o Programa Farmácia Viva"],
-  ["1 e 2", "Telecuidado farmacoterapêutico em doenças crônicas"],
-  ["1, 2 e 3", "Formação, pesquisa, inovação e tecnologia na assistência à pessoa com câncer"],
-  ["1", "Letramento digital para a saúde com jovens da comunidade"],
-  ["3", "Gestão da informação em saúde: integração ensino-serviço para análise e uso de dados"],
-  ["1 e 2", "Cultura de saúde digital: controle social e políticas públicas de saúde"],
-  ["2 e 3", "Geotecnologias na prevenção e controle de arboviroses em Goiânia"],
-  ["2", "Saúde digital e telenefrologia na Atenção Primária à Saúde"],
-  ["2", "Teleambulatório de especialidades médicas (teleinterconsulta)"],
-  ["1 e 2", "Segunda opinião formativa em oftalmologia"],
-  ["1 e 2", "Saúde mental digital: RAPS e apoio a estudantes do ensino superior"],
-  ["2 e 3", "Teleodontologia: informação em saúde bucal na Rede de Atenção à Saúde"],
+// [eixos, rótulo curto, título] — Projeto institucional PET-SD UFG, "Descrição dos GATs".
+const GAT_LIST: Array<[string, string, string]> = [
+  ["2", "Alerta de violências com IA", "Sistema de alerta para situações de violências interpessoais e autoprovocadas em prontuário eletrônico utilizando inteligência artificial"],
+  ["2 e 3", "Farmácia Viva", "Assistente Farmácia Viva: solução computacional para auxiliar na operacionalização do Programa Farmácia Viva"],
+  ["1 e 2", "Telecuidado farmacoterapêutico", "Telecuidado farmacoterapêutico: monitoramento terapêutico e manejo de reações adversas em pacientes com doenças crônicas"],
+  ["1, 2 e 3", "Cuidado à pessoa com câncer", "Formação, pesquisa, inovação e tecnologia para assistência à pessoa com câncer"],
+  ["1", "Letramento digital", "Letramento digital para a saúde: engajando jovens da comunidade"],
+  ["3", "Gestão da informação em saúde", "Gestão da informação em saúde: integração ensino-serviço para análise e uso de dados por estudantes e trabalhadores do SUS"],
+  ["1 e 2", "Cultura de saúde digital", "Cultura de saúde digital: controle social e saúde digital no cenário das políticas públicas de saúde"],
+  ["2 e 3", "Geotecnologias e arboviroses", "Mapeando epidemias: geotecnologias na prevenção e controle de arboviroses no município de Goiânia"],
+  ["2", "Telenefrologia", "Saúde digital e telenefrologia na Atenção Primária à Saúde"],
+  ["2", "Teleambulatório", "Fomentar a criação de teleambulatório de especialidades médicas"],
+  ["1 e 2", "Segunda opinião em oftalmologia", "Produção de segunda opinião formativa em oftalmologia"],
+  ["1 e 2", "Saúde mental digital", "Saúde mental digital: fortalecimento da RAPS e apoio aos estudantes do ensino superior"],
+  ["2 e 3", "Teleodontologia", "Teleodontologia: registro da informação em saúde bucal e disponibilidade na Rede de Atenção à Saúde"],
 ];
 
 export const PROGRAM = {
@@ -93,10 +94,16 @@ export const PROGRAM = {
   defaultRole: "Monitor(a)",
 
   defaultGat: "01",
+  /** Eixos do Edital (item 1.4), usados no cadastro de GATs. */
+  axes: [
+    "Eixo 1: cultura de saúde digital, formação e educação permanente em saúde",
+    "Eixo 2: soluções tecnológicas e serviços de saúde digital no âmbito do SUS",
+    "Eixo 3: interoperabilidade, análise e disseminação de dados e informações de saúde",
+  ] as string[],
   gats: Object.fromEntries(
-    GAT_TITLES.map(([axis, description], index) => {
+    GAT_LIST.map(([axis, name, description], index) => {
       const number = String(index + 1).padStart(2, "0");
-      return [number, { number, name: `GAT ${number}`, axis: `Eixo ${axis}`, description }];
+      return [number, { number, name, axis: `Eixo ${axis}`, description }];
     }),
   ) as Record<string, ProgramGat>,
 

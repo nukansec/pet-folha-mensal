@@ -1,6 +1,7 @@
 "use client";
 
 import { Modal } from "./Modal";
+import { PROGRAM } from "@/config/program";
 import React, { useEffect, useState } from "react";
 import { UserProfile, GATInfo, ActivityTemplate, ModalityType } from "@/types";
 import {
@@ -49,6 +50,18 @@ type AdminAccessStatus =
   | "unconfigured"
   | "unavailable";
 
+const GAT_TEMPLATE_NAME = "Reunião semanal do GAT {gatNumber}";
+// Eixos do Edital (item 1.4); um GAT pode atuar em mais de um.
+const AXIS_OPTIONS = [
+  "Eixo 1",
+  "Eixo 2",
+  "Eixo 3",
+  "Eixo 1 e 2",
+  "Eixo 1 e 3",
+  "Eixo 2 e 3",
+  "Eixo 1, 2 e 3",
+];
+
 export function AdminModal({
   isOpen,
   onClose,
@@ -89,7 +102,7 @@ export function AdminModal({
   // Formulário de Edição / Novo GAT
   const [newGatNumber, setNewGatNumber] = useState("");
   const [newGatName, setNewGatName] = useState("");
-  const [newGatAxis, setNewGatAxis] = useState("Eixo I");
+  const [newGatAxis, setNewGatAxis] = useState("Eixo 1");
   const [newGatDesc, setNewGatDesc] = useState("");
   const [editingGatOriginalNumber, setEditingGatOriginalNumber] = useState<
     string | null
@@ -98,8 +111,10 @@ export function AdminModal({
 
   // Formulário de Edição / Novo Template (Sem datas nem horários!)
   const [newTplName, setNewTplName] = useState("");
-  const [newTplModality, setNewTplModality] =
-    useState<ModalityType>("Síncrona virtual");
+  const [newTplModality, setNewTplModality] = useState<ModalityType>(
+    PROGRAM.modalities[0],
+  );
+  const [newTplLocal, setNewTplLocal] = useState("");
   const [newTplGatSpecific, setNewTplGatSpecific] = useState(false);
   const [editingTemplate, setEditingTemplate] =
     useState<ActivityTemplate | null>(null);
@@ -215,8 +230,8 @@ export function AdminModal({
     if (!clean) return;
     if (roles.some((r) => r.toLowerCase() === clean.toLowerCase())) {
       await alert({
-        title: "Função Existente",
-        message: "Esta função já está cadastrada.",
+        title: "Perfil existente",
+        message: "Este perfil já está cadastrado.",
         variant: "warning",
       });
       return;
@@ -244,7 +259,7 @@ export function AdminModal({
     ) {
       await alert({
         title: "Nome Existente",
-        message: "Já existe outra função com este nome.",
+        message: "Já existe outro perfil com este nome.",
         variant: "warning",
       });
       return;
@@ -268,8 +283,8 @@ export function AdminModal({
 
   const handleDeleteRole = async (roleToDelete: string) => {
     const ok = await confirm({
-      title: "Excluir Função",
-      message: `Deseja realmente excluir a função "${roleToDelete}"?`,
+      title: "Excluir perfil",
+      message: `Deseja realmente excluir o perfil "${roleToDelete}"?`,
       confirmText: "Excluir",
       variant: "danger",
     });
@@ -305,8 +320,8 @@ export function AdminModal({
         number: num,
         name,
         fullName: `GAT ${num} (${name})`,
-        axis: newGatAxis.trim() || "Eixo I",
-        description: newGatDesc.trim() || `Grupo Tutorial ${num}`,
+        axis: newGatAxis.trim() || "Eixo 1",
+        description: newGatDesc.trim() || `GAT ${num}`,
       },
     };
 
@@ -396,7 +411,7 @@ export function AdminModal({
   const handleAddTemplate = (e: React.FormEvent) => {
     e.preventDefault();
     const cleanName = newTplGatSpecific
-      ? "Reunião do GAT {gatNumber} ({gatName})"
+      ? GAT_TEMPLATE_NAME
       : newTplName.trim();
 
     if (!cleanName) return;
@@ -405,6 +420,7 @@ export function AdminModal({
       id: `tpl-${Date.now().toString(36)}`,
       name: cleanName,
       modality: newTplModality,
+      local: newTplLocal.trim(),
       isGatSpecific: newTplGatSpecific,
     };
 
@@ -413,6 +429,7 @@ export function AdminModal({
     onTemplatesChange(updated);
 
     setNewTplName("");
+    setNewTplLocal("");
     setNewTplGatSpecific(false);
   };
 
@@ -428,7 +445,7 @@ export function AdminModal({
     if (!editingTemplate) return;
 
     const cleanName = editingTemplate.isGatSpecific
-      ? "Reunião do GAT {gatNumber} ({gatName})"
+      ? GAT_TEMPLATE_NAME
       : editingTemplate.name.trim();
 
     if (!cleanName) return;
@@ -463,7 +480,7 @@ export function AdminModal({
   const handleResetTemplates = async () => {
     const ok = await confirm({
       title: "Restaurar Modelos",
-      message: "Deseja restaurar os modelos padrão do Ministério da Saúde?",
+      message: "Deseja restaurar os modelos padrão do PET-SD?",
       confirmText: "Restaurar",
       variant: "warning",
     });
@@ -613,7 +630,7 @@ export function AdminModal({
                 }`}
               >
                 <Briefcase className="size-4" />
-                <span>Tipos / Funções ({roles.length})</span>
+                <span>Perfis ({roles.length})</span>
               </button>
               <button
                 onClick={() => setActiveTab("gats")}
@@ -624,7 +641,7 @@ export function AdminModal({
                 }`}
               >
                 <Layers className="size-4" />
-                <span>Grupos Tutoriais ({Object.keys(gats).length})</span>
+                <span>GATs ({Object.keys(gats).length})</span>
               </button>
               <button
                 onClick={() => setActiveTab("templates")}
@@ -671,7 +688,7 @@ export function AdminModal({
                       className="min-h-[46px] px-5 py-2.5 text-sm sm:text-base font-semibold rounded-xl bg-primary text-white hover:bg-[var(--primary-hover)] cursor-pointer flex items-center justify-center gap-2 transition-all shadow-[var(--page-shadow)]"
                     >
                       <Plus className="size-4" />
-                      <span>Adicionar Função</span>
+                      <span>Adicionar perfil</span>
                     </button>
                   </form>
 
@@ -730,20 +747,20 @@ export function AdminModal({
                           </div>
                           <div className="flex items-center gap-1.5">
                             <button
-                              aria-label="Editar nome da função"
+                              aria-label="Editar nome do perfil"
                               type="button"
                               onClick={() => handleStartEditRole(r)}
                               className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-accent hover:bg-raised cursor-pointer transition-colors"
-                              title="Editar nome da função"
+                              title="Editar nome do perfil"
                             >
                               <Edit2 className="size-4" />
                             </button>
                             <button
-                              aria-label="Excluir função"
+                              aria-label="Excluir perfil"
                               type="button"
                               onClick={() => handleDeleteRole(r)}
                               className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-danger hover:bg-raised cursor-pointer transition-colors"
-                              title="Excluir função"
+                              title="Excluir perfil"
                             >
                               <Trash2 className="size-4" />
                             </button>
@@ -838,15 +855,9 @@ export function AdminModal({
                             }
                             className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent cursor-pointer"
                           >
-                            <option value="Eixo I">
-                              Eixo I (Atenção Primária e SAN)
-                            </option>
-                            <option value="Eixo II">
-                              Eixo II (Atenção Especializada)
-                            </option>
-                            <option value="Eixo III">
-                              Eixo III (Comunicação e IA Preditiva)
-                            </option>
+                            {Array.from(new Set([...AXIS_OPTIONS, editingGat.axis])).map((axis) => (
+                              <option key={axis} value={axis}>{axis}</option>
+                            ))}
                           </select>
                         </div>
                       </div>
@@ -855,7 +866,7 @@ export function AdminModal({
                           htmlFor="adminmodal-field-4"
                           className="block text-xs sm:text-sm text-body font-medium mb-1.5"
                         >
-                          Descrição do Território / Foco
+                          Tema do GAT
                         </label>
                         <input
                           id="adminmodal-field-4"
@@ -947,15 +958,9 @@ export function AdminModal({
                           onChange={(e) => setNewGatAxis(e.target.value)}
                           className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent cursor-pointer"
                         >
-                          <option value="Eixo I">
-                            Eixo I (Atenção Primária e SAN)
-                          </option>
-                          <option value="Eixo II">
-                            Eixo II (Atenção Especializada)
-                          </option>
-                          <option value="Eixo III">
-                            Eixo III (Comunicação e IA Preditiva)
-                          </option>
+                          {Array.from(new Set([...AXIS_OPTIONS, newGatAxis])).map((axis) => (
+                            <option key={axis} value={axis}>{axis}</option>
+                          ))}
                         </select>
                       </div>
                     </div>
@@ -964,7 +969,7 @@ export function AdminModal({
                         htmlFor="adminmodal-field-8"
                         className="block text-xs sm:text-sm text-body font-medium mb-1.5"
                       >
-                        Descrição do Território / Foco
+                        Tema do GAT
                       </label>
                       <input
                         id="adminmodal-field-8"
@@ -1080,7 +1085,7 @@ export function AdminModal({
                             disabled={editingTemplate.isGatSpecific}
                             value={
                               editingTemplate.isGatSpecific
-                                ? "Reunião do GAT {gatNumber} ({gatName})"
+                                ? GAT_TEMPLATE_NAME
                                 : editingTemplate.name
                             }
                             onChange={(e) =>
@@ -1110,17 +1115,31 @@ export function AdminModal({
                             }
                             className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent cursor-pointer"
                           >
-                            <option value="Síncrona virtual">
-                              Síncrona virtual
-                            </option>
-                            <option value="Síncrona presencial">
-                              Síncrona presencial
-                            </option>
-                            <option value="Assíncrona virtual">
-                              Assíncrona virtual
-                            </option>
+                            {Array.from(new Set([...PROGRAM.modalities, editingTemplate.modality])).map((item) => (
+                              <option key={item} value={item}>{item}</option>
+                            ))}
                           </select>
                         </div>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="adminmodal-template-local"
+                          className="block text-xs sm:text-sm text-body font-medium mb-1.5"
+                        >
+                          Unidade/Local padrão
+                        </label>
+                        <input
+                          id="adminmodal-template-local"
+                          type="text"
+                          value={editingTemplate.local ?? ""}
+                          onChange={(e) =>
+                            setEditingTemplate({
+                              ...editingTemplate,
+                              local: e.target.value,
+                            })
+                          }
+                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent"
+                        />
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                         <label className="flex items-center gap-2 text-xs sm:text-sm text-body cursor-pointer">
@@ -1180,11 +1199,11 @@ export function AdminModal({
                           placeholder={
                             newTplGatSpecific
                               ? "Reunião do GAT (automática)"
-                              : "Ex: Oficina de Indicadores SISVAN, Seminário..."
+                              : "Ex.: Oficina, seminário, visita técnica..."
                           }
                           value={
                             newTplGatSpecific
-                              ? "Reunião do GAT {gatNumber} ({gatName})"
+                              ? GAT_TEMPLATE_NAME
                               : newTplName
                           }
                           onChange={(e) => setNewTplName(e.target.value)}
@@ -1206,17 +1225,27 @@ export function AdminModal({
                           }
                           className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent cursor-pointer"
                         >
-                          <option value="Síncrona virtual">
-                            Síncrona virtual
-                          </option>
-                          <option value="Síncrona presencial">
-                            Síncrona presencial
-                          </option>
-                          <option value="Assíncrona virtual">
-                            Assíncrona virtual
-                          </option>
+                          {Array.from(new Set([...PROGRAM.modalities, newTplModality])).map((item) => (
+                            <option key={item} value={item}>{item}</option>
+                          ))}
                         </select>
                       </div>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="adminmodal-new-template-local"
+                        className="block text-xs sm:text-sm text-body font-medium mb-1.5"
+                      >
+                        Unidade/Local padrão (opcional)
+                      </label>
+                      <input
+                        id="adminmodal-new-template-local"
+                        type="text"
+                        placeholder="Ex.: UFG, Google Meet ou -"
+                        value={newTplLocal}
+                        onChange={(e) => setNewTplLocal(e.target.value)}
+                        className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent"
+                      />
                     </div>
 
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
@@ -1261,6 +1290,9 @@ export function AdminModal({
                             <span className="text-accent font-medium">
                               {tpl.modality}
                             </span>
+                            {tpl.local && (
+                              <span className="ml-2 text-muted">• {tpl.local}</span>
+                            )}
                             {tpl.isGatSpecific && (
                               <span className="ml-2 text-info font-medium">
                                 • GAT Dinâmico

@@ -9,7 +9,7 @@ Registro de progresso da adaptação deste fork para o PET-SD UFG 2025–2027
 |---|---|---|---|---|
 | E0 Reconhecimento e linha de base | feito | `docs: inventário da adaptação para o PET-SD` | ler este arquivo | respostas às dúvidas abaixo |
 | E1 Identidade e textos | feito | `feat: identidade do PET-SD centralizada em config` | `npm run lint && npm run typecheck && npm run test:ui`; abrir `npm run dev` e ver marca, rodapé e FAQ | logo oficial (TODO(pet-sd)); links de Forms vazios |
-| E2 Domínio e regras | não iniciado | | | |
+| E2 Domínio e regras | feito | `feat: regras e cadastro do PET-SD` | `npm run test:ui` (testes de CH, soma do mês, migração v2→v3 e cópias 1.0–1.3) | confirmar modalidades e prazo |
 | E3 Folha oficial | não iniciado | | | |
 | E4 Testes e validação visual | não iniciado | | | |
 | E5 Documentação e limpeza | não iniciado | | | |
@@ -125,6 +125,18 @@ em `src`, `public`, `docs`, `tests`, `scripts` e raiz, mais leitura dos componen
   "PET-SD" provisório com `TODO(pet-sd)`.
 - **D9 — Remoções.** Arquivos do Clima e do fluxo pessoal do autor original saem
   com `git rm` (recuperáveis pelo histórico). Lista no relatório final.
+- **D11 — Migração v2→v3.** Perfis e atividades são copiados uma vez para as
+  chaves `_v3` (perfil antigo → perfil da ficha; modalidade antiga → modalidade
+  nova; `local` e `descricao` vazios; CH recalculada pela regra exata). As chaves
+  `_v2` ficam intactas. GATs, perfis e modelos personalizados no `_v2` eram do
+  programa anterior e não são copiados. Os perfis de exemplo da versão original
+  só são copiados se tiverem sido usados.
+- **D12 — Cópia de segurança 1.3.** Leva `local` e `descricao`. Cópias 1.0–1.2
+  restauram com esses campos vazios; o `formReport` das 1.2 é ignorado.
+- **D13 — Campos.** "Atividade desenvolvida" é obrigatória (campo `description`);
+  "Unidade/Local" e "Descrição" são opcionais. Rótulos "Início/Fim" como na ficha.
+- **D14 — GATs.** Rótulo curto criado a partir do título do projeto para caber no
+  seletor; título completo em `description`. Editáveis no painel local.
 - **D10 — Vigência.** Meses selecionáveis de ago/2025 a ago/2027 (cronograma do
   GAT; o edital fala em 24 meses a partir do início).
 

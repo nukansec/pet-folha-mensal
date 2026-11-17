@@ -2,13 +2,19 @@
 
 import { useState } from "react";
 import { Activity, UserProfile } from "@/types";
-import { cleanActivityDescription, formatDateBR } from "@/lib/pet-calculator";
+import {
+  calcPetMinutes,
+  cleanActivityDescription,
+  formatDateBR,
+  formatDuration,
+  formatTotalHours,
+} from "@/lib/pet-calculator";
 import { Pencil, Trash2, ListChecks } from "lucide-react";
 import { ConfirmModal } from "./ConfirmModal";
 
 interface ActivityTableProps {
   activities: Activity[];
-  totalHours: number;
+  totalMinutes: number;
   editingId: string | null;
   onEdit: (activity: Activity) => void;
   onDelete: (id: string) => void;
@@ -20,7 +26,7 @@ interface ActivityTableProps {
 
 export function ActivityTable({
   activities,
-  totalHours,
+  totalMinutes,
   editingId,
   onEdit,
   onDelete,
@@ -101,12 +107,16 @@ export function ActivityTable({
                   <time dateTime={activity.date}>
                     {formatDateBR(activity.date)}
                   </time>
-                  <strong>{activity.hours}h</strong>
+                  <strong>{formatDuration(calcPetMinutes(activity.start, activity.end))}</strong>
                 </div>
                 <h3>{cleanActivityDescription(activity.description)}</h3>
                 <p>
                   {activity.start} às {activity.end} · {activity.modality}
+                  {activity.local && <> · {activity.local}</>}
                 </p>
+                {activity.descricao && (
+                  <p className="record-detail">{activity.descricao}</p>
+                )}
                 {actions(activity)}
               </article>
             ))}
@@ -117,8 +127,9 @@ export function ActivityTable({
               <thead>
                 <tr>
                   <th>Data e horário</th>
+                  <th>Unidade/Local</th>
                   <th>Atividade</th>
-                  <th>Horas</th>
+                  <th>CH</th>
                   <th>
                     <span className="sr-only">Ações</span>
                   </th>
@@ -138,13 +149,19 @@ export function ActivityTable({
                         {activity.start} às {activity.end}
                       </small>
                     </td>
+                    <td>{activity.local || "-"}</td>
                     <td>
                       <strong>
                         {cleanActivityDescription(activity.description)}
                       </strong>
                       <small>{activity.modality}</small>
+                      {activity.descricao && (
+                        <small className="record-detail">{activity.descricao}</small>
+                      )}
                     </td>
-                    <td className="record-hours">{activity.hours}h</td>
+                    <td className="record-hours">
+                      {formatDuration(calcPetMinutes(activity.start, activity.end))}
+                    </td>
                     <td>{actions(activity)}</td>
                   </tr>
                 ))}
@@ -153,7 +170,7 @@ export function ActivityTable({
           </div>
           <div className="records-total">
             <span>Total do mês</span>
-            <strong>{totalHours}h</strong>
+            <strong>{formatTotalHours(totalMinutes)}</strong>
           </div>
         </>
       )}
