@@ -64,11 +64,12 @@ export function ActivityForm({
   }
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (!date.startsWith(monthKey) || !description.trim() || minutes <= 0) {
+    const activityName = cleanActivityDescription(description);
+    if (!date.startsWith(monthKey) || !activityName || minutes <= 0) {
       setError(
         !date.startsWith(monthKey)
           ? "Escolha uma data no mês desta folha."
-          : !description.trim()
+          : !activityName
             ? "Informe a atividade desenvolvida."
             : "O fim deve ser posterior ao início.",
       );
@@ -80,7 +81,7 @@ export function ActivityForm({
       end,
       modality,
       local: local.trim(),
-      description: cleanActivityDescription(description),
+      description: activityName,
       descricao: descricao.trim(),
     });
     if (saved !== false) {

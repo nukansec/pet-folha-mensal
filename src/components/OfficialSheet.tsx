@@ -5,6 +5,7 @@ import { Activity, UserProfile } from '@/types';
 import { PROGRAM } from '@/config/program';
 import {
   calcPetMinutes,
+  sumActivityMinutes,
   formatDayMonth,
   formatDuration,
   formatTotalHours,
@@ -49,7 +50,7 @@ export function OfficialSheet({
   user,
   monthLabel = '',
   activities = [],
-  totalMinutes = 0,
+  totalMinutes,
   isBlankTemplate = false,
 }: OfficialSheetProps) {
   const sortedActivities = React.useMemo(
@@ -59,6 +60,7 @@ export function OfficialSheet({
   const emptyRows = isBlankTemplate
     ? BLANK_ROWS
     : Math.max(1, MIN_FILLED_ROWS - sortedActivities.length);
+  const total = totalMinutes ?? sumActivityMinutes(sortedActivities);
   const role = isBlankTemplate ? '' : user?.role ?? '';
 
   return (
@@ -154,7 +156,7 @@ export function OfficialSheet({
                   <tr className="pet-sheet-total">
                     <td colSpan={COLUMNS.length}>
                       Total de CH no mês:{' '}
-                      {isBlankTemplate ? ' '.repeat(8) + ' horas' : formatTotalHours(totalMinutes)}
+                      {isBlankTemplate ? ' '.repeat(8) + ' horas' : formatTotalHours(total)}
                     </td>
                   </tr>
                 </tbody>

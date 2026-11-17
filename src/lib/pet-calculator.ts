@@ -8,7 +8,7 @@ import { PROGRAM } from "@/config/program";
  */
 export function calcPetMinutes(startTimeStr: string, endTimeStr: string): number {
   const toMinutes = (value: string) => {
-    const match = /^(\d{1,2}):(\d{2})$/.exec(value ?? "");
+    const match = /^(\d{2}):(\d{2})$/.exec(value ?? "");
     if (!match) return NaN;
     const hours = Number(match[1]);
     const minutes = Number(match[2]);

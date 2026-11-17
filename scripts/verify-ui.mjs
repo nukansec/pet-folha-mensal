@@ -116,6 +116,7 @@ test("fim igual ou anterior ao início e horários inválidos valem zero", () =>
   assert.equal(calcPetMinutes("25:00", "26:00"), 0);
   assert.equal(calcPetMinutes("aa:bb", "10:00"), 0);
   assert.equal(calcPetHours("18:00", "17:00"), 0);
+  assert.equal(calcPetMinutes("9:00", "10:00"), 0);
 });
 
 test("soma do mês em minutos e total no formato da ficha", () => {
@@ -251,6 +252,15 @@ test("migração v2 para v3 copia perfis e atividades, completa campos e preserv
   storage.saveActivitiesForMonth("pessoa-a", "2026-10", []);
   assert.equal(storage.migrateFromV2(), false);
   assert.deepEqual(storage.getActivitiesForMonth("pessoa-a", "2026-10"), []);
+});
+
+test("perfis v3 malformados não impedem a migração e o GAT antigo ganha o nome do PET-SD", () => {
+  const records = isolatedStorage();
+  records.set("pet_folha_profiles_v3", JSON.stringify([{}, null]));
+  records.set("pet_folha_profiles_v2", JSON.stringify([{ id: "p", name: "Pessoa Sintética", role: "Estudante", gatNumber: "01", gatName: "Antigo", createdAt: "2026-09-01T00:00:00.000Z" }]));
+  records.set("pet_folha_activities_v2_p_2026-10", JSON.stringify([{ id: "a", date: "2026-10-01", start: "10:00", end: "11:00", modality: "Assíncrona virtual", description: "Estudo" }]));
+  assert.deepEqual(storage.getStoredProfiles().map((p) => [p.id, p.gatName]), [["p", "Alerta de violências com IA"]]);
+  assert.equal(storage.getActivitiesForMonth("p", "2026-10").length, 1);
 });
 
 test("exemplo antigo com atividades ou ativo é migrado; navegador sem v2 não ganha marcador", () => {

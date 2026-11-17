@@ -500,6 +500,10 @@ test("seletor de mês mantém opções contrastantes nos dois temas e funciona p
       await month.press("Alt+ArrowDown");
       await page.screenshot({ path: testInfo.outputPath(`month-${theme}.png`) });
       await page.keyboard.press("Escape");
+    } else {
+      // No celular, o Enter abre a lista nativa do select; feche-a antes da
+      // próxima iteração, senão as teclas seguintes vão para a lista aberta.
+      await page.keyboard.press("Escape");
     }
   }
 });

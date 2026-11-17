@@ -67,7 +67,7 @@ export function EditActivityModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!description.trim()) {
+    if (!cleanActivityDescription(description)) {
       await alert({
         title: "Atividade obrigatória",
         message: "Informe a atividade desenvolvida.",

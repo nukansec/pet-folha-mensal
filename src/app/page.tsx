@@ -194,7 +194,10 @@ export default function Home() {
   };
 
   const changeMonth = async (value: string) => {
-    if (value === monthKey || !(await confirmDraft())) return;
+    if (value === monthKey) return;
+    // Sem rascunho, troca o mês no mesmo evento: o select é controlado e um
+    // await aqui faria o React restaurar o valor antigo até o estado mudar.
+    if (draftDirty && !(await confirmDraft())) return;
     setDraftDirty(false);
     setEditingActivity(null);
     setMonthKey(value);

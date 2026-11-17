@@ -194,7 +194,13 @@ export function migrateFromV2(): boolean {
       .filter((item) => !isUntouchedLegacyExample(item, activityKeys, activeId))
       .map((item) => {
         const profile = removeLegacyPin(item as unknown as UserProfile);
-        return { ...profile, role: normalizeRole(profile.role) };
+        // O nome do GAT no _v2 era do programa anterior: usa o do PET-SD.
+        const gatName = DEFAULT_GATS[text(profile.gatNumber)]?.name;
+        return {
+          ...profile,
+          role: normalizeRole(profile.role),
+          ...(gatName ? { gatName } : {}),
+        };
       });
 
     let current: unknown = [];
@@ -207,7 +213,13 @@ export function migrateFromV2(): boolean {
       PROFILES_KEY,
       JSON.stringify(
         deduplicateProfiles([
-          ...(Array.isArray(current) ? (current as UserProfile[]) : []),
+          ...(Array.isArray(current)
+            ? (current as unknown[]).filter(
+                (item): item is UserProfile =>
+                  typeof item === "object" && item !== null &&
+                  typeof (item as UserProfile).name === "string",
+              )
+            : []),
           ...migratedProfiles,
         ]),
       ),
