@@ -1,181 +1,79 @@
 # Interface e experiência de uso
 
-## Percurso entregue — 02/11/2026
+O percurso prioriza preencher a frequência em poucos passos, inclusive no
+celular: abrir perfil → escolher mês → lançar e revisar → conferir a folha →
+guardar a cópia (.json) e o PDF. A base da interface vem do projeto original;
+esta página descreve o estado do fork PET-SD.
 
-A prioridade é preencher a frequência com poucos passos, inclusive no celular:
-abrir perfil → escolher mês → lançar/revisar → conferir folha → guardar cópia e PDF.
-A direção e as referências estão no [plano](ui-ux-restructure-plan.md).
+## Entrada e retomada
 
-### Entrada e retomada sem JSON
+- “Continuar” lista os perfis guardados neste navegador; dá para abrir outro mês
+  sem restaurar arquivo. “Primeiro acesso” pede nome, **Perfil** (padrão
+  Monitor(a)) e **GAT** (padrão GAT 01). Navegador novo começa sem perfis.
+- Nome já cadastrado oferece “Continuar com este perfil”, sem recriar nem apagar
+  meses anteriores.
+- “Restaurar cópia” aceita o .json salvo pelo app (versões 1.0 a 1.3). O PDF não
+  restaura registros. A entrada explica, sem expansão, a diferença entre JSON e PDF.
+- Frame e Segmented Control foram adaptados de componentes de terceiros;
+  [origem e licença](THIRD-PARTY-UI.md).
 
-“Continuar” oferece um seletor dos perfis que permanecem neste navegador. O participante pode
-abrir outro mês sem restaurar o arquivo anterior. Primeiro acesso cria um perfil;
-novos navegadores começam sem participantes de exemplo. Uma tentativa com nome
-já cadastrado oferece “Continuar com este perfil”, mostrando a identificação
-existente, sem recriar, alterar sua função/GAT ou apagar os meses anteriores.
+## Minha frequência
 
-A restauração atende à troca de aparelho. A interface explica que os registros
-antigos dependem do navegador original ou da cópia .json; um PDF não os restaura.
-A entrada mostra, sem expansão, o que é o JSON, como salvar/restaurar e a
-finalidade distinta do PDF. A prévia demonstrativa foi removida. FAQ/ajuda
-continuam disponíveis. Frame e Segmented Control foram adaptados dos componentes
-nativos do Frequência Hub; [origem e licença](THIRD-PARTY-UI.md).
+- Mês, participante e GAT definem o contexto. O seletor cobre a vigência da
+  config (ago/2025 a ago/2027); um mês restaurado fora do intervalo continua
+  selecionável.
+- O resumo mostra a **CH do mês** (`21 horas`, `33h30`), o número de atividades e
+  quanto falta para o mínimo de 32 h. Não declara aptidão para envio.
+- O formulário tem Data, Modalidade, Início, Fim, CH calculada na hora,
+  Unidade/Local, Atividade desenvolvida (obrigatória) e Descrição. Modelos rápidos
+  preenchem atividade, modalidade e local.
+- A lista mostra data, horário, modalidade, local, CH e o início da descrição
+  (duas linhas). Editar e excluir têm nomes acessíveis; “Limpar mês” pede
+  confirmação; exemplos são opcionais e identificados como fictícios.
+- Formulário e lista ficam lado a lado quando há espaço e em uma coluna no celular.
 
-A versão antiga distribuía cinco perfis de exemplo. A entrada oculta somente
-as assinaturas originais intactas, sem chave de atividades e sem perfil ativo.
-Perfis editados, com campos extras ou qualquer chave de atividades (inclusive
-vazia ou inválida) continuam acessíveis. A filtragem não grava nem remove dados;
-o cadastro repetido ainda pode oferecer a retomada do perfil armazenado.
-Isso é uma apresentação local, sem diretório remoto. Qualquer pessoa que use o
-mesmo navegador pode abrir seus perfis, como informa a entrada.
-
-### Minha frequência
-
-Mês, participante e GAT definem o contexto. O mês inicial acompanha a data atual,
-limitado aos meses da vigência. A seleção cobre agosto/2026 a agosto/2028. Um mês
-válido restaurado fora desse intervalo continua selecionável, preservando a
-compatibilidade. A data inicial da atividade acompanha o mês escolhido. As opções dos seletores
-nativos definem fundo e texto com os tokens do tema, evitando texto claro sobre
-um popup claro no modo escuro.
-
-O resumo mostra horas, atividades e referência mensal aproximada de 32h. Não usa
-média por quatro semanas como validação semanal nem declara “Apta para envio”.
-O formulário mostra o cálculo PET antes de adicionar, oferece modelos opcionais
-e mantém o preenchimento diante de erro. Troca de mês/seção pede confirmação
-antes de descartar um formulário ainda não adicionado.
-
-Formulário e registros ficam lado a lado quando há espaço e em uma coluna no
-celular. A tabela usa quatro colunas; listas em cartões atendem espaços menores.
-Editar/excluir têm nomes acessíveis com a descrição do registro. Limpar mês exige
-confirmação; exemplos são opcionais e identificados como fictícios.
-
-### Tipografia e conforto
-
-A escala deriva da orientação `frontend-design-ultimate` e dos controles e
-formulários documentados no Frequência Hub, adaptados à identidade PET:
+## Tipografia e conforto
 
 | Uso | Tamanho |
 | --- | --- |
-| Texto principal, campos, rótulos e ações usuais | 16px |
-| Informações auxiliares, metadados e rodapé | Pelo menos 14px |
-| Navegação compacta no celular | 15–16px |
-| Títulos de blocos | 20–24px |
-| Título da área de trabalho | 28px |
+| Texto principal, campos, rótulos e ações | 16 px |
+| Informações auxiliares e rodapé | pelo menos 14 px |
+| Títulos de blocos | 20–24 px |
+| Título da área de trabalho | 28 px |
 
-A entrelinha do texto é de 1,5–1,65. As superfícies são claras ou grafite; a ação
-principal usa verde PET acessível. Contornos de campos são distintos das bordas
-estruturais. Foco visível, alvos de pelo menos 44×44px e movimento reduzido são
-preservados. A folha oficial mantém sua escala em pontos e entrelinha própria.
+Entrelinha de 1,5–1,65, temas claro e escuro, foco visível, alvos de pelo menos
+44×44 px e respeito a “reduzir movimento”. A folha oficial mantém a escala em
+pontos do modelo (Times New Roman 10 pt).
 
-### Cópia, restauração e conclusão
+## Folha oficial e impressão
 
-“Salvar cópia” produz o JSON para continuar editando e leva os comprovantes originais. “Imprimir / salvar PDF”
-abre a impressão da folha para assinatura. A conclusão distingue as duas ações e
-mantém confirmação de saída quando existem alterações sem cópia acionada.
-Em **Minha folha**, a seção opcional **Comprovantes** fica abaixo da prévia.
-Aceita PDFs, JPEGs e PNGs de até 20 MB por arquivo, com limite mensal de 40 MB
-e 30 páginas de comprovantes. A impressão mantém a folha oficial primeiro e
-acrescenta uma página A4 em paisagem para cada imagem ou página de PDF, na ordem
-da lista. As páginas de comprovantes saem como imagens. Assine o PDF completo.
-Restaurar uma cópia antiga preserva os comprovantes locais daquele mês.
+- A aba **Folha oficial** mostra a prévia do “Registro de Frequência e
+  Atividades – PET-SD” e alterna entre **Minha folha** e **Modelo em branco**
+  (com download do .docx e do PDF em branco).
+- Impressão em **Carta paisagem**, papel branco mesmo no tema escuro. A faixa de
+  logos se repete em cada página, a linha de títulos da tabela se repete nas
+  quebras, o bloco de nota e assinaturas não se divide e as instruções saem na
+  última página.
+- **Comprovação fotográfica** fica abaixo da prévia: fotos (JPEG, PNG) ou PDFs de
+  até 20 MB por arquivo, 40 MB e 30 páginas por mês, impressos depois da folha, na
+  ordem da lista.
 
-Os avisos descrevem a ação iniciada, sem afirmar que um download/PDF foi salvo
-quando o navegador não fornece essa confirmação.
+## Cópia, restauração e conclusão
 
-Antes da restauração, a interface mostra participante, mês, quantidade de
-atividades e o efeito da substituição. Todos os registros são validados antes
-de gravar. Colisão de nome com outro ID é recusada. A restauração recupera as
-escritas anteriores se uma etapa falhar; se a recuperação também falhar, informa
-isso explicitamente. Outros perfis e meses permanecem fora da operação.
+- “Salvar cópia” gera o .json com os comprovantes; “Imprimir / salvar PDF” abre a
+  impressão. O diálogo “Concluir” separa as duas ações e pede confirmação para
+  sair com alterações sem cópia.
+- A restauração mostra participante, mês e quantidade de atividades antes de
+  gravar, valida tudo antes e reverte escritas se uma etapa falhar. Os detalhes
+  de suporte não incluem conteúdo do arquivo.
+- Links de formulário do programa e de avaliação só aparecem se configurados em
+  `src/config/program.ts`.
 
-Erro exibe orientação e detalhes opcionais selecionáveis para suporte: operação,
-código permitido e formato suportado. Conteúdo, identificadores pessoais, nomes,
-atividades, horários e exceções brutas não entram nesse relatório. Não há envio
-automático. Edição de perfil/atividade conserva o diálogo e o preenchimento
-quando a gravação falha.
+## Verificação
 
-### Folha e impressão
-
-A folha oficial usa paginação automática em A4 paisagem, com assinaturas no final.
-A impressão força papel branco também
-quando a interface usa tema escuro. A prévia tem rolagem própria, sem alargar a
-página inteira.
-
-## Validação e limites
-
-Com Node 22 e instalação pelo lockfile:
-
-```text
-npm run test:ui
-npm run lint
-npm run build
-npm run typecheck
-npx playwright install chromium
-npm run test:e2e
-```
-
-A suíte local cobre cálculo, isolamento, formato de cópia, retomada sem JSON,
-validação antes de escrita, falha intermediária/recuperação e estrutura da UI.
-Playwright cobre o percurso real, download/restauração, edição/exclusão, foco,
-rascunhos, falha de armazenamento e conteúdo acima do limite de impressão, em
-Chromium desktop e celular emulado. A matriz inclui 360/390/768/1440px e os dois
-temas. HTML estático não é tratado como teste de interação.
-
-Resultados, capturas, PDFs e limites de homologação estão em
-[evidências da reestruturação](validation/ui-ux-20261102/README.md).
-O CI está preparado; sua primeira execução remota depende do push humano.
-Conferência física de smartphone, zoom real de 200% e impressora continuam
-pendentes. O piloto Maestri tem sua homologação própria e não bloqueia esta UI.
-
-## Referências
-
-- [Design do Frequência Hub](</mnt/hddw/Users/felip/Documents/GitHub/frequencia-hub/docs/UI-DESIGN.md>) e [formulários refinados](</mnt/hddw/Users/felip/Documents/GitHub/frequencia-hub/docs/validation/design-refinement/README.md>).
-- [Unslop, Damir Sokolovsky, revisão a6f121e](https://github.com/heydamir/unslop/blob/a6f121eee5f29c2f74976b75456feae8b66afb3a/skills/unslop/SKILL.md), CC BY 4.0: direção do produto e passes de refinamento adaptados ao PET.
-- [Referências Oracle](oracle-ci-logs-unslop.md) para CI e diagnóstico local.
-
-A impressão divide frequências extensas automaticamente em A4 paisagem. Os cabeçalhos da tabela se repetem nas páginas seguintes. O total e os campos de assinatura aparecem juntos somente no final da frequência, antes dos comprovantes. Na área de lançamentos há um lembrete com acesso ao formulário de cada atividade.
-
-## Formulário por atividade e novidades
-
-O botão "Forms" de cada atividade abre o modal "Enviar ao Forms": e-mail, grupo,
-perfil e tipo de atividade, mais as perguntas do tipo escolhido (local da visita,
-nome do evento, dados do curso EAD; em "Outros", a atividade vem com o nome
-registrado), atendimento a usuários do SUS, declaração e cópia por e-mail.
-O link pré-preenche todas as etapas do Forms oficial (campos mapeados em
-`src/lib/form-report.ts`, horários em `entry.X_hour/_minute`). O participante
-confere, resolve o CAPTCHA, anexa o certificado do curso EAD (se houver) e envia
-pelo Google. O resumo continua disponível para copiar.
-
-O envio só é confirmado quando a pessoa marca "Já enviei". A lista oferece filtro
-de pendências. Alterações nos dados da atividade ou na identificação após a
-confirmação mostram "Revisar envio". O preparo e a confirmação acompanham a
-cópia 1.2; respostas extras são opcionais e não invalidam confirmações antigas.
-Cópias 1.0 e 1.1 entram com os relatórios pendentes.
-
-## Layout em tela única
-
-No desktop (a partir de 1100 px de largura e 640 px de altura) a tela de
-lançamentos ocupa a janela sem rolar a página: barra superior em uma linha,
-resumo de horas na faixa do título, lembrete do formulário e "Conferir folha" em
-uma barra inferior. Só a lista de atividades rola, quando necessário. No celular
-a ordem é natural e a rolagem é esperada, com espaçamento compacto.
-
-## Peso dos comprovantes
-
-Páginas de comprovantes em PDF e fotos reduzidas para a página são geradas em
-JPEG a 80% com fundo branco, a ~150 dpi, em vez de PNG, para manter o PDF final
-abaixo dos 5 MB aceitos para assinatura. Fotos que já cabem na página não são
-recodificadas. O tamanho final não foi medido com comprovantes reais.
-
-Na entrada, Novidades apresenta a publicação mais recente e um histórico
-expansível antes das dúvidas frequentes. As datas vêm de publicações
-registradas em src/lib/releases.ts. A retomada de perfil é descrita como
-dados guardados no navegador.
-
-Validação de 07/11/2026 para Forms assistido: 22 testes locais, build e tipagem
-aprovados. Lint sem erros, com três avisos dos scripts legados. Os 24 casos
-de navegador pertinentes passaram em desktop e celular simulado, com checagem
-visual em 390 e 1440 px, nos dois temas. O teste legado do seletor de mês foi
-separado desta rodada; sua falha no mobile já foi reproduzida na versão anterior.
-O pré-preenchimento real foi conferido na primeira etapa do Forms, encerrando
-a verificação antes de avançar ou enviar respostas.
+- `npm run test:ui`: renderização dos componentes, rótulos de campos, folha
+  oficial (campos, perfis, 8 colunas, total, instruções), CSS de impressão.
+- `npm run test:e2e`: percurso completo em desktop e celular, temas, larguras de
+  360 a 1440 px, falhas de gravação, cópia e restauração, comprovantes, migração
+  do formato antigo e PDF de folha extensa em Carta paisagem.
+- Capturas e comparação com o modelo: [validation/pet-sd-20261117](validation/pet-sd-20261117/README.md).

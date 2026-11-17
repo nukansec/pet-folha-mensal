@@ -1,183 +1,110 @@
-# Arquitetura de Software: PET Folha Mensal
+# Arquitetura: PET-SD Folha Mensal
 
-Este documento detalha o desenho arquitetural, os princípios de engenharia, a modelagem de dados e as decisões técnicas que sustentam o **PET Folha Mensal**.
+## 1. Visão geral
 
----
+Aplicação Next.js 16 (App Router) de página única, renderizada no cliente
+(`"use client"` em `src/app/page.tsx`). É **local-first**: não há banco de dados
+nem backend de registros. O navegador guarda tudo e a folha oficial é impressa
+pelo próprio navegador via CSS `@media print`.
 
-## 1. Visão Geral e Paradigma
-
-A aplicação é construída com **Next.js 16 (App Router)** utilizando **React 19**, **TypeScript 5** e **Tailwind CSS v4**.
-
-O sistema adota o paradigma **Local-First**, fundamentado nas seguintes premissas:
-1. **Privacidade e Conformidade LGPD**: Os dados cadastrais dos participantes e os registros de atividades residem exclusivamente no armazenamento local do navegador (`localStorage`).
-2. **Disponibilidade e Resiliência**: O sistema opera plenamente sem depender de conexão permanente com bancos de dados relacionais na nuvem para leitura e escrita diária.
-3. **Portabilidade de Dados**: O usuário possui soberania total sobre suas informações, podendo exportar e importar a qualquer momento sua cópia de segurança estruturada em formato `.json`.
-
-```text
-┌────────────────────────────────────────────────────────────────────────┐
-│                        Next.js 16 App Router                           │
-├──────────────────────────┬─────────────────────────────────────────────┤
-│    Tela de Acesso        │             Painel Principal                │
-│    (LandingPage.tsx)     │            (Dashboard / Navbar)             │
-├──────────────────────────┼─────────────────────────────────────────────┤
-│  • Acesso Rápido         │  • Navbar (Mobile-First / Multiabas)        │
-│  • Seleção dos 5 GATs    │  • StatsGrid (Metas semanais / Progresso)   │
-│  • Funções do SUS        │  • ActivityForm (Templates rápidos por GAT) │
-│  • Modal de Registro     │  • ActivityTable (Cards Mobile vs. Tabela)  │
-│  • Cópia de Segurança    │  • ExitModal (Exportação JSON + PDF)        │
-├──────────────────────────┴─────────────────────────────────────────────┤
-│                          OfficialSheet.tsx                             │
-│       (Motor de Renderização e Impressão Nativa A4 Paisagem)           │
-├────────────────────────────────────────────────────────────────────────┤
-│                  Persistência e bloqueio de acesso                     │
-│ localStorage + IndexedDB + Route Handler (PIN) + cookie HttpOnly      │
-└────────────────────────────────────────────────────────────────────────┘
+```
+src/
+├── app/
+│   ├── layout.tsx            # metadados (da config), tema inicial, Vercel Analytics
+│   ├── page.tsx              # estado da sessão, lançamentos, cópia, impressão
+│   ├── icon.svg              # selo provisório PET-SD (TODO(pet-sd))
+│   ├── globals.css           # tokens de tema, layout e regras de impressão
+│   └── api/admin/session/    # única rota de servidor: sessão do painel local
+├── config/program.ts         # dados do programa (ver ADR 0001)
+├── components/               # telas, formulários, modais e folha oficial
+├── context/DialogContext.tsx # alert/confirm acessíveis
+├── lib/
+│   ├── pet-calculator.ts     # CH exata, formatação, datas e vigência
+│   ├── storage.ts            # localStorage (_v3), migração do _v2, cópia 1.3
+│   ├── attachments*.ts       # comprovantes (IndexedDB), PDF.js, impressão
+│   ├── admin-auth.ts         # hash da frase e sessão assinada (HMAC)
+│   └── releases.ts, theme.ts
+└── types/index.ts            # tipos e padrões derivados da config
 ```
 
----
+## 2. Configuração do programa
 
-## 2. Camadas do Sistema
+`src/config/program.ts` concentra nome, edital, instituições, vigência, meta (32 h),
+prazo exibido, modalidades, perfis, os 13 GATs, modelos rápidos, links opcionais
+e os textos da folha. `src/types/index.ts` deriva `DEFAULT_GATS` e
+`DEFAULT_ROLES` dela; `storage.ts` deriva `DEFAULT_TEMPLATES`. Decisão e
+trade-offs: [ADR 0001](adr/0001-config-central-do-programa.md).
 
-### 2.1. Interface de Usuário (`src/components/`)
+## 3. Modelo de dados
 
-- **`Navbar.tsx`**: Navegação em duas faixas com identificação, seções da folha, ajuda e configurações. As ações de salvar/restaurar cópia permanecem visíveis no computador e no celular.
-- **`LandingPage.tsx`**: Entrada com retomada dos perfis deste navegador, primeiro acesso e restauração. Perfil repetido oferece continuação explícita, preservando os meses existentes; novos navegadores não recebem perfis de exemplo. Prévia recolhida, FAQ e rodapé compartilhado.
-- **`StatsGrid.tsx`**: Resumo único com horas, quantidade de atividades e referência mensal aproximada. Não declara aptidão nem usa média mensal como comprovação da obrigação semanal.
-- **`ActivityForm.tsx`**: Formulário de inclusão de atividades, com cálculo instantâneo da regra de horas do PET, seleção de modalidade (Síncrona Virtual, Síncrona Presencial e Assíncrona Virtual) e templates dinâmicos por GAT.
-- **`ActivityTable.tsx`**: Componente híbrido inteligente:
-  - **Smartphone (`sm:hidden`)**: Renderiza uma lista de cartões empilhados completos, com touch targets mínimos de 44x44px (WCAG 2.5.5), texto legível sem zoom involuntário e ações de editar ou excluir.
-  - **Desktop (`hidden sm:block`)**: Apresenta a tabela tabular densa com 7 colunas (`Data`, `Entrada`, `Saída`, `Tipo`, `Descrição`, `Horas` e `Ações`), incluindo edição e exclusão com confirmação.
-- **`EditActivityModal.tsx`**: Modal de edição de lançamentos que recalcula as horas conforme a regra do PET antes de persistir a alteração.
-- **`OfficialSheet.tsx`**: Gabarito oficial de impressão compatível com as exigências da SGTES/Ministério da Saúde, com paginação automática em A4 paisagem e assinaturas no final (`@media print`).
-- **`MonthlyAttachments.tsx`**: Lista opcional de comprovantes vinculada ao perfil e mês. A impressão coloca as páginas de comprovantes após o gabarito oficial.
-- **`ExitModal.tsx`**: Fluxo de saída seguro e responsivo que incentiva o participante a baixar sua cópia de segurança em `.json` e gerar sua folha assinada em `.pdf` antes de encerrar a sessão, com confirmação explícita e uma única ação de download por vez.
-- **`AdminModal.tsx`**: Painel de configurações locais. Consulta a sessão no servidor antes de exibir a interface e informa que o bloqueio não transforma dados do `localStorage` em dados administrativos confiáveis.
-- **`FeedbackModal.tsx`**: Modal minimalista com atalho para o formulário oficial de avaliação do sistema, sugestões e envio de prints de bugs.
-
-### 2.2. Núcleo Lógico e Utilitários (`src/lib/`)
-
-- **`pet-calculator.ts`**: Implementa a regra matemática oficial do PET-Saúde:
-  $$\text{Duração} = \lceil \text{Saída} \rceil - \lfloor \text{Chegada} \rfloor$$
-  Contém também formatadores para datas no padrão brasileiro (`DD/MM/YYYY`) e rotulagem de meses de referência.
-- **`storage.ts`**: Camada de abstração do `localStorage`. Implementa:
-  - Isolamento de dados por perfil de usuário e por mês (`pet_folha_activities_v2_${userId}_${monthKey}`).
-  - Leitura de cópias 1.0, 1.1 e 1.2 e exportação no formato 1.2 pelo app, com validação antes da restauração (`inspectUserData`, `importUserData`), com confirmação na interface, preservação de registros em falhas recuperáveis e diagnóstico local sem conteúdo pessoal.
-  - Remoção automática do campo legado `pin` dos perfis armazenados e importados.
-  - Suporte a templates e funções dinâmicas.
-- Os comprovantes são gravados como arquivos originais no IndexedDB, por perfil e mês. O JSON 1.2 leva os bytes em Base64. Na restauração, a gravação de comprovantes é abortada se o `localStorage` falhar. Se a transação de comprovantes abortar, as escritas locais são revertidas.
-- **`admin-auth.ts` + `/api/admin/session`**: Camada exclusivamente server-side que valida `ADMIN_PIN_HASH` com comparação constante, emite sessão assinada de 8 horas em cookie `HttpOnly`, `SameSite=Strict` e falha de forma fechada quando a configuração está ausente.
-- **`theme.ts`**: Hook `useTheme` que controla os modos `dark` e `light` via atributo `data-theme` na raiz do documento e chave `pet_theme` no storage.
-
----
-
-## 3. Modelo de Dados (`src/types/index.ts`)
-
-```typescript
-export type UserRole =
-  | 'Estudante'
-  | 'Orientador de Serviço'
-  | 'Preceptor'
-  | 'Tutor'
-  | 'Coordenador de GAT';
-
-export type ModalityType =
-  | 'Síncrona virtual'
-  | 'Síncrona presencial'
-  | 'Assíncrona virtual';
-
-export interface UserProfile {
-  id: string;
-  name: string;
-  email?: string;
-  role: UserRole;
-  gatNumber: string; // '01' a '05'
-  gatName?: string;
-  createdAt: string;
+```ts
+interface UserProfile {
+  id: string; name: string; email?: string;
+  role: string;            // um dos perfis da ficha (editável no painel)
+  gatNumber: string;       // "01".."13"
+  gatName?: string; createdAt: string;
 }
 
-export interface Activity {
+interface Activity {
   id: string;
-  date: string; // YYYY-MM-DD
-  start: string; // HH:MM
-  end: string; // HH:MM
-  modality: ModalityType;
-  description: string;
-  hours: number;
-}
-
-export interface ActivityTemplate {
-  id: string;
-  name: string;
-  modality: ModalityType;
-  isGatSpecific?: boolean;
-}
-
-export interface GATInfo {
-  number: string;
-  name: string;
-  axis: string;
-  color: string;
+  date: string;            // YYYY-MM-DD
+  start: string; end: string;  // HH:MM
+  modality: string;        // PROGRAM.modalities
+  description: string;     // coluna "Atividade Desenvolvida"
+  local: string;           // coluna "Unidade/Local" ("" se não se aplica)
+  descricao: string;       // coluna "Descrição"
+  hours: number;           // minutos/60, mantido por compatibilidade
 }
 ```
 
----
+## 4. Cálculo de carga horária
 
-## 4. Segurança e Privacidade
+`calcPetMinutes(início, fim)` devolve a diferença exata em minutos (0 se o fim
+não for posterior ao início ou se o horário for inválido). O total do mês é
+`sumActivityMinutes`, uma soma de inteiros: somar horas decimais acumularia erro
+de ponto flutuante (três atividades de 20 min = 0,333… h cada). A exibição usa
+`formatDuration` (`2h`, `1h30`) e `formatTotalHours` (`34 horas`, `33h30`).
 
-1. **PIN fora do bundle**: O hash e o segredo de sessão usam variáveis sem o prefixo `NEXT_PUBLIC_` e são lidos apenas por código marcado como `server-only`. Não existe hash padrão embutido.
-2. **Sessão do painel**: O endpoint `/api/admin/session` valida o PIN no servidor, compara hashes em tempo constante, restringe requisições mutáveis à mesma origem e mantém a sessão em cookie assinado e `HttpOnly`. Parâmetros de URL não concedem acesso.
-3. **Limite de confiança**: O painel altera somente o `localStorage` do navegador. A sessão reduz acesso casual à interface, mas não impede o proprietário do navegador de editar dados, scripts, backups ou folhas. Autoridade institucional real exige persistência, autenticação e autorização server-side sobre cada mutação.
-4. **Zero Rastreamento Invasivo**: A telemetria de uso é fornecida pelo `@vercel/analytics`, que opera de maneira puramente estatística sem uso de cookies e sem coleta de IP ou dados identificáveis.
-5. **Contenção de Viewport**: A interface implementa proteção estrita contra overflow horizontal (`overflow-x: hidden; max-width: 100vw;`) e dimensões fluidas, garantindo que navegadores móveis (Safari iOS e Chrome Android) mantenham a escala correta `1:1`.
+## 5. Armazenamento
 
-## Refinamento de interface (31/10/2026)
+| Onde | Chave | Conteúdo |
+|---|---|---|
+| localStorage | `pet_folha_profiles_v3` | perfis |
+| localStorage | `pet_folha_active_profile_id_v3` | perfil aberto |
+| localStorage | `pet_folha_activities_v3_<perfil>_<AAAA-MM>` | atividades do mês |
+| localStorage | `pet_folha_config_{gats,roles,templates}_v3` | personalizações do painel |
+| localStorage | `pet_folha_migrated_from_v2` | marca da migração |
+| IndexedDB | `pet-folha-comprovantes` | comprovantes por perfil e mês |
 
-A interface usa tokens semânticos e componentes compartilhados de marca, rodapé e ajuda. Os modais utilizam o elemento nativo `dialog`, e o tema é sincronizado com `useSyncExternalStore`, preservando a preferência no navegador. Não há alteração de contratos de dados nem de autenticação. Consulte [ui-ux.md](ui-ux.md) para detalhes e verificação.
+**Migração `_v2` → `_v3`** (`migrateFromV2`, chamada na primeira leitura):
+copia perfis e atividades uma única vez, troca perfis e modalidades antigos
+pelos da ficha, preenche `local` e `descricao` com `""` e recalcula a CH. Não
+apaga as chaves `_v2` e não sobrescreve chaves `_v3` existentes, então um erro
+na migração não perde dados. Personalizações de GATs, perfis e modelos do
+programa anterior não são copiadas.
 
+**Cópia de segurança** (`exportUserData`/`inspectUserData`/`applyUserData`):
+JSON versão `1.3` com perfil, mês, atividades e, opcionalmente, comprovantes em
+base64. Versões 1.0–1.2 continuam aceitas (campos novos vazios; o `formReport`
+das 1.2 é ignorado). A validação completa acontece antes de qualquer escrita, e
+a restauração é transacional: se uma escrita falha, as anteriores são revertidas.
 
-## Reestruturação do percurso (02/11/2026)
+## 6. Folha oficial e impressão
 
-A entrada permite continuar sem JSON quando o perfil permanece neste navegador.
-As áreas centrais são Minha frequência e Folha oficial. Datas acompanham o mês
-selecionado; a lista de meses cobre agosto/2026 a agosto/2028 e mantém visível
-um mês válido de backup legado fora desse intervalo. O cálculo canônico e a
-leitura de cópias 1.0 permanecem.
+`OfficialSheet.tsx` reproduz o modelo do PET-SD. Uma tabela externa com `<thead>`
+contém a faixa de logos, que o navegador repete no topo de cada página impressa
+(como o cabeçalho do Word); a tabela de atividades também repete a linha de
+títulos. As larguras das oito colunas vêm do `w:gridCol` do `.docx` oficial. A
+página é `@page { size: letter landscape }`. Os comprovantes são rasterizados no
+cliente (PDF.js para PDFs) e entram como páginas depois da folha.
 
-A importação valida todos os registros antes de escrever, recusa colisão de nome
-com ID diferente e registra os valores anteriores das três chaves afetadas.
-Falha intermediária tenta recuperar as escritas já concluídas; falha dessa
-recuperação é anunciada separadamente. Há teste das duas situações. O relatório
-opcional contém somente operação, código permitido e versão suportada, sem envio
-remoto. O estado React só confirma uma gravação concluída.
+## 7. Segurança e privacidade
 
-A camada de leitura usa texto principal/campos em 16px e auxiliares a partir de
-14px. A tipografia do documento mantém tamanhos em pontos e entrelinha própria.
-A paginação automática permite distribuir o conteúdo pelo espaço
-A4 disponível, preservando os registros para revisão. Resultado de impressão ou
-download acionado não é apresentado como confirmação de arquivo salvo.
-
-O CI está definido em `.github/workflows/ci.yml`, com Node 22, instalação pelo
-lockfile, lint, testes, build, tipagem e percurso Playwright. A documentação de
-[UI/UX](ui-ux.md) concentra as evidências e limites de homologação.
-
-A impressão divide frequências extensas automaticamente em A4 paisagem. Os cabeçalhos da tabela se repetem nas páginas seguintes. O total e os campos de assinatura aparecem juntos somente no final da frequência, antes dos comprovantes. Na área de lançamentos há um lembrete com acesso ao formulário de cada atividade.
-
-## Preparo do Forms e histórico de publicações
-
-form-report.ts centraliza o endereço oficial, os identificadores da primeira
-etapa, as opções e a montagem do link. Os identificadores e o preenchimento
-foram conferidos no formulário respondente em 07/11/2026. Nome precisa
-corresponder à grafia da lista oficial. As próximas etapas variam com o tipo
-de atividade e são preenchidas pelo participante no Google.
-
-Activity.formReport é opcional. Contém grupo, perfil e tipo escolhidos.
-A confirmação manual guarda data e uma representação ordenada dos dados
-da atividade e identificação. A comparação com os valores atuais determina
-Enviado, Pendente ou Revisar envio. Editar uma atividade preserva esses metadados.
-Os links preenchidos são gerados na ação do participante, sem persistência
-da URL. O site não recebe confirmação de envio do Google.
-
-A restauração 1.2 valida o preparo e os campos da confirmação antes de gravar.
-Versões anteriores são lidas sem confirmação de relatório.
-ReleaseNotes usa uma lista estática de publicações em releases.ts, com datas
-explícitas no fuso de São Paulo.
+- Nenhum registro sai do navegador. A rota `/api/admin/session` só compara o hash
+  SHA-256 da frase com `ADMIN_PIN_HASH` (comparação em tempo constante) e emite um
+  cookie de sessão assinado com `ADMIN_SESSION_SECRET` por 8 horas. Sem as duas
+  variáveis, o painel fica fechado. O painel protege contra acesso casual; os
+  dados continuam no navegador de quem usa.
+- Detalhes de suporte da restauração são uma lista fixa de campos, sem conteúdo
+  do arquivo nem exceções brutas.
+- O repositório é público: testes, exemplos e capturas usam dados fictícios.

@@ -8,8 +8,8 @@ licença MIT, crédito coss.com / Cal.com e contribuidores. A implementação no
 PET usa elementos HTML nativos, tokens existentes e controles de 44 px.
 
 O [Unslop de Damir](https://github.com/heydamir/unslop/blob/a6f121eee5f29c2f74976b75456feae8b66afb3a/skills/unslop/SKILL.md),
-CC BY 4.0, orienta a retirada de promoção e prévia fictícia na entrada; referências
-canônicas em `oracle-ci-logs-unslop.md`. Nenhum pacote desse catálogo foi instalado.
+CC BY 4.0, orientou a retirada de promoção e prévia fictícia na entrada no projeto
+original. Nenhum pacote desse catálogo foi instalado.
 
 ## Aviso MIT
 

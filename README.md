@@ -1,247 +1,125 @@
-# PET-Saúde Clima: Folha de Frequência Mensal
+# PET-SD UFG: Folha de Frequência Mensal
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Next.js-16.3-black?style=flat&logo=next.js" alt="Next.js">
-  <img src="https://img.shields.io/badge/React-19.2-61DAFB?style=flat&logo=react" alt="React">
-  <img src="https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC?style=flat&logo=tailwind-css" alt="Tailwind CSS">
-  <img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat&logo=typescript" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Deploy-Vercel-black?style=flat&logo=vercel" alt="Vercel">
-  <img src="https://img.shields.io/badge/Edital-SGTES%2FMS%20nº%2023%2F2026-008D4C?style=flat" alt="Edital SGTES/MS">
-  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
-</p>
+Aplicação web para registrar as atividades do mês e gerar o **Registro de
+Frequência e Atividades – PET-SD** do PET-Saúde: Informação e Saúde Digital
+(PET-SD) da UFG, edição 2025–2027 (Edital Conjunto SEIDIGI/SGTES-MS nº 1/2025).
 
----
+A folha gerada reproduz o modelo oficial do programa: faixa de logomarcas,
+identificação com perfil marcado, oito colunas (Data, Unidade/Local, Atividade
+Desenvolvida, Início, Fim, CH, Modalidade e Descrição), total de CH, nota de
+prazo, assinaturas e página de instruções, em papel Carta na horizontal.
 
-<p align="center">
-  <strong>Aplicação web oficial de gestão de dedicação, acompanhamento de metas e emissão da folha de frequência mensal em formato A4 Paisagem para os bolsistas e participantes do PET-Saúde Clima UFG.</strong>
-</p>
+> Este repositório é um fork adaptado do projeto original feito para o
+> PET-Saúde Clima. Veja [Créditos](#créditos).
 
-<p align="center">
-  <a href="https://pet-folha-mensal.vercel.app" target="_blank"><strong>Acessar Aplicação Online (Vercel)</strong></a> &bull;
-  <a href="https://docs.google.com/forms/d/e/1FAIpQLSfIxvavW_gq0xCUb6qx7VKK-I9tYino158tsCrNCO6IZ1Wf-A/viewform" target="_blank"><strong>Avaliação e Sugestões (Forms)</strong></a> &bull;
-  <a href="#documentacao-do-projeto"><strong>Documentação Técnica</strong></a>
-</p>
+## O que o app faz
 
----
+- Cadastro local do participante (nome, perfil e GAT) e retomada sem arquivo no
+  mesmo navegador.
+- Lançamento de atividades com data, horários, Unidade/Local, modalidade,
+  atividade desenvolvida e descrição; modelos rápidos para atividades recorrentes.
+- Cálculo da carga horária (CH) exata e acompanhamento da meta de 32 h no mês.
+- Prévia e impressão da folha oficial (Imprimir / salvar PDF) e modelo em branco
+  em `.docx` e PDF.
+- Comprovação fotográfica: fotos ou PDFs anexados saem nas páginas seguintes da folha.
+- Cópia de segurança em `.json` para continuar em outro aparelho.
 
-## Sobre o Projeto PET-Saúde Clima
+## Regras de carga horária (CH)
 
-O **PET-Saúde: Clima** (13ª Edição do Programa de Educação pelo Trabalho para a Saúde, regulamentado pelo **Edital SGTES/MS nº 23/2026** e Chamamento Público nº 16/2026) é uma iniciativa interinstitucional e interprofissional que integra a **Secretaria Municipal de Saúde de Goiânia (SMS Goiânia)** como proponente principal, a **Secretaria Estadual de Saúde de Goiás (SES Goiás)** e a **Universidade Federal de Goiás (UFG)**.
+Fonte: Regimento Interno do PET-SD/UFG e o modelo oficial da ficha. Resumo em
+[docs/regimento-pet.md](docs/regimento-pet.md).
 
-O projeto reúne estudantes de graduação, orientadores de serviço, preceptores da rede pública e tutores acadêmicos com foco no fortalecimento do Sistema Único de Saúde (SUS) diante das mudanças climáticas no Cerrado brasileiro.
+- **CH = duração exata** entre início e fim, em minutos, sem arredondar:
+  16:30–18:00 = `1h30`; 11:00–13:00 = `2h`; 18:00–19:00 = `1h`.
+- Fim igual ou anterior ao início não é aceito (CH = 0).
+- O total do mês soma minutos e aparece como `34 horas` ou `33h30`.
+- Mínimo de **32 h no mês**; o excedente **não** passa para o mês seguinte.
+- Atividades presenciais e in loco exigem registro fotográfico.
+- O rodapé da folha reproduz o prazo do modelo (1º dia útil do mês seguinte). O
+  prazo exibido no app é configurável (padrão: dia 19) e ainda precisa ser
+  confirmado com a coordenação; ver [docs/adaptacao-pet-sd.md](docs/adaptacao-pet-sd.md).
 
-* **Vigência**: 24 meses (03/08/2026 a 02/08/2028).
-* **Coordenação Geral**: SMS Goiânia (Gerência de Planejamento e Projetos da DPP).
-* **Canal Oficial**: `petsaudeufg.smsgoiania@gmail.com`.
-* **Referenciais Normativos**: **AdaptaSUS** (Plano Clima Adaptação 2025-2035), **Plano de Ação em Saúde de Belém (BHAP)** (COP30), **Programa Brasil Saudável** (Decreto Federal nº 11.908/2024) e **Guia de Bolso de Mudanças Climáticas** (Ministério da Saúde, 2ª ed. 2026).
+## Como rodar
 
----
-
-## Estrutura Operacional dos 5 GATs
-
-A atuação territorial e formativa está organizada em 5 Grupos Tutoriais de Aprendizagem (GATs), distribuídos em três eixos estratégicos:
-
-```text
-PET-Saúde Clima (SMS Goiânia · SES Goiás · UFG)
-│
-├── Eixo I: Cuidado no Território e Vigilância Socioambiental
-│   ├── GAT 1 (Araticum): Segurança Alimentar e Nutricional (SAN), SISVAN/TRIA, hortas e feiras agroecológicas na APS.
-│   └── GAT 2 (Buriti): Vigilância socioambiental territorial, impactos psicossociais e apoio à RAPS.
-│
-├── Eixo II: Atenção Especializada e Assistência Integral
-│   └── GAT 3 (Ipê-amarelo): Cuidado farmacêutico, assistência em eventos extremos e resiliência da cadeia de frio.
-│
-└── Eixo III: Comunicação, Inovação e Vigilância Preditiva
-    ├── GAT 4 (Mangaba): Comunicação inclusiva (LIBRAS, Braille, audiodescrição), educação popular e podcast em saúde.
-    └── GAT 5 (Pequi): Vigilância preditiva com inteligência artificial para antecipação de zoonoses e arboviroses.
-```
-
----
-
-## Dores Resolvidas e Propósito da Aplicação
-
-Historicamente, o controle mensal de frequência em projetos acadêmicos e do SUS sofre com planilhas manuais quebradas, fórmulas arrastadas de forma incorreta e inconsistências na formatação de impressão. 
-
-O **PET Folha Mensal** foi desenvolvido para solucionar esses problemas de forma definitiva:
-
-1. **Cálculo Matemático Automatizado do PET**:
-   Aplica com precisão a regra editalícia do Ministério da Saúde: cada hora iniciada computa uma hora inteira de dedicação:
-   $$\text{Horas Computadas} = \lceil \text{Saída} \rceil - \lfloor \text{Chegada} \rfloor$$
-   *Exemplos*:
-   - 14:00 às 15:30 = **2 horas**
-   - 13:30 às 17:30 = **5 horas**
-   - 19:00 às 20:40 = **2 horas**
-2. **Monitoramento da Meta Semanal e Mensal**:
-   Acompanhamento visual em tempo real da meta de **8 horas semanais** (totalizando ~32 horas mensais obrigatórias), sinalizando o status da folha (*Em Preenchimento* ou *Apta para Envio*).
-3. **Fidelidade Normativa em PDF Oficial (A4 Paisagem)**:
-   Motor de renderização e impressão que produz a Folha Oficial do Ministério da Saúde em exatamente **1 página A4 Paisagem**, contendo o cabeçalho tríplice ministerial, campos de dados cadastrais, tabela de atividades e linhas de assinatura do bolsista e do orientador/coordenador.
-4. **Respeito à LGPD e Paradigma Local-First**:
-   Todos os dados de lançamentos, nomes e perfis residem exclusivamente no navegador do participante (`localStorage`). Nenhuma informação de presença ou dado sensível transita por servidores externos.
-
----
-
-## Recursos da Aplicação
-
-- **Autenticação Multiusuário sem Burocracia**: Seleção rápida de perfil ou cadastro instantâneo por Nome, Função no SUS e GAT (01 a 05).
-- **Interface Mobile-First Ergonômica**:
-  - Em telas de smartphone (`< 640px`), os lançamentos são exibidos em cards empilhados completos, com toque mínimo de 44x44px (WCAG 2.5.5) e texto legível sem zoom involuntário.
-  - Em computadores e tablets (`>= 640px`), apresenta a tabela tabular densa com colunas completas.
-- **Modelos Pré-Configurados por GAT**: Preenchimento rápido em um clique de atividades recorrentes (reuniões tutoradas de GAT, reuniões gerais do PET, oficinas formativas e estudos de campo).
-- **Painel de Configurações Locais com Sessão Server-Side**: O PIN é validado fora do bundle e a sessão usa cookie assinado `HttpOnly`. Esse bloqueio limita acesso casual à interface; os dados no `localStorage` continuam sob controle do próprio navegador.
-- **Cópia de Segurança (.json)**: Exportação e importação manual instantânea do banco de dados local para troca de aparelho ou guarda de histórico.
-- **Alternador de Temas Anti-Fadiga**: Modos **Gentle Dark** e **Soft Light** com conforto óptico para preenchimento noturno e ícones nativos adaptados.
-- **Canal de Avaliação e Feedback**: Acesso direto ao formulário oficial de sugestões, relatos de bugs e avaliação geral da plataforma.
-- **Telemetria com Privacidade**: Integração com `@vercel/analytics` sem cookies, respeitando a privacidade dos usuários.
-
----
-
-## Tecnologias Utilizadas
-
-- **Framework Web**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack, React Server Components)
-- **Biblioteca de Interface**: [React 19](https://react.dev/)
-- **Estilização e Design System**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Tipagem Estática**: [TypeScript 5](https://www.typescriptlang.org/)
-- **Ícones**: [Lucide React](https://lucide.dev/)
-- **Hospedagem e Edge Network**: [Vercel](https://vercel.com/)
-- **Telemetria Responsável**: [@vercel/analytics](https://vercel.com/analytics)
-
----
-
-## Como Executar Localmente
-
-### Pré-requisitos
-- Node.js 22 (versão definida em `.nvmrc`)
-- Gerenciador de pacotes npm
-
-### Passos de Instalação
+Requisitos: Node.js 22 (veja `.nvmrc`) e npm.
 
 ```bash
-# 1. Clonar o repositório
-git clone https://github.com/vvvvvdal/pet-folha-mensal.git
-cd pet-folha-mensal
-
-# 2. Usar a versão de Node do projeto e instalar pelo lockfile
-nvm use
 npm ci
-
-# 3. Opcional: habilitar o painel de configurações
-cp .env.example .env.local
-# Preencha ADMIN_PIN_HASH e ADMIN_SESSION_SECRET conforme as instruções do arquivo.
-
-# 4. Iniciar o servidor de desenvolvimento
-npm run dev
-
-# 5. Acessar no navegador
-# Abra http://localhost:5000
+npm run dev        # http://localhost:5000
 ```
 
----
+| Script | O que faz |
+|---|---|
+| `npm run dev` | servidor de desenvolvimento na porta 5000 |
+| `npm run build` / `npm start` | build de produção e servidor na porta 5000 |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run test:ui` | testes unitários (Node test runner, sem navegador) |
+| `npm run test:e2e` | testes de navegador (Playwright, desktop e celular) |
 
-## Gates de Validação e Qualidade
+Antes do primeiro `test:e2e`: `npx playwright install chromium`.
 
-Antes de qualquer entrega ou submissão para deploy, execute os comandos de verificação:
+## Privacidade
+
+- **Local-first.** Perfis, atividades e configurações ficam no `localStorage` do
+  navegador; os comprovantes ficam no IndexedDB. Nada disso é enviado a um
+  servidor. Quem usa o mesmo navegador pode abrir os perfis salvos nele.
+- Não há sincronização entre aparelhos: use **Salvar cópia** (.json) e
+  **Restaurar cópia**.
+- A única rota de servidor (`/api/admin/session`) protege o painel local de
+  configurações com uma frase de acesso; ela não recebe registros de frequência.
+- O app usa o Vercel Analytics (sem cookies) para métricas agregadas de acesso.
+- Este repositório é público: exemplos, testes e capturas usam apenas dados
+  fictícios. Nunca versione dados reais de participantes ou de pacientes.
+
+## Configuração do programa
+
+Tudo o que identifica o programa (nome, edital, instituições, GATs, perfis,
+modalidades, meta, prazo, links e textos da folha) fica em
+[`src/config/program.ts`](src/config/program.ts). O motivo e o custo dessa
+escolha estão em [docs/adr/0001-config-central-do-programa.md](docs/adr/0001-config-central-do-programa.md).
+
+Pendências marcadas no código com `TODO(pet-sd)`: logo oficial do PET-SD para o
+ícone do app, links de formulários (vazios = botões ocultos) e prazo exibido.
+
+## Deploy na Vercel
+
+O app funciona sem variáveis de ambiente. O painel de configurações locais só
+abre depois de configurar, no projeto da Vercel (Settings → Environment Variables):
+
+- `ADMIN_PIN_HASH`: hash SHA-256, em hexadecimal, de uma frase longa de acesso.
+- `ADMIN_SESSION_SECRET`: segredo aleatório com pelo menos 32 caracteres.
+
+Para gerar os valores sem gravá-los no repositório:
 
 ```bash
-# Verificação estática de tipos (TypeScript)
-npm run typecheck
-
-# Compilação completa para produção com Turbopack
-npm run build
-
-# Análise estática de código e boas práticas
-npm run lint
-
-# Cálculo, persistência, restauração e estrutura da interface
-npm run test:ui
-
-# Instalar o navegador de teste e conferir a jornada em desktop/celular
-npx playwright install chromium
-npm run test:e2e
+printf %s 'UMA FRASE LONGA E EXCLUSIVA' | sha256sum   # valor de ADMIN_PIN_HASH
+openssl rand -hex 32                                    # valor de ADMIN_SESSION_SECRET
 ```
 
----
+Não use o prefixo `NEXT_PUBLIC_` (exporia o valor no navegador). Detalhes em
+[docs/deployment-vercel.md](docs/deployment-vercel.md).
 
-## Deploy Contínuo na Vercel
+## Documentação
 
-A aplicação está configurada para deploy automático via Git na [Vercel](https://vercel.com):
+- [docs/architecture.md](docs/architecture.md): arquitetura, modelo de dados e armazenamento.
+- [docs/regimento-pet.md](docs/regimento-pet.md): resumo do Regimento Interno do PET-SD/UFG.
+- [docs/ui-ux.md](docs/ui-ux.md): telas, folha oficial e verificações de interface.
+- [docs/deployment-vercel.md](docs/deployment-vercel.md): deploy e variáveis de ambiente.
+- [docs/adaptacao-pet-sd.md](docs/adaptacao-pet-sd.md): registro da adaptação, decisões e pendências.
+- [CONTRIBUTING.md](CONTRIBUTING.md): fluxo de Git, commits e verificações.
 
-1. Conecte o repositório `vvvvvdal/pet-folha-mensal`.
-2. As opções de build são identificadas nativamente:
-   - **Framework Preset**: Next.js
-   - **Build Command**: `next build`
-   - **Output Directory**: `.next`
-3. **Variáveis de Ambiente do painel**:
-   - `ADMIN_PIN_HASH`: hash SHA-256 da frase de acesso, lido apenas no servidor.
-   - `ADMIN_SESSION_SECRET`: segredo aleatório usado para assinar a sessão `HttpOnly`.
-   - Sem ambas, o aplicativo continua operando, mas o painel de configurações permanece bloqueado.
+## Créditos
 
-Para mais detalhes, consulte [docs/deployment-vercel.md](docs/deployment-vercel.md).
-
----
-
-## Estrutura do Repositório
-
-```text
-pet-folha-mensal/
-├── docs/                        # Documentação técnica e arquitetural canônica
-│   ├── README.md                # Índice consolidado da documentação
-│   ├── architecture.md          # Arquitetura de software e contratos de dados
-│   ├── deployment-vercel.md     # Guia detalhado de deploy na Vercel
-│   ├── regimento-pet.md         # Normas, cálculo de horas e validação de bolsas
-│   └── visual-identity/         # Referências de identidade visual oficial
-├── public/                      # Imagens oficiais, logos e templates de frequência
-│   ├── images/                  # Logotipo colorida e avatar oficial do PET
-│   └── templates/               # Gabarito oficial (.pdf, .docx e .xlsx expandido)
-├── scripts/                     # Ferramentas auxiliares e scripts históricos
-│   └── legacy-tools/            # Automações legadas (Python e Google Apps Script)
-├── src/
-│   ├── app/                     # Next.js App Router (layout, página principal e CSS)
-│   ├── components/              # Componentes React desacoplados e responsivos
-│   ├── context/                 # Contextos de diálogo e feedback
-│   ├── lib/                     # Calculadora de horas, gerenciador de storage e temas
-│   └── types/                   # Interfaces e contratos de dados TypeScript
-├── AGENTS.md                    # Contrato de execução para agentes de IA
-├── CONTRIBUTING.md              # Diretrizes de colaboração e convenções de código
-├── LICENSE                      # Licença de código aberto MIT
-└── README.md                    # Este documento
-```
-
----
-
-## Documentação do Projeto
-
-* [docs/architecture.md](docs/architecture.md): Arquitetura de software, fluxo de estados e diagrama de componentes.
-* [docs/regimento-pet.md](docs/regimento-pet.md): Regras de carga horária, relatórios no Google Forms e comprovação de bolsa.
-* [docs/deployment-vercel.md](docs/deployment-vercel.md): Manual de infraestrutura, DNS e variáveis de ambiente na Vercel.
-* [CONTRIBUTING.md](CONTRIBUTING.md): Diretrizes de contribuição, fluxo Git e gates de aceitação.
-* [AGENTS.md](AGENTS.md): Contrato normativo para agentes de IA que atuam no repositório.
-
----
-
-## Autoria e Desenvolvimento
-
-Este sistema foi concebido, desenhado e implementado no âmbito do PET-Saúde Clima UFG por:
-
-* **[Felipe Vidal](https://www.linkedin.com/in/vvvvvdal/)** (Estudante e Bolsista PET-Saúde Clima / UFG)
-* **[Robert Taveira](https://www.linkedin.com/in/robert-taveira/)** (Colaborador e Desenvolvedor)
-
----
-
-## Instituições Parceiras
-
-* **Secretaria Municipal de Saúde de Goiânia (SMS Goiânia)** - Coordenação Geral
-* **Secretaria Estadual de Saúde de Goiás (SES Goiás)**
-* **Universidade Federal de Goiás (UFG)** - Campus Goiânia
-* **Ministério da Saúde (SGTES/MS)** - 13ª Edição do PET-Saúde
-
----
+Este projeto é um fork de
+[vvvvvdal/pet-folha-mensal](https://github.com/vvvvvdal/pet-folha-mensal),
+criado para o PET-Saúde Clima UFG por
+[Felipe Gonçalves Vidal](https://www.linkedin.com/in/vvvvvdal/) e
+[Robert Francisco Taveira](https://www.linkedin.com/in/robert-taveira/).
+A arquitetura local-first, a cópia de segurança, os comprovantes e a base da
+interface vêm do trabalho deles. Esta versão adapta regras, cadastro e folha ao
+PET-SD UFG.
 
 ## Licença
 
-Este software é livre e de código aberto, publicado sob os termos da [Licença MIT](LICENSE).
-
----
-
-<p align="center">
-  PET-Saúde Clima: Folha de Frequência Mensal &copy; 2026 &bull; Desenvolvido por <a href="https://www.linkedin.com/in/vvvvvdal/">Felipe Vidal</a> & <a href="https://www.linkedin.com/in/robert-taveira/">Robert Taveira</a> &bull; Licença MIT
-</p>
+[MIT](LICENSE). O aviso de copyright original foi mantido.

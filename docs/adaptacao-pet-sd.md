@@ -12,7 +12,7 @@ Registro de progresso da adaptação deste fork para o PET-SD UFG 2025–2027
 | E2 Domínio e regras | feito | `feat: regras e cadastro do PET-SD` | `npm run test:ui` (testes de CH, soma do mês, migração v2→v3 e cópias 1.0–1.3) | confirmar modalidades e prazo |
 | E3 Folha oficial | feito | `feat: folha oficial no modelo do PET-SD` | `npm run test:e2e` (folha extensa: Carta paisagem, cabeçalho repetido, assinaturas e instruções no fim); aba "Folha oficial" → "Imprimir / salvar PDF" | ver "Diferenças que restam" |
 | E4 Testes e validação visual | feito | `test: cobertura do PET-SD e validação visual` | `npm run test:ui` (24) e `npm run test:e2e` (26); capturas em `docs/validation/pet-sd-20261117/` | diferenças listadas no README da validação |
-| E5 Documentação e limpeza | não iniciado | | | |
+| E5 Documentação e limpeza | feito | `docs: documentação do fork PET-SD` | ler `README.md`, `AGENTS.md`, `docs/`; `git grep -i clima` só acha Créditos, este registro e fixtures de teste | — |
 | E6 Fechamento | não iniciado | | | |
 
 ## Linha de base (antes de qualquer mudança, commit `8d6c9f9`)
@@ -134,7 +134,17 @@ em branco ao lado foi exportado pelo Word a partir desse `.docx`.
 - **D8 — Logo do app.** Sem arquivo separado do logo PET-SD, uso selo textual
   "PET-SD" provisório com `TODO(pet-sd)`.
 - **D9 — Remoções.** Arquivos do Clima e do fluxo pessoal do autor original saem
-  com `git rm` (recuperáveis pelo histórico). Lista no relatório final.
+  com `git rm` (recuperáveis pelo histórico do git): imagens e manual de identidade
+  do Clima, 7 modelos em `public/templates/`, `src/lib/form-report.ts`,
+  `src/components/ActivityReportModal.tsx`, `src/app/favicon.ico` (trocado por
+  `icon.svg`), `docs/validation/` antigos, `.maestri/`, `docs/AGENT-WORKFLOW.md`,
+  `docs/oracle-ci-logs-unslop.md`, `docs/ui-ux-restructure-plan.md` (plano do autor
+  original com caminhos locais dele e links para evidências removidas) e
+  `scripts/legacy-tools/` (geradores do Clima em A4 com a regra CEILING − FLOOR).
+- **D15 — Menções ao programa anterior que ficam.** Créditos do README; este
+  registro (inventário do que mudou); e as fixtures de teste do perfil-exemplo
+  antigo, que precisam dos valores originais para reproduzir o fingerprint usado
+  na migração. Os testes também garantem que a interface não mostra "Clima".
 - **D11 — Migração v2→v3.** Perfis e atividades são copiados uma vez para as
   chaves `_v3` (perfil antigo → perfil da ficha; modalidade antiga → modalidade
   nova; `local` e `descricao` vazios; CH recalculada pela regra exata). As chaves
