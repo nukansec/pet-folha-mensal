@@ -154,7 +154,9 @@ export const PROGRAM = {
       "Ao final do mês, assine e colete a assinatura(s) do(s) responsável(is), pelo Gov.br",
       "Envie o arquivo conforme o prazo indicado na observação do rodapé da primeira página.",
     ],
+    /** Modelo em branco gerado do .docx oficial (sem dados de participante). */
     blankTemplateDocx: "/templates/pet-sd-registro-de-frequencia-modelo-em-branco.docx",
+    blankTemplatePdf: "/templates/pet-sd-registro-de-frequencia-modelo-em-branco.pdf",
   },
 } as const;
 

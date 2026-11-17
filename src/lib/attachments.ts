@@ -2,9 +2,9 @@ export const ATTACHMENT_LIMIT_MB = 20;
 export const MONTH_LIMIT_MB = 40;
 export const MONTH_PAGE_LIMIT = 30;
 const MIB = 1024 * 1024;
-// About 160 dpi within the printable A4 landscape area.
-const PRINT_WIDTH = 1745;
-const PRINT_HEIGHT = 1222;
+// About 160 dpi within the printable Letter landscape area (margins 20 mm x 12/15 mm).
+const PRINT_WIDTH = 1508;
+const PRINT_HEIGHT = 1172;
 
 type AttachmentType = "application/pdf" | "image/jpeg" | "image/png";
 

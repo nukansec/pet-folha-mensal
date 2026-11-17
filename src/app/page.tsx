@@ -843,6 +843,17 @@ export default function Home() {
                       <span>Baixar .docx</span>
                     </a>
                   )}
+                  {showBlankTemplate && (
+                    <a
+                      href={PROGRAM.sheet.blankTemplatePdf}
+                      download
+                      className="px-3 py-1.5 rounded-xl border border-line hover:bg-raised text-body cursor-pointer flex items-center gap-1.5 text-xs font-medium transition-all"
+                      title="Baixar o modelo em branco (PDF)"
+                    >
+                      <Download className="size-3.5" />
+                      <span>Baixar PDF</span>
+                    </a>
+                  )}
                   <button
                     onClick={() => void handlePrint()}
                     disabled={preparingPrint || attachmentsBusy}

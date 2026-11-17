@@ -404,7 +404,7 @@ test("formulários e modais renderizam com campos rotulados e diálogos nativos"
   }
 });
 
-test("folha oficial mantém estrutura, horas e áreas de assinatura", () => {
+test("folha oficial reproduz o modelo do PET-SD: campos, perfis, 8 colunas, total e instruções", () => {
   const html = renderToStaticMarkup(
     React.createElement(OfficialSheet, {
       user: sampleUser,
@@ -413,22 +413,43 @@ test("folha oficial mantém estrutura, horas e áreas de assinatura", () => {
       totalMinutes: 90,
     }),
   );
-  assert.match(html, /TOTAL: 1h30/);
-  assert.match(html, /Assinatura do Participante/);
-  assert.match(html, /Assinatura da Supervisão do GAT/);
-  assert.equal(
-    (html.match(/<tbody>[\s\S]*?<\/tbody>/)?.[0].match(/<tr/g) || []).length,
-    10,
+  assert.match(html, /REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD/);
+  assert.match(html, /images\/pet-sd\/cabecalho-ficha\.png/);
+  for (const field of ["Nome:", "GAT:", "Perfil:", "Mês de Referência:"])
+    assert.ok(html.includes(field), "Campo ausente: " + field);
+  assert.match(html, /PARTICIPANTE DE TESTE/);
+  assert.match(html, /<td>1<\/td>/);
+  assert.match(html, /\( X \) Monitor\(a\)/);
+  assert.equal((html.match(/\( X \)/g) || []).length, 1);
+  for (const role of ["Coordenador(a)", "Tutor(a)", "Preceptor(a)", "Orientador(a) de serviço"])
+    assert.ok(html.includes(role), "Perfil ausente: " + role);
+  const head = html.match(/pet-sheet-activities[\s\S]*?<thead>([\s\S]*?)<\/thead>/)[1];
+  assert.deepEqual(
+    [...head.matchAll(/<th[^>]*>([^<]*)<\/th>/g)].map((m) => m[1]),
+    ["Data", "Unidade/Local", "Atividade Desenvolvida", "Início", "Fim", "CH (h)", "Modalidade", "Descrição"],
   );
-  assert.doesNotMatch(
-    html,
-    /Perguntas frequentes|site-footer|Exemplo · dados fictícios/,
+  assert.match(html, /<td>06\/10<\/td><td>Sala fictícia<\/td><td>Atividade de teste<\/td><td>14:00<\/td><td>15:30<\/td><td>1h30<\/td><td>Interação em tempo real \(Síncrona\)<\/td>/);
+  assert.match(html, /Total de CH no mês: 1h30/);
+  assert.match(html, /primeiro dia útil do mês posterior/);
+  assert.match(html, /Assinatura do Participante:/);
+  assert.match(html, /Assinatura do Responsável:/);
+  assert.match(html, /Instruções de preenchimento/);
+  assert.equal((html.match(/<li>/g) || []).length, 5);
+  assert.doesNotMatch(html, /Perguntas frequentes|site-footer|Clima/);
+
+  const blank = renderToStaticMarkup(
+    React.createElement(OfficialSheet, { user: sampleUser, monthLabel: "Outubro/2026", activities: [sampleActivity], isBlankTemplate: true }),
   );
+  assert.doesNotMatch(blank, /PARTICIPANTE DE TESTE|Atividade de teste|\( X \)/);
+  assert.equal((blank.match(/pet-sheet-empty-row/g) || []).length, 12);
 });
 
-test("CSS mantém impressão A4 paisagem isolada, temas e redução de movimento", () => {
+test("CSS mantém impressão Carta paisagem isolada, temas e redução de movimento", () => {
   const css = readFileSync(path.join(root, "src/app/globals.css"), "utf8");
-  assert.match(css, /size: A4 landscape/);
+  assert.match(css, /size: letter landscape/);
+  assert.doesNotMatch(css, /size: A4/);
+  assert.match(css, /\.pet-sheet-instructions \{\s*break-before: page/);
+  assert.match(css, /\.pet-sheet-frame > thead \{\s*display: table-header-group/);
   assert.match(css, /\.screen-only\s*\{\s*display: none !important/);
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
   assert.match(css, /html\[data-theme="light"\]/);

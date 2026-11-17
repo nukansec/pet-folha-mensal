@@ -47,7 +47,9 @@ export function LandingPage({
   );
   const [name, setName] = useState("");
   const [gat, setGat] = useState(Object.keys(gats)[0] || "");
-  const [role, setRole] = useState(roles[0] || "");
+  const [role, setRole] = useState(
+    roles.includes(PROGRAM.defaultRole) ? PROGRAM.defaultRole : roles[0] || "",
+  );
   const [helpOpen, setHelpOpen] = useState(false);
   const [profileId, setProfileId] = useState(profiles[0]?.id || "");
   const fileRef = useRef<HTMLInputElement>(null);

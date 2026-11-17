@@ -1725,14 +1725,131 @@ body {
   }
 }
 
-.official-sheet {
-  line-height: 1.5;
+/* Folha oficial PET-SD: medidas do modelo (Carta paisagem, Times New Roman 10 pt).
+   Larguras de coluna em OfficialSheet.tsx; margens do Word: 2 cm. */
+.pet-sheet {
+  background: #ffffff;
+  color: #000000;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 10pt;
+  line-height: 1.15;
+  width: 100%;
+  max-width: 279.4mm;
+  margin: 0 auto;
+  padding: 12mm 20mm 15mm;
+  box-sizing: border-box;
+}
+.pet-sheet-frame {
+  width: 100%;
+  border-collapse: collapse;
+}
+.pet-sheet-frame > thead > tr > td,
+.pet-sheet-frame > tbody > tr > td {
+  padding: 0;
+  border: 0;
+}
+.pet-sheet-header {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 4mm;
+}
+.pet-sheet-header img {
+  display: block;
+  height: 12mm;
+  width: auto;
+  max-width: 133mm;
+}
+.pet-sheet .pet-sheet-title {
+  text-align: center;
+  font-size: 12pt;
+  font-weight: 700;
+  margin: 0 0 4mm;
+  letter-spacing: 0;
+}
+.pet-sheet-identification,
+.pet-sheet-activities {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  color: #000000;
+}
+.pet-sheet-identification th,
+.pet-sheet-identification td,
+.pet-sheet-activities th,
+.pet-sheet-activities td {
+  border: 1px solid #000000;
+  text-align: left;
+  vertical-align: top;
+  font-size: 10pt;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.pet-sheet-identification th,
+.pet-sheet-identification td {
+  padding: 1.2mm 1.5mm;
+}
+.pet-sheet-identification th,
+.pet-sheet-activities th {
+  font-weight: 700;
+}
+.pet-sheet-roles span {
+  margin-right: 1.4em;
+  white-space: nowrap;
+}
+.pet-sheet-activities {
+  margin-top: 5mm;
+}
+.pet-sheet-activities th,
+.pet-sheet-activities td {
+  padding: 0.6mm 1.2mm;
+}
+.pet-sheet-activities th {
+  vertical-align: middle;
+}
+.pet-sheet-description {
+  white-space: pre-line;
+}
+.pet-sheet-empty-row td {
+  height: 6mm;
+}
+.pet-sheet-activities .pet-sheet-total td {
+  font-weight: 700;
+  font-size: 12pt;
+  padding: 0.6mm 1.5mm;
+}
+.pet-sheet-note {
+  font-style: italic;
+  margin: 0.5mm 0 0;
+}
+.pet-sheet-signature {
+  font-weight: 700;
+  font-size: 12pt;
+  margin: 9mm 0 0;
+  min-height: 14mm;
+}
+.pet-sheet-instructions {
+  margin-top: 10mm;
+  padding-top: 8mm;
+  border-top: 1px dashed #9a9a9a;
+}
+.pet-sheet .pet-sheet-instructions h2 {
+  font-size: 10pt;
+  font-weight: 700;
+  margin: 0 0 4mm;
+}
+.pet-sheet-instructions ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.pet-sheet-instructions li {
+  margin: 0 0 3.5mm;
 }
 
-/* Documento oficial: regras de impressão preservadas. */
+/* Documento oficial: Carta paisagem, como o modelo do PET-SD (15840 x 12240 twips). */
 @page {
-  size: A4 landscape;
-  margin: 8mm 10mm 8mm 10mm;
+  size: letter landscape;
+  margin: 12mm 20mm 15mm;
 }
 
 /* Acesso: composição Frame e Segmented Control do Frequência Hub. */
@@ -1944,8 +2061,8 @@ select optgroup {
 
 @media print {
   @page {
-    size: A4 landscape;
-    margin: 8mm 10mm 8mm 10mm;
+    size: letter landscape;
+    margin: 12mm 20mm 15mm;
   }
 
   html,
@@ -1987,31 +2104,17 @@ select optgroup {
     break-inside: auto !important;
   }
 
-  table.official-table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    border: 1.5px solid #000000 !important;
-    page-break-inside: auto !important;
-    break-inside: auto !important;
-    box-sizing: border-box !important;
+  .pet-sheet {
+    padding: 0 !important;
+    max-width: none !important;
   }
 
-  table.official-table th {
-    border: 1px solid #000000 !important;
-    color: #000000 !important;
-    background-color: #ffffff !important;
-    padding: 3px 5px !important;
-  }
-
-  table.official-table td {
-    border: 1px solid #000000 !important;
-    color: #000000 !important;
-    padding: 3px 5px !important;
-    line-height: 1.2 !important;
-  }
-
-  table.official-table tbody tr:last-child td {
-    border-bottom: 1.5px solid #000000 !important;
+  .pet-sheet-instructions {
+    break-before: page;
+    page-break-before: always;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
   }
 }
 
@@ -2038,14 +2141,14 @@ select optgroup {
     display: grid;
     place-items: center;
     width: 100%;
-    height: 193mm;
+    height: 186mm;
   }
 
   .print-attachment-page img {
     display: block;
     width: 100%;
     height: 100%;
-    max-height: 193mm;
+    max-height: 186mm;
     object-fit: contain;
     image-orientation: from-image;
   }
@@ -2054,6 +2157,10 @@ select optgroup {
 
 @media print {
   .official-table thead {
+    display: table-header-group;
+  }
+
+  .pet-sheet-frame > thead {
     display: table-header-group;
   }
 

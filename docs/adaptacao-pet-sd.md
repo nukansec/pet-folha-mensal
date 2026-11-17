@@ -10,7 +10,7 @@ Registro de progresso da adaptação deste fork para o PET-SD UFG 2025–2027
 | E0 Reconhecimento e linha de base | feito | `docs: inventário da adaptação para o PET-SD` | ler este arquivo | respostas às dúvidas abaixo |
 | E1 Identidade e textos | feito | `feat: identidade do PET-SD centralizada em config` | `npm run lint && npm run typecheck && npm run test:ui`; abrir `npm run dev` e ver marca, rodapé e FAQ | logo oficial (TODO(pet-sd)); links de Forms vazios |
 | E2 Domínio e regras | feito | `feat: regras e cadastro do PET-SD` | `npm run test:ui` (testes de CH, soma do mês, migração v2→v3 e cópias 1.0–1.3) | confirmar modalidades e prazo |
-| E3 Folha oficial | não iniciado | | | |
+| E3 Folha oficial | feito | `feat: folha oficial no modelo do PET-SD` | `npm run test:e2e` (folha extensa: Carta paisagem, cabeçalho repetido, assinaturas e instruções no fim); aba "Folha oficial" → "Imprimir / salvar PDF" | ver "Diferenças que restam" |
 | E4 Testes e validação visual | não iniciado | | | |
 | E5 Documentação e limpeza | não iniciado | | | |
 | E6 Fechamento | não iniciado | | | |
@@ -97,6 +97,16 @@ em `src`, `public`, `docs`, `tests`, `scripts` e raiz, mais leitura dos componen
 | `scripts/legacy-tools/*` | geradores do Clima (Python/Apps Script, A4, CEILING) | removidos no E5 (ver D9) |
 | `tests/e2e/frequency.spec.ts:9,488,683-778` | GAT Mangaba, Forms do Clima | novo domínio |
 | `scripts/verify-ui.mjs:66,185,514-570` | idem, regra CEILING | novo domínio + testes de CH e migração |
+
+## Modelo em branco
+
+`public/templates/pet-sd-registro-de-frequencia-modelo-em-branco.docx` foi gerado
+do `.docx` oficial com `scripts/gerar-modelo-em-branco.py` (python-docx): limpa
+nome, GAT, perfil marcado, mês, total e todas as linhas de atividade (ficam 12
+linhas vazias) e remove do pacote `customXML/` (ID do documento no Google Docs) e
+`docProps/custom.xml` (ID do Grammarly). Conferência feita com `unzip` + `grep`
+por nome, atividades, descrições, datas, locais e total: nenhuma ocorrência. O PDF
+em branco ao lado foi exportado pelo Word a partir desse `.docx`.
 
 ## Decisões
 
