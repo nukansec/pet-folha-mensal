@@ -11,6 +11,7 @@ import {
   getDefaultActivityDate,
 } from "@/lib/pet-calculator";
 import { Plus } from "lucide-react";
+import { FullSelect } from "@/components/ui/full-select";
 
 interface ActivityFormProps {
   onSave: (
@@ -107,7 +108,7 @@ export function ActivityForm({
             <label htmlFor="activity-template">
               Preenchimento rápido <span className="field-optional">· opcional</span>
             </label>
-            <select
+            <FullSelect
               id="activity-template"
               value={templateId}
               onChange={(event) => {
@@ -139,7 +140,7 @@ export function ActivityForm({
                   )}
                 </option>
               ))}
-            </select>
+            </FullSelect>
           </div>
         )}
         <div className="field">
@@ -196,7 +197,7 @@ export function ActivityForm({
         </p>
         <div className="field">
           <label htmlFor="activity-modality">Modalidade</label>
-          <select
+          <FullSelect
             id="activity-modality"
             value={modality}
             onChange={(event) => {
@@ -209,7 +210,7 @@ export function ActivityForm({
                 <option key={item}>{item}</option>
               ),
             )}
-          </select>
+          </FullSelect>
         </div>
         <div className="field">
           <label htmlFor="activity-local">Unidade/Local</label>

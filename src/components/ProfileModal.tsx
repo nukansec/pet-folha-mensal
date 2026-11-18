@@ -6,6 +6,7 @@ import { UserProfile, UserRole, GATInfo, sortedGats } from "@/types";
 import { normalizeName } from "@/lib/storage";
 import { X, Check, User } from "lucide-react";
 import { useDialog } from "@/context/DialogContext";
+import { FullSelect } from "@/components/ui/full-select";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -130,7 +131,7 @@ export function ProfileModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="field">
               <label htmlFor="profilemodal-field-2">Grupo tutorial (GAT)</label>
-              <select
+              <FullSelect
                 id="profilemodal-field-2"
                 value={gatNumber}
                 onChange={(e) => setGatNumber(e.target.value)}
@@ -140,12 +141,12 @@ export function ProfileModal({
                     GAT {info.number} ({info.name})
                   </option>
                 ))}
-              </select>
+              </FullSelect>
             </div>
 
             <div className="field">
               <label htmlFor="profilemodal-field-3">Perfil</label>
-              <select
+              <FullSelect
                 id="profilemodal-field-3"
                 value={role}
                 onChange={(e) => setRole(e.target.value as UserRole)}
@@ -155,7 +156,7 @@ export function ProfileModal({
                     {r}
                   </option>
                 ))}
-              </select>
+              </FullSelect>
             </div>
           </div>
 

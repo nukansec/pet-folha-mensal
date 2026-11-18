@@ -24,6 +24,7 @@ import { FAQ, HelpModal } from "./Help";
 import { ReleaseNotes } from "./ReleaseNotes";
 import { SiteFooter } from "./SiteFooter";
 import { Frame, FrameHeader, FramePanel, SegmentedControl, SegmentedControlItem } from "./ui/access-controls";
+import { FullSelect } from "@/components/ui/full-select";
 
 interface LandingPageProps {
   onLoginWithJson: (file: File) => void;
@@ -211,9 +212,9 @@ export function LandingPage({
                     <p className="access-hint">Abra seu perfil e escolha o mês. Você pode começar um novo mês sem o arquivo anterior.</p>
                     <div className="field">
                       <label htmlFor="entry-profile">Perfil neste navegador</label>
-                      <select id="entry-profile" value={profileId} onChange={(event) => setProfileId(event.target.value)} required>
+                      <FullSelect id="entry-profile" value={profileId} onChange={(event) => setProfileId(event.target.value)} required>
                         {profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name} · {profile.role} · GAT {profile.gatNumber}</option>)}
-                      </select>
+                      </FullSelect>
                     </div>
                     <button className="primary-button w-full" type="submit">Continuar com este perfil <ArrowRight size={18} /></button>
                   </form>
@@ -239,7 +240,7 @@ export function LandingPage({
                     <div className="start-field-row">
                       <div className="field">
                         <label htmlFor="entry-role">Perfil</label>
-                        <select
+                        <FullSelect
                           id="entry-role"
                           value={role}
                           onChange={(event) => setRole(event.target.value)}
@@ -248,11 +249,11 @@ export function LandingPage({
                           {roles.map((item) => (
                             <option key={item}>{item}</option>
                           ))}
-                        </select>
+                        </FullSelect>
                       </div>
                       <div className="field">
                         <label htmlFor="entry-gat">GAT</label>
-                        <select
+                        <FullSelect
                           id="entry-gat"
                           value={gat}
                           onChange={(event) => setGat(event.target.value)}
@@ -263,7 +264,7 @@ export function LandingPage({
                               GAT {item.number} · {item.name}
                             </option>
                           ))}
-                        </select>
+                        </FullSelect>
                       </div>
                     </div>
                     <button

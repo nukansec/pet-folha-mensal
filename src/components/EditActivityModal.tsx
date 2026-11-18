@@ -12,6 +12,7 @@ import {
 import { fillTemplateName } from "./ActivityForm";
 import { X, Calendar, Clock, Check, Edit3 } from "lucide-react";
 import { useDialog } from "@/context/DialogContext";
+import { FullSelect } from "@/components/ui/full-select";
 
 interface EditActivityModalProps {
   isOpen: boolean;
@@ -154,7 +155,7 @@ export function EditActivityModal({
         {templates && templates.length > 0 && (
           <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-canvas border border-line">
             <span className="text-xs text-muted">Preenchimento rápido:</span>
-            <select
+            <FullSelect
               aria-label="Modelo de atividade para preenchimento rápido"
               onChange={(e) => {
                 const tplId = e.target.value;
@@ -180,7 +181,7 @@ export function EditActivityModal({
                   {fillTemplateName(tpl.name, defaultGatNumber, defaultGatName)} ({tpl.modality})
                 </option>
               ))}
-            </select>
+            </FullSelect>
           </div>
         )}
 

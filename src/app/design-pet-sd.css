@@ -1019,14 +1019,8 @@
 
 @media (max-width: 400px) {
   .time-fields {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-  .hours-preview {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 0;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 56px;
+    gap: 8px;
   }
 }
 
@@ -1036,4 +1030,56 @@
   .secondary-button {
     transition: none;
   }
+}
+
+/* ---------- FullSelect: opção escolhida inteira, com quebra de linha ---------- */
+.full-select {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.full-select-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 1.35;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.full-select-display > svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.full-select > select,
+.field .full-select > select,
+.activity-fields .full-select > select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  /* Mantém 16 px: abaixo disso o iOS aproxima a tela ao focar. */
+  font-size: 16px;
+}
+.full-select:hover .full-select-display {
+  border-color: var(--brand-text);
+}
+.full-select:has(select:focus-visible) .full-select-display {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.full-select:has(select:disabled) .full-select-display {
+  opacity: 0.55;
 }
