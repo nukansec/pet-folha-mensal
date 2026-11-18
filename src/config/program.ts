@@ -126,6 +126,8 @@ export const PROGRAM = {
     feedbackForm: "" as string,
     /** Repositório deste fork. */
     repository: "https://github.com/nukansec/pet-folha-mensal",
+    /** Endereço público do app (base das URLs absolutas do Open Graph). */
+    site: "https://pet-folha-mensal-three.vercel.app",
   },
 
   /** Créditos do projeto original (este app é um fork). */

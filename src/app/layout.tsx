@@ -9,9 +9,38 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
+const title = `${PROGRAM.acronym} ${PROGRAM.campus}: Folha de Frequência Mensal`;
+const description = `Registro mensal de frequência e atividades dos participantes do ${PROGRAM.name} (${PROGRAM.acronym}/${PROGRAM.campus}).`;
+
+// Ícones: arquivos especiais em src/app/ (favicon.ico, icon.png, apple-icon.png);
+// o Next 16 cria as tags <link> sozinho. A imagem de compartilhamento fica em
+// public/ e é declarada aqui para levar texto alternativo (og:image:alt).
+// Todos são gerados por scripts/brand/gerar-marca.py.
+const shareImage = {
+  url: "/images/pet-sd/compartilhamento.png",
+  width: 1200,
+  height: 630,
+  alt: `Logo do ${PROGRAM.name}`,
+};
 export const metadata: Metadata = {
-  title: `${PROGRAM.acronym} ${PROGRAM.campus}: Folha de Frequência Mensal`,
-  description: `Registro mensal de frequência e atividades dos participantes do ${PROGRAM.name} (${PROGRAM.acronym}/${PROGRAM.campus}).`,
+  metadataBase: new URL(PROGRAM.links.site),
+  title,
+  description,
+  applicationName: `${PROGRAM.acronym} ${PROGRAM.campus}`,
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: `${PROGRAM.acronym} ${PROGRAM.campus}`,
+    title,
+    description,
+    images: [shareImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [shareImage],
+  },
 };
 
 import { DialogProvider } from "@/context/DialogContext";

@@ -14,7 +14,7 @@ import {
 import { UserProfile, UserRole, GATInfo } from "@/types";
 import { useTheme } from "@/lib/theme";
 import { PROGRAM } from "@/config/program";
-import { Brand } from "./Brand";
+import { Brand, BrandMark } from "./Brand";
 import { FAQ, HelpModal } from "./Help";
 import { ReleaseNotes } from "./ReleaseNotes";
 import { SiteFooter } from "./SiteFooter";
@@ -96,6 +96,7 @@ export function LandingPage({
       </header>
       <main className="start-main">
         <div className="start-heading">
+          <BrandMark className="start-brand" />
           <p className="section-kicker">{PROGRAM.name} · {PROGRAM.campus}</p>
           <h1>Folha de frequência</h1>
           <p>Registre suas atividades e prepare a folha mensal para assinatura.</p>

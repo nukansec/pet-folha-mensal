@@ -207,33 +207,46 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   gap: 10px;
   flex-shrink: 0;
 }
-.brand > span:not(.brand-seal) {
+.brand > span {
   display: grid;
-  gap: 3px;
+  gap: 2px;
+  min-width: 0;
 }
-.brand-seal {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: #14628a;
-  color: #ffffff;
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: 0.04em;
-  text-align: center;
+.brand-symbol {
+  width: auto;
+  height: 40px;
+  flex-shrink: 0;
 }
 .brand strong {
   font-size: 16px;
-  letter-spacing: -0.6px;
+  letter-spacing: -0.3px;
   color: var(--foreground);
 }
+.brand-campus {
+  color: var(--info);
+}
 .brand small {
-  font-size: 10px;
-  letter-spacing: 0.015em;
+  font-size: 12px;
   color: var(--muted);
+}
+/* Marca completa da entrada. No escuro, uma placa clara mantém o contraste do
+   subtítulo azul-escuro do logo sem alterar as cores da marca. */
+.brand-mark {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 20px;
+}
+.brand-mark img {
+  width: 100%;
+  height: auto;
+}
+.start-brand {
+  width: 160px;
+  margin-bottom: 16px;
+}
+html[data-theme="dark"] .brand-mark {
+  background: #ffffff;
+  padding: 16px;
 }
 .icon-button {
   display: inline-flex;
@@ -761,15 +774,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     padding: 14px 20px;
   }
   .brand strong {
-    font-size: 14px;
+    font-size: 15px;
   }
-  .brand small {
-    font-size: 9px;
-  }
-  .brand-seal {
-    width: 32px;
-    height: 32px;
-    font-size: 9px;
+  .brand-symbol {
+    height: 34px;
   }
   .entry-header nav {
     gap: 0;
