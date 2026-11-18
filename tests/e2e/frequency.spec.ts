@@ -752,9 +752,10 @@ test("cópias com comprovantes levam os originais e a restauração reverte falh
 test("novidades mostram data de publicação nos dois temas", async ({ page }, testInfo) => {
   await page.goto("/");
   const section = page.getByRole("region", { name: "Novidades do site" });
-  await expect(section.getByRole("heading", { name: "Ajustes no formulário e nova modalidade" })).toBeVisible();
+  await expect(section.getByRole("heading", { name: "Perfis, menu do participante e visão semanal" })).toBeVisible();
   await expect(section.getByText("Última atualização", { exact: false })).toContainText("18 de novembro de 2026");
   await section.getByText("Ver histórico de atualizações", { exact: true }).click();
+  await expect(section.getByRole("heading", { name: "Ajustes no formulário e nova modalidade" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Novo visual com a marca do PET-SD" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Folha no modelo do PET-SD" })).toBeVisible();
   for (const theme of ["light", "dark"]) {

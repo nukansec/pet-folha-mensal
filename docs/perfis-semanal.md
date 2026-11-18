@@ -13,6 +13,7 @@ progresso por épico e do relatório final.
 | E3 Gerenciar perfis | feito | `feat: editar e excluir perfis na entrada` | entrada › Continuar; `test:ui` (resumo, exclusão, edição, cópia 1.4); `perfis.spec.ts` › "gerenciar perfis na entrada" | — |
 | E4 Seletores | feito | `feat(ui): seletores em grupos de opção` | formulário, modal de edição, primeiro acesso, modal de identificação; `perfis.spec.ts` › "seletores em grupos de opção"; `frequency.spec.ts` › "modelos rápidos…" | — |
 | E5 Visão semanal | feito | `feat: visão semanal da carga horária` | resumo › Semanal; `test:ui` "faixas de semana…", "semana atual…"; `perfis.spec.ts` › "visão semanal" | — |
+| E6 Fechamento | feito | `docs: ajuda, novidades, compatibilidade e capturas de perfis e visão semanal` | Ajuda/Dúvidas, README, `docs/ui-ux.md`, `src/lib/releases.ts`; `tests/e2e/compat.spec.ts`; `docs/validation/perfis-20261118/depois/` | perguntas 1–5 |
 
 ## E0 — Diagnóstico
 
@@ -171,3 +172,98 @@ Outros achados:
 - **E5** — Semana atual destacada por borda, fundo **e** o texto "Semana
   atual" (`aria-current="date"`), não só por cor. Barras laranja decorativas
   (`aria-hidden`); o valor vem em texto ("1h30 de 8 h").
+- **E6** — Regra de ouro testada com dados **criados pela main** (não escritos
+  à mão): `tests/fixtures/dados-v3-main.json` (gerada pela interface da main
+  269f816). `tests/e2e/compat.spec.ts` injeta localStorage e IndexedDB, navega
+  (entrada, dois perfis, dois meses, folha, comprovante, visão semanal, cópia,
+  troca de participante) e confere que **nenhuma chave existente mudou** e que
+  só entram `pet_folha_active_profile_id_v3` e `pet_folha_summary_view`. Um
+  teste de unidade faz o mesmo pelo storage.
+- **E6** — Chip longo do preenchimento rápido quebra linha no desktop (antes
+  saía da coluna de 380 px); no celular continua em uma linha com rolagem.
+
+## Relatório final
+
+### O que foi feito
+
+- **E0** — Diagnóstico do armazenamento (o que a exclusão precisa apagar),
+  linha de base do CI, capturas "antes" (este app e o app original) e fixture
+  de compatibilidade gerada pela main.
+- **E1** — Rodapé "Feito por Brunno Bernardes · adaptado do projeto original
+  de Felipe Gonçalves Vidal e Robert Francisco Taveira", com links, a partir de
+  `PROGRAM.author` e `PROGRAM.credits`; README › Créditos igual.
+- **E2** — Menu do participante (Editar identificação, Trocar participante,
+  Salvar cópia, Sair) com padrão WAI-ARIA de menu; Trocar/Sair reaproveitam as
+  proteções do Concluir. ProfileModal em caixa de frase e GAT em uma linha.
+- **E3** — Perfis em cartões na entrada (Abrir, Editar, Excluir); exclusão
+  completa (localStorage + IndexedDB) com resumo do que sai e cópia do perfil
+  inteiro (formato 1.4) que a restauração traz de volta; edição sem duplicar.
+- **E4** — Modalidade, preenchimento rápido e perfil como grupos de rádio
+  acessíveis; GAT e Mês continuam select, com o mesmo foco dos campos.
+- **E5** — Resumo Mensal | Semanal, faixas de segunda a domingo com CH exata,
+  semana atual destacada e escolha lembrada.
+- **E6** — Ajuda (2 perguntas novas), README, `docs/ui-ux.md`, novidade em
+  `releases.ts`, teste de compatibilidade e capturas "depois".
+
+### Commits
+
+```
+3550f50 docs: diagnóstico de perfis e visão semanal
+0bd7bd9 docs: autoria da versão PET-SD nos créditos
+81a1df0 feat(ui): menu do participante no topo
+79e63cf feat: editar e excluir perfis na entrada
+19d1e61 feat(ui): seletores em grupos de opção
+9a72cba feat: visão semanal da carga horária
+(E6)    docs: ajuda, novidades, compatibilidade e capturas de perfis e visão semanal
+```
+
+### Como verificar
+
+1. `npm run lint && npm run typecheck && npm run test:ui && npm run test:contrast && npm run build && npm run test:e2e`
+   (resultado em 18/11/2026: tudo verde; `test:ui` 43 testes; e2e 71 passaram
+   e 1 pulado de propósito, o teste só de celular no projeto desktop).
+2. Manual (`npm run dev`, porta 5000): criar dois perfis; no topo, abrir o
+   menu pelo teclado (seta para baixo, Esc); Trocar participante com um
+   rascunho no formulário; na entrada, Excluir um perfil com "Salvar cópia
+   antes" e restaurar a cópia; alternar Mensal | Semanal e recarregar.
+3. Capturas: `docs/validation/perfis-20261118/antes/` e `…/depois/`
+   (1440 e 390 px, claro e escuro), geradas por `scripts/capturar-perfis.mjs`.
+
+### Riscos para quem já usa o app
+
+- **Dados salvos:** nenhuma chave nem formato mudou. Os únicos itens novos no
+  navegador são `pet_folha_summary_view` (preferência de tela) e, ao restaurar
+  uma cópia 1.4, as chaves de atividades dos meses dela (formato de sempre).
+  Provado pelo teste com a fixture da main.
+- **Exclusão é irreversível** sem a cópia. Mitigação: resumo do que sai,
+  oferta da cópia do perfil inteiro e botão de perigo em segundo passo.
+- **Cópia 1.4** só abre nesta versão em diante; uma versão antiga do app
+  recusa com "versão de cópia não compatível" (sem gravar nada). A cópia do dia
+  a dia continua 1.3.
+- **Semana de segunda a domingo** diverge do texto do pedido ("domingo a
+  sábado"); segue o exemplo e o app original (pergunta 5).
+- Teste e2e "avaliação do site" já era instável no celular na linha de base
+  (passa isolado); não foi alterado.
+
+### Descrição do PR
+
+> **feat: perfis na entrada, menu do participante, seletores em grupo e visão semanal**
+>
+> - Rodapé e README com a autoria desta versão e os créditos do original
+>   (`PROGRAM.author`).
+> - Menu do participante no topo (editar identificação, trocar participante,
+>   salvar cópia, sair), acessível por teclado; Trocar e Sair usam as mesmas
+>   proteções do Concluir.
+> - Entrada com perfis em cartões: abrir, editar e excluir. A exclusão mostra o
+>   que será apagado, oferece a cópia do perfil inteiro (nova cópia 1.4,
+>   restaurável) e apaga só aquele perfil (localStorage e IndexedDB).
+> - Modalidade, preenchimento rápido e perfil viraram grupos de rádio
+>   acessíveis; os valores gravados não mudam.
+> - Resumo do mês com visão Semanal (segunda a domingo, CH exata por faixa,
+>   semana atual destacada), lembrando a escolha.
+> - Compatibilidade: teste com dados criados pela main abre tudo igual e não
+>   reescreve nenhuma chave.
+>
+> Verificação: lint, typecheck, test:ui, test:contrast, build e test:e2e
+> verdes. Capturas antes/depois em `docs/validation/perfis-20261118/`.
+> Decisões e perguntas em aberto em `docs/perfis-semanal.md`.

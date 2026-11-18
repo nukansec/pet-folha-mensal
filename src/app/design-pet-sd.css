@@ -1450,9 +1450,11 @@
 }
 .choice-group--chips > label.choice {
   min-height: 44px;
+  max-width: 100%;
   padding: 8px 14px;
-  border-radius: 999px;
-  white-space: nowrap;
+  border-radius: 22px;
+  /* Desktop: um nome longo quebra dentro da pílula em vez de sair da coluna. */
+  white-space: normal;
 }
 
 @media (max-width: 480px) {
@@ -1484,6 +1486,8 @@
   }
   .choice-group--chips > label.choice {
     flex-shrink: 0;
+    max-width: none;
+    white-space: nowrap;
     scroll-snap-align: start;
   }
 }

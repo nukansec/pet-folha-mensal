@@ -450,15 +450,17 @@ test("entrada apresenta acesso e explicação visível do JSON e PDF antes do FA
   assert.doesNotMatch(html, /hubfrequencia@gmail.com|Ver preços/);
 });
 
-test("FAQ compartilhado tem sete perguntas e ajuda usa o diálogo comum", () => {
+test("FAQ compartilhado tem nove perguntas (perfis e visão semanal incluídas) e ajuda usa o diálogo comum", () => {
   const html = renderToStaticMarkup(React.createElement(FAQ));
-  assert.equal((html.match(/<details>/g) || []).length, 7);
+  assert.equal((html.match(/<details>/g) || []).length, 9);
+  assert.match(html, /Como troco, edito ou excluo um perfil\?/);
+  assert.match(html, /O que é a visão semanal\?/);
   const help = render(
     React.createElement(HelpModal, { isOpen: true, onClose: noop }),
   );
   assert.match(help, /<dialog/);
   assert.match(help, /class="pet-dialog screen-only"/);
-  assert.equal((help.match(/<details>/g) || []).length, 7);
+  assert.equal((help.match(/<details>/g) || []).length, 9);
 });
 
 test("painel mantém backup acessível sem ocultar ações em telas menores", () => {
@@ -1011,4 +1013,22 @@ test("resumo mensal é o padrão e a visão semanal mostra as faixas com a meta 
   // localStorage inacessível: volta ao padrão sem erro.
   globalThis.localStorage = { getItem() { throw new Error("bloqueado"); } };
   assert.match(renderToStaticMarkup(React.createElement(StatsGrid, props)), /checked="" value="monthly"/);
+});
+
+test("regra de ouro: fixture da main abre igual pelo storage e nada é reescrito", () => {
+  const fixture = JSON.parse(readFileSync(path.join(root, "tests/fixtures/dados-v3-main.json"), "utf8"));
+  const records = isolatedStorage();
+  for (const [key, value] of Object.entries(fixture.localStorage)) records.set(key, value);
+  const before = JSON.stringify([...records]);
+  const profiles = storage.getStoredProfiles();
+  assert.deepEqual(profiles, JSON.parse(fixture.localStorage.pet_folha_profiles_v3));
+  for (const [key, value] of Object.entries(fixture.localStorage)) {
+    const match = /^pet_folha_activities_v3_(.+)_(\d{4}-\d{2})$/.exec(key);
+    if (!match) continue;
+    const loaded = storage.getActivitiesForMonth(match[1], match[2]);
+    assert.deepEqual(loaded, JSON.parse(value), key);
+  }
+  assert.deepEqual(storage.getProfileActivitySummary(profiles[0].id), { months: 2, activities: 4 });
+  assert.deepEqual(storage.getProfileActivitySummary(profiles[1].id), { months: 1, activities: 1 });
+  assert.equal(JSON.stringify([...records]), before);
 });

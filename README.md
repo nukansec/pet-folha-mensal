@@ -24,18 +24,27 @@ telas do app original. Antes, depois, a referência lado a lado e os ajustes de
 ## O que o app faz
 
 - Cadastro local do participante (nome, perfil e GAT) e retomada sem arquivo no
-  mesmo navegador.
+  mesmo navegador. Na entrada, cada perfil aparece num cartão com **Abrir**,
+  **Editar** e **Excluir** (a exclusão mostra o que será apagado e oferece uma
+  cópia do perfil inteiro antes).
+- Menu do participante no topo: editar identificação, trocar participante,
+  salvar cópia e sair, com os mesmos avisos do Concluir.
 - Lançamento de atividades com data, horários, Unidade/Local, modalidade,
   atividade desenvolvida e descrição.
 - Preenchimento rápido com quatro modelos: **Reunião Geral** (In Loco, UFG),
   **Capacitação** (Síncrona, Online), **Visita Técnica** (In Loco; o local fica
   para a pessoa preencher) e **Pesquisa Bibliográfica e Estudos Autônomos**
   (Assíncrona, Online). O painel de configurações permite editar a lista.
-- Cálculo da carga horária (CH) exata e acompanhamento da meta de 32 h no mês.
+- Modalidade, perfil e preenchimento rápido como opções visíveis (grupos de
+  rádio acessíveis por teclado e leitor de tela).
+- Cálculo da carga horária (CH) exata e acompanhamento da meta de 32 h no mês,
+  em visão **Mensal** ou **Semanal** (faixas de segunda a domingo com a CH de
+  cada semana e a referência de 8 h).
 - Prévia e impressão da folha oficial (Imprimir / salvar PDF) e modelo em branco
   em `.docx` e PDF.
 - Comprovação fotográfica: fotos ou PDFs anexados saem nas páginas seguintes da folha.
-- Cópia de segurança em `.json` para continuar em outro aparelho.
+- Cópia de segurança em `.json` para continuar em outro aparelho: a do mês
+  (formato 1.3) e a do perfil inteiro (1.4, oferecida antes de excluir).
 
 ## Regras de carga horária (CH)
 

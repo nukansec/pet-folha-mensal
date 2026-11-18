@@ -153,7 +153,7 @@ for (const theme of ["light", "dark"]) {
     await shot(page.locator("#nova-atividade"), `formulario-${tag}`);
     if (mode === "depois") {
       await step("menu", async () => {
-        await page.getByRole("button", { name: /Menu do participante/ }).click();
+        await page.getByRole("button", { name: /menu do participante/ }).click();
         await settle(page);
         await shot(page, `menu-participante-${tag}`);
         await page.keyboard.press("Escape");
@@ -161,7 +161,7 @@ for (const theme of ["light", "dark"]) {
     }
     await step("perfil", async () => {
       if (mode === "depois") {
-        await page.getByRole("button", { name: /Menu do participante/ }).click();
+        await page.getByRole("button", { name: /menu do participante/ }).click();
         await page.getByRole("menuitem", { name: "Editar identificação" }).click();
       } else {
         await page.locator(".profile-button").click();
