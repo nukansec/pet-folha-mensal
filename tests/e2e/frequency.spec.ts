@@ -943,3 +943,51 @@ test("cartões .pdf e .json: mesma altura lado a lado, altura própria empilhado
     expect(cards[0].height).toBeLessThan(cards[1].height);
   }
 });
+
+async function buttonsOutsideDialog(page: Page) {
+  const dialog = page.locator("dialog[open] > *").last();
+  await expect(dialog).toBeVisible();
+  return dialog.evaluate((box) => {
+    const outer = box.getBoundingClientRect();
+    return [...box.querySelectorAll("button, a")]
+      .filter((el) => el.getBoundingClientRect().width > 0)
+      .filter((el) => {
+        const r = el.getBoundingClientRect();
+        return r.left < outer.left - 0.5 || r.right > outer.right + 0.5 || r.top < outer.top - 0.5 || r.bottom > outer.bottom + 0.5;
+      })
+      .map((el) => el.textContent?.trim() || el.getAttribute("aria-label"));
+  });
+}
+
+test("modais: botões ficam dentro da caixa; aviso de rascunho só com rascunho", async ({ page }) => {
+  await create(page);
+  await add(page);
+  // Logo após adicionar com sucesso, trocar de aba não pede confirmação.
+  await page.getByRole("button", { name: "Folha oficial", exact: true }).click();
+  await expect(page.locator("dialog[open]")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Folha oficial", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Minha frequência", exact: true }).click();
+  await expect(page.locator("dialog[open]")).toHaveCount(0);
+  const draft = page.getByLabel("Atividade desenvolvida", { exact: true });
+  const triggers: Array<[string, () => Promise<void>]> = [
+    ["mês", () => page.getByLabel("Mês da folha").selectOption("2026-10").then(() => undefined)],
+    ["aba", () => page.getByRole("button", { name: "Folha oficial", exact: true }).click()],
+    ["concluir", () => page.getByRole("button", { name: /^Concluir/ }).click()],
+  ];
+  for (const [name, trigger] of triggers) {
+    await draft.fill(`Rascunho ${name}`);
+    await trigger();
+    await expect(page.getByRole("dialog", { name: "Atividade ainda não adicionada" })).toBeVisible();
+    expect(await buttonsOutsideDialog(page), name).toEqual([]);
+    await page.getByRole("button", { name: "Continuar editando", exact: true }).click();
+    await expect(draft).toHaveValue(`Rascunho ${name}`);
+  }
+  // Descartar e seguir para o Concluir: o modal de conclusão também cabe.
+  await page.getByRole("button", { name: /^Concluir/ }).click();
+  await page.getByRole("button", { name: "Descartar preenchimento", exact: true }).click();
+  expect(await buttonsOutsideDialog(page), "concluir").toEqual([]);
+  await page.keyboard.press("Escape");
+  // Confirmação de exclusão.
+  await page.getByRole("button", { name: /Excluir/ }).first().click();
+  expect(await buttonsOutsideDialog(page), "excluir").toEqual([]);
+});
