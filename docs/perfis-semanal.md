@@ -13,7 +13,7 @@ progresso por épico e do relatório final.
 | E3 Gerenciar perfis | feito | `feat: editar e excluir perfis na entrada` | entrada › Continuar; `test:ui` (resumo, exclusão, edição, cópia 1.4); `perfis.spec.ts` › "gerenciar perfis na entrada" | — |
 | E4 Seletores | feito | `feat(ui): seletores em grupos de opção` | formulário, modal de edição, primeiro acesso, modal de identificação; `perfis.spec.ts` › "seletores em grupos de opção"; `frequency.spec.ts` › "modelos rápidos…" | — |
 | E5 Visão semanal | feito | `feat: visão semanal da carga horária` | resumo › Semanal; `test:ui` "faixas de semana…", "semana atual…"; `perfis.spec.ts` › "visão semanal" | — |
-| E6 Fechamento | feito | `docs: ajuda, novidades, compatibilidade e capturas de perfis e visão semanal` | Ajuda/Dúvidas, README, `docs/ui-ux.md`, `src/lib/releases.ts`; `tests/e2e/compat.spec.ts`; `docs/validation/perfis-20261118/depois/` | perguntas 1–5 |
+| E6 Fechamento | feito | `docs: ajuda, novidades, compatibilidade e capturas de perfis e visão semanal` | Ajuda/Dúvidas, README, `docs/ui-ux.md`, `src/lib/releases.ts`; `tests/e2e/compat.spec.ts`; `docs/validation/perfis-20261118/depois/` | pergunta 2 (meta das semanas parciais) |
 
 ## E0 — Diagnóstico
 
@@ -75,6 +75,13 @@ Outros achados:
   meses, um comprovante PNG no IndexedDB. É a base do teste da regra de ouro.
 
 ### Perguntas (sigo com a opção conservadora; marcadas `TODO(perfis)` se tocarem código)
+
+**Respostas do mantenedor (18/11/2026):** 1 — não: "Salvar cópia" guarda só o
+mês em preenchimento (1.3); a 1.4 fica restrita à cópia antes de excluir.
+2 — explicada de novo na conversa; mantida a meta de 8 h nas faixas parciais
+até nova decisão. 3 — segue a recomendação (lista no modal de edição).
+4 — segue a recomendação (janela do Concluir). 5 — segunda a domingo.
+Nenhuma mudança de código decorrente.
 
 1. A cópia do perfil inteiro (antes de excluir) usa um formato novo **1.4**
    (`months: [...]`). "Salvar cópia" do dia a dia continua 1.3 (um mês). Quer
@@ -240,8 +247,7 @@ Outros achados:
 - **Cópia 1.4** só abre nesta versão em diante; uma versão antiga do app
   recusa com "versão de cópia não compatível" (sem gravar nada). A cópia do dia
   a dia continua 1.3.
-- **Semana de segunda a domingo** diverge do texto do pedido ("domingo a
-  sábado"); segue o exemplo e o app original (pergunta 5).
+- **Semana de segunda a domingo**: confirmada pelo mantenedor (pergunta 5).
 - Teste e2e "avaliação do site" já era instável no celular na linha de base
   (passa isolado); não foi alterado.
 
