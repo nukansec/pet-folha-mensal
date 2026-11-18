@@ -763,3 +763,153 @@ test("GATs em ordem numérica e contagens no singular", () => {
   assert.equal(pluralize(0, "atividade", "atividades"), "0 atividades");
   assert.equal(pluralize(3, "atividade", "atividades"), "3 atividades");
 });
+
+// ============================================================
+// E3: editar e excluir perfis na entrada
+// ============================================================
+function seedProfiles(records) {
+  const ana = { ...sampleUser, id: "ana", name: "Ana Fictícia" };
+  const ana2 = { ...sampleUser, id: "ana-2", name: "Ana Fictícia Dois" };
+  const outro = { ...sampleUser, id: "ana_b", name: "Outra Pessoa" };
+  records.set("pet_folha_profiles_v3", JSON.stringify([ana, ana2, outro]));
+  records.set("pet_folha_active_profile_id_v3", "ana");
+  const act = (id, date) => ({ ...sampleActivity, id, date });
+  records.set("pet_folha_activities_v3_ana_2026-10", JSON.stringify([act("a1", "2026-10-06"), act("a2", "2026-10-07")]));
+  records.set("pet_folha_activities_v3_ana_2026-11", JSON.stringify([act("a3", "2026-11-03")]));
+  records.set("pet_folha_activities_v3_ana_2026-12", JSON.stringify([]));
+  records.set("pet_folha_activities_v3_ana-2_2026-10", JSON.stringify([act("b1", "2026-10-08")]));
+  records.set("pet_folha_activities_v3_ana_b_2026-10", JSON.stringify([act("c1", "2026-10-09")]));
+  records.set("pet_folha_migrated_from_v2", "2026-10-01T00:00:00.000Z");
+  records.set("pet_folha_profiles_v2", JSON.stringify([{ id: "legado" }]));
+  records.set("pet_theme", "dark");
+  return { ana, ana2, outro };
+}
+
+test("resumo do perfil conta meses com atividades e atividades, só daquele id", () => {
+  const records = isolatedStorage();
+  seedProfiles(records);
+  assert.deepEqual(storage.getProfileActivitySummary("ana"), { months: 2, activities: 3 });
+  assert.deepEqual(storage.getProfileActivitySummary("ana-2"), { months: 1, activities: 1 });
+  assert.deepEqual(storage.listProfileMonths("ana"), ["2026-10", "2026-11"]);
+  assert.deepEqual(storage.getProfileActivitySummary("ninguem"), { months: 0, activities: 0 });
+});
+
+test("excluir remove só os dados daquele perfil no localStorage", () => {
+  const records = isolatedStorage();
+  seedProfiles(records);
+  const before = new Map(records);
+  const removed = storage.deleteUserProfile("ana");
+  assert.deepEqual(removed, { months: 2, activities: 3 });
+  assert.deepEqual(storage.getStoredProfiles().map((p) => p.id), ["ana-2", "ana_b"]);
+  for (const key of [...before.keys()]) {
+    const isAna = /^pet_folha_activities_v3_ana_\d{4}-\d{2}$/.test(key);
+    if (isAna) assert.equal(records.has(key), false, key);
+    else if (key !== "pet_folha_profiles_v3" && key !== "pet_folha_active_profile_id_v3")
+      assert.equal(records.get(key), before.get(key), key);
+  }
+  // Perfil ativo excluído: a entrada volta sem perfil aberto.
+  assert.equal(records.has("pet_folha_active_profile_id_v3"), false);
+  // Excluir um perfil não ativo preserva o ativo.
+  records.set("pet_folha_active_profile_id_v3", "ana_b");
+  storage.deleteUserProfile("ana-2");
+  assert.equal(records.get("pet_folha_active_profile_id_v3"), "ana_b");
+  assert.equal(records.has("pet_folha_activities_v3_ana_b_2026-10"), true);
+});
+
+test("editar nome não duplica perfil: mesmo id, e nome de outro perfil é recusado", () => {
+  const records = isolatedStorage();
+  const { ana } = seedProfiles(records);
+  const renamed = storage.updateUserProfileAdmin({ ...ana, name: "Ana Renomeada" });
+  assert.equal(renamed.success, true);
+  const profiles = storage.getStoredProfiles();
+  assert.equal(profiles.length, 3);
+  assert.equal(profiles.find((p) => p.id === "ana").name, "Ana Renomeada");
+  // Atividades continuam na mesma chave (o id não muda).
+  assert.equal(storage.getActivitiesForMonth("ana", "2026-10").length, 2);
+  const clash = storage.updateUserProfileAdmin({ ...ana, name: "  ANA FICTÍCIA dois " });
+  assert.equal(clash.success, false);
+  assert.equal(storage.getStoredProfiles().length, 3);
+  assert.equal(storage.getStoredProfiles().find((p) => p.id === "ana-2").name, "Ana Fictícia Dois");
+});
+
+test("cópia do perfil inteiro (1.4) restaura todos os meses depois de excluir", () => {
+  const records = isolatedStorage();
+  const { ana } = seedProfiles(records);
+  const attachment = { id: "f1", name: "foto.png", base64: "iVBORw0KGgo=" };
+  const json = storage.exportProfileData(ana, { "2026-11": [attachment], "2027-01": [attachment] });
+  const data = JSON.parse(json);
+  assert.equal(data.version, "1.4");
+  assert.deepEqual(data.months.map((m) => [m.monthKey, m.activities.length, m.attachments.length]), [
+    ["2026-10", 2, 0],
+    ["2026-11", 1, 1],
+    ["2027-01", 0, 1],
+  ]);
+  const before = {
+    oct: records.get("pet_folha_activities_v3_ana_2026-10"),
+    nov: records.get("pet_folha_activities_v3_ana_2026-11"),
+  };
+  storage.deleteUserProfile("ana");
+  const preview = storage.inspectUserData(json);
+  assert.equal(preview.success, true);
+  assert.equal(preview.monthKey, "2027-01");
+  assert.equal(preview.months.length, 3);
+  assert.deepEqual(preview.months[1].attachmentData, [attachment]);
+  // Sem IndexedDB, importUserData recusa cópias com comprovantes.
+  assert.equal(storage.importUserData(json).success, false);
+  const result = storage.applyUserData(preview);
+  assert.equal(result.success, true);
+  assert.equal(records.get("pet_folha_activities_v3_ana_2026-10"), before.oct);
+  assert.equal(records.get("pet_folha_activities_v3_ana_2026-11"), before.nov);
+  assert.equal(storage.getStoredProfiles().find((p) => p.id === "ana").name, "Ana Fictícia");
+  assert.deepEqual(storage.getProfileActivitySummary("ana"), { months: 2, activities: 3 });
+});
+
+test("cópia 1.4 inválida não grava nada", () => {
+  const records = isolatedStorage();
+  const { ana } = seedProfiles(records);
+  const valid = JSON.parse(storage.exportProfileData(ana));
+  const snapshot = JSON.stringify([...records]);
+  const broken = [
+    { ...valid, months: [] },
+    { ...valid, months: "x" },
+    { ...valid, months: [valid.months[0], valid.months[0]] },
+    { ...valid, months: [{ ...valid.months[0], monthKey: "2026-13" }] },
+    { ...valid, months: [{ ...valid.months[0], attachments: undefined }] },
+    { ...valid, months: [{ ...valid.months[0], monthKey: "2026-11" }] },
+    { ...valid, months: [{ ...valid.months[0], activities: [{ id: "x" }] }] },
+  ];
+  for (const data of broken) {
+    assert.equal(storage.inspectUserData(JSON.stringify(data)).success, false);
+  }
+  assert.equal(JSON.stringify([...records]), snapshot);
+});
+
+test("entrada mostra perfis em cartões com Abrir, Editar e Excluir rotulados", () => {
+  const { profileInitials, monthsWithActivities } = load("./src/components/LandingPage.tsx");
+  assert.equal(profileInitials("ana maria fictícia"), "AF");
+  assert.equal(profileInitials("Ícaro"), "Í");
+  assert.equal(monthsWithActivities(0), "Nenhum mês com atividades");
+  assert.equal(monthsWithActivities(1), "1 mês com atividades");
+  assert.equal(monthsWithActivities(3), "3 meses com atividades");
+  const html = render(
+    React.createElement(LandingPage, {
+      profiles: [sampleUser],
+      profileSummaries: { [sampleUser.id]: { months: 2, activities: 5 } },
+      onSelectProfile: noop,
+      onEditProfile: noop,
+      onDeleteProfile: noop,
+      onLoginWithJson: noop,
+      onCreateProfile: noop,
+      gats: DEFAULT_GATS,
+      roles: DEFAULT_ROLES,
+      onOpenAdmin: noop,
+      onOpenFeedback: noop,
+    }),
+  );
+  assert.match(html, /<ul class="profile-cards" aria-label="Perfis neste navegador">/);
+  assert.match(html, /aria-label="Abrir folha de Participante de teste"/);
+  assert.match(html, /aria-label="Editar perfil de Participante de teste"/);
+  assert.match(html, /aria-label="Excluir perfil de Participante de teste"/);
+  assert.match(html, /2 meses com atividades/);
+  assert.doesNotMatch(html, /<select[^>]*id="entry-profile"/);
+});

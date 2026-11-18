@@ -1194,3 +1194,153 @@
 .dialog-actions > :only-child {
   flex-grow: 0;
 }
+
+/* ---------- Entrada: perfis em cartões (Abrir, Editar, Excluir) ---------- */
+.profile-cards {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.profile-card {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.profile-card:hover {
+  border-color: var(--brand-text);
+}
+.profile-card-open {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 64px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  text-align: left;
+  color: var(--foreground);
+}
+.profile-card-open:hover {
+  background: var(--brand-soft);
+}
+.profile-card-initials {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand-text);
+  font-size: 16px;
+  font-weight: 700;
+}
+.profile-card-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.profile-card-text strong {
+  font-size: 16px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.profile-card-text small {
+  font-size: 14px;
+  color: var(--muted);
+}
+.profile-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  color: var(--brand-text);
+  font-size: 15px;
+  font-weight: 600;
+}
+.profile-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 6px;
+  border-left: 1px solid var(--border);
+  padding-left: 6px;
+}
+.profile-card-actions .icon-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.profile-card-delete:hover {
+  color: var(--danger);
+}
+
+/* Ação destrutiva: vermelho, nunca o laranja da marca. */
+.danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--danger-fill);
+  border-radius: 10px;
+  background: var(--danger-fill);
+  color: var(--on-danger);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.danger-button:hover:not(:disabled) {
+  background: var(--danger-fill-strong);
+  border-color: var(--danger-fill-strong);
+}
+.danger-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.delete-profile-panel > p {
+  margin: 12px 0 4px;
+  color: var(--body);
+  font-size: 15px;
+}
+.delete-profile-list {
+  margin: 0 0 8px;
+  padding-left: 20px;
+  list-style: disc;
+  color: var(--foreground);
+  font-size: 15px;
+  line-height: 1.7;
+}
+.delete-profile-panel .dialog-actions {
+  margin-top: 8px;
+}
+
+@media (max-width: 767px) {
+  .profile-card-cta {
+    display: none;
+  }
+  .profile-card-sep {
+    display: none;
+  }
+  /* Celular: Editar e Excluir numa linha abaixo; o nome usa a largura toda. */
+  .profile-card {
+    flex-direction: column;
+    gap: 0;
+  }
+  .profile-card-actions {
+    justify-content: flex-end;
+    padding: 2px 6px;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+  .profile-card-months {
+    display: block;
+  }
+}

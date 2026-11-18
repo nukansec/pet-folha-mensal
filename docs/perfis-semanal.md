@@ -10,6 +10,7 @@ progresso por épico e do relatório final.
 | E0 Reconhecimento | feito | `docs: diagnóstico de perfis e visão semanal` | este arquivo; `docs/validation/perfis-20261118/antes/` | — |
 | E1 Créditos | feito | `docs: autoria da versão PET-SD nos créditos` | rodapé (entrada e painel); README › Créditos; `test:ui` "botão Avaliar o site…" | — |
 | E2 Menu do participante | feito | `feat(ui): menu do participante no topo` | clique no cartão do topo; `tests/e2e/perfis.spec.ts` › "menu do participante" | — |
+| E3 Gerenciar perfis | feito | `feat: editar e excluir perfis na entrada` | entrada › Continuar; `test:ui` (resumo, exclusão, edição, cópia 1.4); `perfis.spec.ts` › "gerenciar perfis na entrada" | — |
 
 ## E0 — Diagnóstico
 
@@ -101,3 +102,23 @@ Outros achados:
 - **E2** — GAT no modal: `FullSelect` ganhou `singleLine` (uma linha, reticências,
   texto inteiro no `title`); o resto do app continua quebrando a linha.
   "Salvar alterações" e títulos em caixa de frase também no modal de edição.
+- **E3** — Exclusão completa: perfil, atividades de todos os meses
+  (`pet_folha_activities_v3_<id>_<AAAA-MM>`, id exato) e comprovantes
+  (`IDBKeyRange.bound([id], [id, []])`: só as chaves daquele id). Os
+  comprovantes saem **primeiro**; se o IndexedDB falhar, nada é apagado.
+  O inverso deixaria comprovantes órfãos sem perfil para alcançá-los.
+- **E3** — "Salvar cópia antes" gera a cópia do **perfil inteiro**, formato
+  **1.4** (`months: [{monthKey, activities, attachments}]`). A 1.3 só tinha um
+  mês e não serviria para "restaurar o perfil inteiro". Restaurar 1.4 troca só
+  os meses da cópia (atividades e comprovantes) numa transação IndexedDB com
+  rollback do localStorage, como a 1.3. Cópias 1.0–1.3 continuam iguais.
+  Versões antigas do app recusam a 1.4 com a mensagem de versão incompatível.
+- **E3** — Editar pela entrada usa o mesmo `ProfileModal`; a gravação passou
+  a usar `updateUserProfileAdmin`, que recusa nome igual a outro perfil
+  (`normalizeName`). Antes, `saveProfiles` desduplicava e um nome repetido
+  apagaria o outro perfil se o modal deixasse passar.
+- **E3** — Confirmação explícita = segundo passo com botão de perigo
+  vermelho (`.danger-button`, token `--danger-fill`), nunca o laranja da marca.
+  Sem caixa "digite o nome": a cópia antes já é oferecida e o custo de digitar
+  no celular não compensa para dados locais.
+- **E3** — Sem perfis (o último excluído), a entrada cai em "Primeiro acesso".

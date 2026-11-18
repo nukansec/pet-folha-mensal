@@ -383,19 +383,68 @@ export function registerProfile(data: {
   return { success: true, user: newProfile };
 }
 
-export function deleteUserProfile(profileId: string): void {
-  if (typeof window === "undefined") return;
-  const profiles = getStoredProfiles().filter((p) => p.id !== profileId);
-  saveProfiles(profiles);
-
-  const activeId = localStorage.getItem(ACTIVE_PROFILE_ID_KEY);
-  if (activeId === profileId) {
-    if (profiles.length > 0) {
-      setActiveProfileId(profiles[0].id);
-    } else {
-      setActiveProfileId(null);
-    }
+/**
+ * Chaves de atividades de um perfil: `${ACTIVITIES_PREFIX}<id>_<AAAA-MM>`.
+ * Correspondência exata (id + "_" + mês): o id "ana" não pega "ana-2".
+ */
+function profileActivityKeys(profileId: string): Array<{ key: string; monthKey: string }> {
+  const prefix = `${ACTIVITIES_PREFIX}${profileId}_`;
+  const found: Array<{ key: string; monthKey: string }> = [];
+  for (let index = 0; index < localStorage.length; index++) {
+    const key = localStorage.key(index);
+    if (!key?.startsWith(prefix)) continue;
+    const monthKey = key.slice(prefix.length);
+    if (/^\d{4}-(0[1-9]|1[0-2])$/.test(monthKey)) found.push({ key, monthKey });
   }
+  return found.sort((a, b) => a.monthKey.localeCompare(b.monthKey));
+}
+
+/** Meses (AAAA-MM) com pelo menos uma atividade gravada para o perfil. */
+export function listProfileMonths(profileId: string): string[] {
+  if (typeof window === "undefined") return [];
+  return profileActivityKeys(profileId)
+    .map(({ monthKey }) => monthKey)
+    .filter((monthKey) => getActivitiesForMonth(profileId, monthKey).length > 0);
+}
+
+export interface ProfileActivitySummary {
+  /** Meses com pelo menos uma atividade. */
+  months: number;
+  /** Atividades somadas de todos os meses. */
+  activities: number;
+}
+
+export function getProfileActivitySummary(profileId: string): ProfileActivitySummary {
+  if (typeof window === "undefined") return { months: 0, activities: 0 };
+  try {
+    let months = 0;
+    let activities = 0;
+    for (const { monthKey } of profileActivityKeys(profileId)) {
+      const count = getActivitiesForMonth(profileId, monthKey).length;
+      if (count) months++;
+      activities += count;
+    }
+    return { months, activities };
+  } catch {
+    return { months: 0, activities: 0 };
+  }
+}
+
+/**
+ * Apaga do localStorage o perfil, as atividades de todos os meses e, se for o
+ * caso, a marca de perfil ativo. Não toca em outros perfis, nas configurações
+ * nem nas chaves _v2 (a marca de migração impede que o perfil volte).
+ * Os comprovantes (IndexedDB) são apagados por deleteProfileAttachments.
+ */
+export function deleteUserProfile(profileId: string): ProfileActivitySummary {
+  if (typeof window === "undefined") return { months: 0, activities: 0 };
+  const summary = getProfileActivitySummary(profileId);
+  const keys = profileActivityKeys(profileId);
+  saveProfiles(getStoredProfiles().filter((p) => p.id !== profileId));
+  for (const { key } of keys) localStorage.removeItem(key);
+  if (localStorage.getItem(ACTIVE_PROFILE_ID_KEY) === profileId)
+    setActiveProfileId(null);
+  return summary;
 }
 
 export function updateUserProfileAdmin(updated: UserProfile): {
@@ -677,7 +726,10 @@ export function saveActivitiesForMonth(
 
 /** 1.3: atividades com local e descricao. 1.0–1.2 continuam restaurando. */
 export const BACKUP_VERSION = "1.3";
-const SUPPORTED_VERSIONS = ["1.0", "1.1", "1.2", "1.3"];
+/** 1.4: cópia do perfil inteiro (todos os meses, cada um com comprovantes). */
+export const PROFILE_BACKUP_VERSION = "1.4";
+const SUPPORTED_VERSIONS = ["1.0", "1.1", "1.2", "1.3", "1.4"];
+const MAX_BACKUP_MONTHS = 120;
 
 export function exportUserData(
   user: UserProfile,
@@ -698,6 +750,38 @@ export function exportUserData(
   return JSON.stringify(data, null, 2);
 }
 
+/**
+ * Cópia do perfil inteiro (formato 1.4): identificação e, para cada mês com
+ * atividades ou comprovantes, as atividades e os comprovantes. Usada antes de
+ * excluir um perfil; "Salvar cópia" continua gerando a cópia do mês (1.3).
+ */
+export function exportProfileData(
+  user: UserProfile,
+  attachmentsByMonth: Record<string, BackupAttachment[]> = {},
+): string {
+  const monthKeys = new Set([
+    ...listProfileMonths(user.id),
+    ...Object.keys(attachmentsByMonth).filter(
+      (monthKey) => attachmentsByMonth[monthKey].length > 0,
+    ),
+  ]);
+  const months = [...monthKeys].sort().map((monthKey) => ({
+    monthKey,
+    activities: getActivitiesForMonth(user.id, monthKey),
+    attachments: attachmentsByMonth[monthKey] ?? [],
+  }));
+  return JSON.stringify(
+    {
+      version: PROFILE_BACKUP_VERSION,
+      exportedAt: new Date().toISOString(),
+      user: removeLegacyPin(user),
+      months,
+    },
+    null,
+    2,
+  );
+}
+
 export type RestoreCode =
   | "RESTORED"
   | "INVALID_JSON"
@@ -706,12 +790,21 @@ export type RestoreCode =
   | "PROFILE_CONFLICT"
   | "STORAGE_FAILED"
   | "ROLLBACK_FAILED";
+export interface RestoreMonth {
+  monthKey: string;
+  activities: Activity[];
+  /** Comprovantes da cópia; ausente = preservar os já salvos neste navegador. */
+  attachmentData?: unknown[];
+}
 export type RestoreResult = {
   success: boolean;
   user?: UserProfile;
+  /** Mês aberto depois de restaurar (o único da cópia ou o mais recente). */
   monthKey?: string;
   activities?: Activity[];
   attachmentData?: unknown[];
+  /** Todos os meses da cópia (1 nas cópias 1.0–1.3). */
+  months?: RestoreMonth[];
   error?: string;
   code: RestoreCode;
 };
@@ -723,7 +816,7 @@ const restoreMessages: Record<RestoreCode, string> = {
   INVALID_BACKUP:
     "A cópia está incompleta ou contém registros inválidos. Selecione outra cópia. Seus registros não foram alterados.",
   UNSUPPORTED_VERSION:
-    "Esta versão de cópia não é compatível. Use uma cópia no formato 1.0 a 1.3. Seus registros não foram alterados.",
+    "Esta versão de cópia não é compatível. Use uma cópia no formato 1.0 a 1.4. Seus registros não foram alterados.",
   PROFILE_CONFLICT:
     "Já existe um perfil com este nome e outra identificação neste navegador. Continue com o perfil local ou peça ajuda antes de restaurar.",
   STORAGE_FAILED:
@@ -747,6 +840,36 @@ const validTime = (value: unknown): value is string =>
   typeof value === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 const optionalText = (value: unknown, max: number) =>
   value === undefined || (typeof value === "string" && value.length <= max);
+
+function readActivities(records: unknown): Activity[] | null {
+  if (!Array.isArray(records)) return null;
+  const ids = new Set<string>();
+  const activities: Activity[] = [];
+  for (const record of records) {
+    if (
+      !record ||
+      !nonempty(record.id) ||
+      ids.has(record.id) ||
+      !validDate(record.date) ||
+      !validTime(record.start) ||
+      !validTime(record.end) ||
+      calcPetMinutes(record.start, record.end) <= 0 ||
+      !nonempty(record.description) ||
+      !nonempty(record.modality) ||
+      record.modality.length > 120 ||
+      !optionalText(record.local, 300) ||
+      !optionalText(record.descricao, 4000)
+    )
+      return null;
+    ids.add(record.id);
+    // Cópias 1.2 podiam trazer "formReport" (Forms do programa anterior): ignorado.
+    activities.push(normalizeActivity(record));
+  }
+  return sortActivitiesChronologically(activities);
+}
+
+const validMonthKey = (value: unknown): value is string =>
+  typeof value === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
 
 // Validate the shared fields before any browser write. Files are validated separately.
 export function inspectUserData(jsonStr: string): RestoreResult {
@@ -773,34 +896,9 @@ export function inspectUserData(jsonStr: string): RestoreResult {
     !profile ||
     !["id", "name", "role", "gatNumber", "createdAt"].every((key) =>
       nonempty(profile[key]),
-    ) ||
-    typeof data.monthKey !== "string" ||
-    !/^\d{4}-(0[1-9]|1[0-2])$/.test(data.monthKey) ||
-    !Array.isArray(data.activities)
+    )
   )
     return restoreFailure("INVALID_BACKUP");
-  const ids = new Set<string>();
-  const activities: Activity[] = [];
-  for (const record of data.activities) {
-    if (
-      !record ||
-      !nonempty(record.id) ||
-      ids.has(record.id) ||
-      !validDate(record.date) ||
-      !validTime(record.start) ||
-      !validTime(record.end) ||
-      calcPetMinutes(record.start, record.end) <= 0 ||
-      !nonempty(record.description) ||
-      !nonempty(record.modality) ||
-      record.modality.length > 120 ||
-      !optionalText(record.local, 300) ||
-      !optionalText(record.descricao, 4000)
-    )
-      return restoreFailure("INVALID_BACKUP");
-    ids.add(record.id);
-    // Cópias 1.2 podiam trazer "formReport" (Forms do programa anterior): ignorado.
-    activities.push(normalizeActivity(record));
-  }
   const user: UserProfile = {
     id: profile.id,
     name: profile.name.trim(),
@@ -810,6 +908,49 @@ export function inspectUserData(jsonStr: string): RestoreResult {
   };
   if (typeof profile.gatName === "string") user.gatName = profile.gatName;
   if (typeof profile.email === "string") user.email = profile.email;
+
+  if (data.version === PROFILE_BACKUP_VERSION) {
+    if (
+      !Array.isArray(data.months) ||
+      data.months.length === 0 ||
+      data.months.length > MAX_BACKUP_MONTHS
+    )
+      return restoreFailure("INVALID_BACKUP");
+    const months: RestoreMonth[] = [];
+    const seen = new Set<string>();
+    for (const month of data.months) {
+      const activities = readActivities(month?.activities);
+      if (
+        !month ||
+        !validMonthKey(month.monthKey) ||
+        seen.has(month.monthKey) ||
+        !activities ||
+        !Array.isArray(month.attachments) ||
+        activities.some((activity) => !activity.date.startsWith(month.monthKey))
+      )
+        return restoreFailure("INVALID_BACKUP");
+      seen.add(month.monthKey);
+      months.push({
+        monthKey: month.monthKey,
+        activities,
+        attachmentData: month.attachments,
+      });
+    }
+    months.sort((a, b) => a.monthKey.localeCompare(b.monthKey));
+    const latest = months[months.length - 1];
+    return {
+      success: true,
+      code: "RESTORED",
+      user,
+      monthKey: latest.monthKey,
+      activities: latest.activities,
+      months,
+    };
+  }
+
+  if (!validMonthKey(data.monthKey)) return restoreFailure("INVALID_BACKUP");
+  const activities = readActivities(data.activities);
+  if (!activities) return restoreFailure("INVALID_BACKUP");
   const hasAttachments =
     ["1.1", "1.2"].includes(data.version) ||
     (data.version === "1.3" && Array.isArray(data.attachments));
@@ -818,14 +959,23 @@ export function inspectUserData(jsonStr: string): RestoreResult {
     code: "RESTORED",
     user,
     monthKey: data.monthKey,
-    activities: sortActivitiesChronologically(activities),
+    activities,
     ...(hasAttachments && { attachmentData: data.attachments }),
+    months: [
+      {
+        monthKey: data.monthKey,
+        activities,
+        ...(hasAttachments && { attachmentData: data.attachments }),
+      },
+    ],
   };
 }
 
 export function importUserData(jsonStr: string): RestoreResult {
   const result = inspectUserData(jsonStr);
-  if (result.attachmentData) return restoreFailure("INVALID_BACKUP");
+  // Sem IndexedDB aqui: cópias com comprovantes passam por restoreWithAttachments.
+  if (result.months?.some((month) => month.attachmentData))
+    return restoreFailure("INVALID_BACKUP");
   return applyUserData(result);
 }
 
@@ -836,9 +986,14 @@ export function applyUserData(
   if (!result.success || !result.user || !result.monthKey || !result.activities)
     return result;
   if (typeof window === "undefined") return restoreFailure("STORAGE_FAILED");
-  const { user, monthKey, activities } = result;
-  const activityKey = `${ACTIVITIES_PREFIX}${user.id}_${monthKey}`;
-  const keys = [activityKey, PROFILES_KEY, ACTIVE_PROFILE_ID_KEY];
+  const { user } = result;
+  const months = result.months ?? [
+    { monthKey: result.monthKey, activities: result.activities },
+  ];
+  const activityKeys = months.map(
+    ({ monthKey }) => `${ACTIVITIES_PREFIX}${user.id}_${monthKey}`,
+  );
+  const keys = [...activityKeys, PROFILES_KEY, ACTIVE_PROFILE_ID_KEY];
   const previous = new Map<string, string | null>();
   const written: Array<{ key: string; value: string }> = [];
   const rollback = () => {
@@ -880,7 +1035,7 @@ export function applyUserData(
         )
       : [...profiles.map(removeLegacyPin), user];
     const values = [
-      JSON.stringify(activities),
+      ...months.map(({ activities }) => JSON.stringify(activities)),
       JSON.stringify(updated),
       user.id,
     ];

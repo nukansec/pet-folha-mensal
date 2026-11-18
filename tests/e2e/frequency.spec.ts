@@ -75,7 +75,7 @@ test("perfil repetido retoma sem arquivo e preserva meses anteriores", async ({
   );
   await page.goto("/");
   await expect(
-    page.getByLabel("Perfil neste navegador", { exact: true }),
+    page.getByRole("list", { name: "Perfis neste navegador" }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Primeiro acesso", exact: true })
@@ -100,7 +100,7 @@ test("perfil repetido retoma sem arquivo e preserva meses anteriores", async ({
   await page
     .getByRole("button", { name: "Sair / trocar participante", exact: true })
     .click();
-  await page.getByRole("button", { name: "Continuar com este perfil", exact: true }).click();
+  await page.getByRole("button", { name: `Abrir folha de ${user.name}`, exact: true }).click();
   await page.reload();
   const stored = await page.evaluate(
     (keys) => ({
@@ -522,13 +522,14 @@ test("dados do formato antigo migram para o v3; exemplo sem uso não aparece; v2
     localStorage.setItem("pet_folha_activities_v2_pessoa-v2_2026-10", JSON.stringify(old));
   }, { legacy, used, old });
   await page.reload();
-  const select = page.getByLabel("Perfil neste navegador", { exact: true });
-  await expect(select.locator("option")).toHaveCount(1);
-  await expect(select).toHaveValue(used.id);
-  await expect(select.locator("option")).toHaveText(/Monitor\(a\)/);
+  const cards = page.getByRole("list", { name: "Perfis neste navegador" }).getByRole("listitem");
+  await expect(cards).toHaveCount(1);
+  await expect(cards).toContainText(used.name);
+  await expect(cards).toContainText(/Monitor\(a\)/);
+  await expect(cards).toContainText("1 mês com atividades");
   await expect(page.getByText(/O JSON é um arquivo que guarda sua identificação/)).toBeVisible();
   await expect(page.getByText(/Quem usa este navegador pode abrir/)).toBeVisible();
-  await page.getByRole("button", { name: "Continuar com este perfil", exact: true }).click();
+  await page.getByRole("button", { name: `Abrir folha de ${used.name}`, exact: true }).click();
   await page.getByLabel("Mês da folha").selectOption("2026-10");
   await expect(page.locator(".summary-total strong")).toHaveText("1h30");
   await expect(page.locator(".record-hours:visible, .record-meta strong:visible").first()).toHaveText("1h30");
