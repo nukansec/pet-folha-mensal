@@ -9,7 +9,6 @@ import {
   Download,
   FileJson,
   FileText,
-  HelpCircle,
   Lock,
   Moon,
   Plus,
@@ -81,7 +80,7 @@ export function LandingPage({
             <a href="#o-que-guardar">O que guardar</a>
             <a href="#perguntas">Dúvidas</a>
           </nav>
-          <nav className="entry-tools" aria-label="Ajuda e preferências">
+          <nav className="entry-tools" aria-label="Preferências">
             {profiles.length > 0 && (
               <a
                 className="secondary-button entry-continue"
@@ -91,14 +90,6 @@ export function LandingPage({
                 Continuar minha folha
               </a>
             )}
-            <button
-              className="icon-button"
-              onClick={() => setHelpOpen(true)}
-              aria-label="Abrir ajuda"
-              title="Ajuda"
-            >
-              <HelpCircle size={20} />
-            </button>
             <button
               className="icon-button"
               onClick={toggleTheme}
