@@ -144,10 +144,16 @@ export const PROGRAM = {
 
   /** Links opcionais. Vazio = o botão correspondente não aparece. */
   links: {
-    /** Formulário de registro de atividades do programa, se houver. TODO(pet-sd) */
+    /**
+     * Formulário de registro de atividades: vazio de propósito. O PET-SD não
+     * tem formulário de registro (o registro é a própria folha assinada).
+     */
     activityForm: "" as string,
-    /** Formulário de avaliação do site, se houver. TODO(pet-sd) */
-    feedbackForm: "" as string,
+    /**
+     * Formulário de avaliação do site (Google Forms do PET-SD). Abre em nova
+     * aba, sem parâmetros: nenhum dado do usuário vai na URL.
+     */
+    feedbackForm: "https://forms.gle/tjpuiFpgJ2Njnx7F7" as string,
     /** Repositório deste fork. */
     repository: "https://github.com/nukansec/pet-folha-mensal",
     /** Endereço público do app (base das URLs absolutas do Open Graph). */

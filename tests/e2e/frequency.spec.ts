@@ -542,13 +542,28 @@ test("dados do formato antigo migram para o v3; exemplo sem uso não aparece; v2
   expect(stored.v3[0]).toMatchObject({ modality: "Interação em tempo real (In Loco)", local: "", descricao: "", hours: 1.5 });
 });
 
-test("sem links configurados, botões de Forms e avaliação não aparecem", async ({ page }) => {
+test("avaliação do site abre o formulário em nova aba; sem formulário de registro", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("button", { name: "Avaliar", exact: true })).toHaveCount(0);
   await expect(page.getByText(/Clima/)).toHaveCount(0);
   await expect(page.locator("footer")).toContainText("Felipe Gonçalves Vidal");
+  const rate = page.getByRole("button", { name: "Avaliar o site", exact: true });
+  await expect(rate).toBeVisible();
+  await rate.click();
+  const link = page
+    .getByRole("dialog", { name: "Avaliar o site" })
+    .getByRole("link", { name: /Abrir formulário de avaliação/ });
+  // Endereço exato, sem parâmetros: nenhum dado do usuário vai na URL.
+  await expect(link).toHaveAttribute("href", "https://forms.gle/tjpuiFpgJ2Njnx7F7");
+  await expect(link).toHaveAttribute("target", "_blank");
+  await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  await page.keyboard.press("Escape");
   await create(page);
   await add(page);
+  // Mesmo link no rodapé do painel, depois de criar a folha.
+  await page.getByRole("button", { name: "Avaliar o site", exact: true }).click();
+  await expect(link).toHaveAttribute("href", "https://forms.gle/tjpuiFpgJ2Njnx7F7");
+  await page.keyboard.press("Escape");
+  // O PET-SD não tem formulário de registro: nada de Forms no painel nem no Concluir.
   await expect(page.getByRole("button", { name: /Forms/ })).toHaveCount(0);
   await page.getByRole("button", { name: /^Concluir/ }).click();
   await expect(page.getByRole("link", { name: "Abrir formulário de atividades" })).toHaveCount(0);

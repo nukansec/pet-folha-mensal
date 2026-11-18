@@ -358,6 +358,26 @@ test("endereço do site só na config; metadados usam PROGRAM.links.site", () =>
   assert.match(readFileSync(path.join(root, "src/app/layout.tsx"), "utf8"), /metadataBase: new URL\(PROGRAM\.links\.site\)/);
 });
 
+test("botão Avaliar o site depende do link configurado", () => {
+  const { PROGRAM } = load("./src/config/program.ts");
+  const { SiteFooter } = load("./src/components/SiteFooter.tsx");
+  const { FeedbackModal } = load("./src/components/FeedbackModal.tsx");
+  const footer = () => render(React.createElement(SiteFooter, { onHelp: noop, onFeedback: noop }));
+  assert.equal(PROGRAM.links.feedbackForm, "https://forms.gle/tjpuiFpgJ2Njnx7F7");
+  assert.equal(PROGRAM.links.activityForm, "");
+  assert.match(footer(), />Avaliar o site</);
+  const modal = render(React.createElement(FeedbackModal, { isOpen: true, onClose: noop }));
+  assert.match(modal, /href="https:\/\/forms\.gle\/tjpuiFpgJ2Njnx7F7" target="_blank" rel="noopener noreferrer"/);
+  const saved = PROGRAM.links.feedbackForm;
+  try {
+    PROGRAM.links.feedbackForm = "";
+    assert.doesNotMatch(footer(), /Avaliar/);
+    assert.equal(render(React.createElement(FeedbackModal, { isOpen: true, onClose: noop })), "");
+  } finally {
+    PROGRAM.links.feedbackForm = saved;
+  }
+});
+
 test("cópias 1.0 a 1.2 restauram com campos novos vazios e ignoram o Forms antigo", () => {
   isolatedStorage();
   const old = {
