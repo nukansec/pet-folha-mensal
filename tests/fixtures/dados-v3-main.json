@@ -1,0 +1,26 @@
+{
+  "origem": "main 269f816 (18/11/2026), dados fictícios",
+  "localStorage": {
+    "pet_folha_profiles_v3": "[{\"id\":\"participante-fict-cio-um-f4g5\",\"name\":\"Participante Fictício Um\",\"role\":\"Monitor(a)\",\"gatNumber\":\"03\",\"gatName\":\"Telecuidado farmacoterapêutico\",\"createdAt\":\"2026-11-18T18:00:00.581Z\"},{\"id\":\"participante-fict-cia-dois-f4z0\",\"name\":\"Participante Fictícia Dois\",\"role\":\"Preceptor(a)\",\"gatNumber\":\"12\",\"gatName\":\"Saúde mental digital\",\"createdAt\":\"2026-11-18T18:00:01.260Z\"}]",
+    "pet_folha_activities_v3_participante-fict-cio-um-f4g5_2026-11": "[{\"date\":\"2026-11-03\",\"start\":\"11:00\",\"end\":\"13:00\",\"modality\":\"Interação em tempo real (In Loco)\",\"local\":\"UFG\",\"description\":\"Reunião Geral\",\"descricao\":\"Pauta fictícia A.\",\"id\":\"e764f063-afb4-4483-870f-8e3d9bb18b54\",\"hours\":2},{\"date\":\"2026-11-05\",\"start\":\"16:30\",\"end\":\"18:00\",\"modality\":\"Assíncrona\",\"local\":\"Online\",\"description\":\"Pesquisa Bibliográfica e Estudos Autônomos\",\"descricao\":\"Leitura fictícia.\",\"id\":\"11a8a27e-d912-4483-b133-cc8532f84de3\",\"hours\":1.5},{\"date\":\"2026-11-30\",\"start\":\"08:00\",\"end\":\"12:15\",\"modality\":\"Interação em tempo real (In Loco)\",\"local\":\"Unidade fictícia\",\"description\":\"Visita Técnica\",\"descricao\":\"Visita de exemplo.\",\"id\":\"dedf79f0-b968-46b9-bf85-0506d5d8f0bf\",\"hours\":4.25}]",
+    "pet_folha_activities_v3_participante-fict-cio-um-f4g5_2026-10": "[{\"date\":\"2026-10-07\",\"start\":\"14:00\",\"end\":\"15:30\",\"modality\":\"Interação em tempo real (Síncrona)\",\"local\":\"Sala fictícia\",\"description\":\"Capacitação\",\"descricao\":\"Capacitação de exemplo.\",\"id\":\"645e83c8-441a-48ed-baca-11aa90c0bf8d\",\"hours\":1.5}]",
+    "pet_folha_activities_v3_participante-fict-cia-dois-f4z0_2026-11": "[{\"date\":\"2026-11-10\",\"start\":\"09:00\",\"end\":\"10:00\",\"modality\":\"Interação em tempo real (Síncrona)\",\"local\":\"Online\",\"description\":\"Capacitação\",\"descricao\":\"Outro perfil.\",\"id\":\"92f96b74-3b26-4882-930c-ab620b98a3fb\",\"hours\":1}]"
+  },
+  "indexedDB": [
+    {
+      "key": [
+        "participante-fict-cio-um-f4g5",
+        "2026-11"
+      ],
+      "attachments": [
+        {
+          "id": "4bc096fe-0d42-4614-833b-56da57f1a31a",
+          "name": "foto-ficticia.png",
+          "pages": 1,
+          "type": "image/png",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAMklEQVR4nGP4T2PAQCcLFPoCqI5GLRi1YNSCUQtGLRi1YNSCUQtGLRi1gBwLaAdobgEAXUfXXDidab8AAAAASUVORK5CYII="
+        }
+      ]
+    }
+  ]
+}
