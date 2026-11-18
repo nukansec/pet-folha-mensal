@@ -307,6 +307,30 @@ test("modalidades antigas mapeiam por nome; In Loco é aceita em cópias e model
   ]);
 });
 
+test("modelos rápidos: lista padrão antiga vira a nova; lista editada é mantida", () => {
+  const { PROGRAM } = load("./src/config/program.ts");
+  assert.deepEqual(PROGRAM.templates.map((t) => [t.name, t.modality, t.local]), [
+    ["Reunião Geral", "Interação em tempo real (In Loco)", "UFG"],
+    ["Capacitação", "Interação em tempo real (Síncrona)", "Online"],
+    ["Visita Técnica", "Interação em tempo real (In Loco)", ""],
+    ["Pesquisa Bibliográfica e Estudos Autônomos", "Assíncrona", "Online"],
+  ]);
+  // Lista antiga salva sem edição (como o painel admin gravava).
+  const records = isolatedStorage();
+  const legacy = PROGRAM.legacyTemplates.map((t) => ({ ...t, isGatSpecific: Boolean(t.isGatSpecific) }));
+  records.set("pet_folha_config_templates_v3", JSON.stringify(legacy));
+  assert.deepEqual(storage.getStoredTemplates().map((t) => t.id), PROGRAM.templates.map((t) => t.id));
+  // A chave salva não é reescrita na leitura.
+  assert.equal(records.get("pet_folha_config_templates_v3"), JSON.stringify(legacy));
+  // Lista editada: um local diferente basta para manter a da pessoa.
+  const edited = legacy.map((t, i) => (i === 3 ? { ...t, local: "Sala fictícia" } : t));
+  records.set("pet_folha_config_templates_v3", JSON.stringify(edited));
+  assert.deepEqual(storage.getStoredTemplates().map((t) => [t.id, t.local]), edited.map((t) => [t.id, t.local]));
+  // Lista antiga com um modelo a menos também é da pessoa.
+  records.set("pet_folha_config_templates_v3", JSON.stringify(legacy.slice(1)));
+  assert.equal(storage.getStoredTemplates().length, 6);
+});
+
 test("cópias 1.0 a 1.2 restauram com campos novos vazios e ignoram o Forms antigo", () => {
   isolatedStorage();
   const old = {

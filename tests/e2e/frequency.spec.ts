@@ -802,7 +802,7 @@ test("sem texto cortado, foco visível e folha oficial em preto e branco", async
   await page.getByLabel("GAT", { exact: true }).selectOption("01");
   await create(page);
   await add(page);
-  // A modalidade padrão é a mais longa ("Interação em tempo real (Síncrona)").
+  // Modalidade padrão do formulário: Síncrona (PROGRAM.defaultModality).
   await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue(/Síncrona/);
   for (const theme of ["light", "dark"]) {
     await page.evaluate((theme) => {
@@ -853,6 +853,55 @@ test("sem texto cortado, foco visível e folha oficial em preto e branco", async
   }
   // Modelo rápido de nome longo, no celular.
   await page.setViewportSize({ width: 390, height: 1000 });
-  await page.getByLabel(/Preenchimento rápido/).selectOption({ label: "Pesquisa bibliográfica e estudo autônomo" });
+  await page.getByLabel(/Preenchimento rápido/).selectOption({ label: "Pesquisa Bibliográfica e Estudos Autônomos" });
   expect(await cutTexts(page), "modelo longo 390px").toEqual([]);
+});
+
+test("modelos rápidos novos; modelo sem local deixa o campo vazio", async ({ page }) => {
+  await create(page);
+  const template = page.getByLabel(/Preenchimento rápido/);
+  await expect(template.locator("option")).toHaveText([
+    "Em branco",
+    "Reunião Geral",
+    "Capacitação",
+    "Visita Técnica",
+    "Pesquisa Bibliográfica e Estudos Autônomos",
+  ]);
+  await template.selectOption({ label: "Reunião Geral" });
+  await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("UFG");
+  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Interação em tempo real (In Loco)");
+  await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Reunião Geral");
+  await template.selectOption({ label: "Visita Técnica" });
+  await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("");
+  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Interação em tempo real (In Loco)");
+  await template.selectOption({ label: "Pesquisa Bibliográfica e Estudos Autônomos" });
+  await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("Online");
+  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Assíncrona");
+});
+
+test("lista antiga de modelos salva sem edição abre com os modelos novos", async ({ page }) => {
+  const legacy = [
+    { id: "tpl-reuniao-gat", name: "Reunião semanal do GAT {gatNumber}", modality: "Interação em tempo real (Síncrona)", local: "UFG", isGatSpecific: true },
+    { id: "tpl-reuniao-frente", name: "Reunião da frente de trabalho", modality: "Interação em tempo real (Síncrona)", local: "Google Meet", isGatSpecific: false },
+    { id: "tpl-ata", name: "Elaboração de ata", modality: "Assíncrona", local: "-", isGatSpecific: false },
+    { id: "tpl-estudos", name: "Grupo de estudos", modality: "Interação em tempo real (Síncrona)", local: "UFG", isGatSpecific: false },
+    { id: "tpl-capacitacao", name: "Capacitação", modality: "Interação em tempo real (Síncrona)", local: "UFG", isGatSpecific: false },
+    { id: "tpl-visita", name: "Visita técnica", modality: "Interação em tempo real (Síncrona)", local: "Unidade de saúde", isGatSpecific: false },
+    { id: "tpl-estudo-assincrono", name: "Pesquisa bibliográfica e estudo autônomo", modality: "Assíncrona", local: "-", isGatSpecific: false },
+  ];
+  await page.addInitScript((legacy) => {
+    if (localStorage.getItem("test-seeded")) return;
+    localStorage.setItem("pet_folha_config_templates_v3", JSON.stringify(legacy));
+    localStorage.setItem("test-seeded", "1");
+  }, legacy);
+  await create(page);
+  const options = page.getByLabel(/Preenchimento rápido/).locator("option");
+  await expect(options).toHaveCount(5);
+  await expect(options.nth(1)).toHaveText("Reunião Geral");
+  // Lista editada pela pessoa: fica a dela.
+  await page.evaluate((legacy) => {
+    localStorage.setItem("pet_folha_config_templates_v3", JSON.stringify([{ ...legacy[2], name: "Ata da reunião (editada)" }]));
+  }, legacy);
+  await page.reload();
+  await expect(page.getByLabel(/Preenchimento rápido/).locator("option")).toHaveText(["Em branco", "Ata da reunião (editada)"]);
 });

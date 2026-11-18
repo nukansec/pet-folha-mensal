@@ -125,7 +125,8 @@ export function ActivityForm({
                     ),
                   );
                   setModality(template.modality);
-                  if (template.local) setLocal(template.local);
+                  // Modelo sem local limpa o campo: não herda o do modelo anterior.
+                  setLocal(template.local);
                   dirty();
                 }
               }}
@@ -230,7 +231,7 @@ export function ActivityForm({
           <input
             id="activity-description"
             required
-            placeholder="Ex.: Reunião semanal do GAT"
+            placeholder="Ex.: Reunião Geral"
             value={description}
             onChange={(event) => {
               setDescription(event.target.value);

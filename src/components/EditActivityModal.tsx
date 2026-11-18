@@ -166,7 +166,7 @@ export function EditActivityModal({
                     fillTemplateName(found.name, defaultGatNumber, defaultGatName),
                   );
                   setModality(found.modality);
-                  if (found.local) setLocal(found.local);
+                  setLocal(found.local);
                 }
                 e.target.value = "";
               }}
@@ -335,7 +335,7 @@ export function EditActivityModal({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
-                placeholder="Ex.: Reunião semanal do GAT"
+                placeholder="Ex.: Reunião Geral"
                 className="w-full min-h-[44px] px-3 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-brand-text transition-colors"
               />
             </div>

@@ -117,8 +117,22 @@ export const PROGRAM = {
     }),
   ) as Record<string, ProgramGat>,
 
-  /** Modelos rápidos genéricos. {gatNumber} é trocado pelo GAT do participante. */
+  /**
+   * Modelos do preenchimento rápido: nome = Atividade desenvolvida.
+   * local vazio = a pessoa preenche (o campo fica vazio ao escolher o modelo).
+   * {gatNumber} no nome é trocado pelo GAT do participante.
+   */
   templates: [
+    { id: "tpl-reuniao-geral", name: "Reunião Geral", modality: "Interação em tempo real (In Loco)", local: "UFG" },
+    { id: "tpl-capacitacao-online", name: "Capacitação", modality: "Interação em tempo real (Síncrona)", local: "Online" },
+    { id: "tpl-visita-tecnica", name: "Visita Técnica", modality: "Interação em tempo real (In Loco)", local: "" },
+    { id: "tpl-pesquisa-estudos", name: "Pesquisa Bibliográfica e Estudos Autônomos", modality: "Assíncrona", local: "Online" },
+  ] as ProgramTemplate[],
+  /**
+   * Lista padrão até a versão de 18/11/2026. Se o navegador ainda guarda
+   * exatamente esta lista (sem edição), ela é lida como a lista nova acima.
+   */
+  legacyTemplates: [
     { id: "tpl-reuniao-gat", name: "Reunião semanal do GAT {gatNumber}", modality: "Interação em tempo real (Síncrona)", local: "UFG", isGatSpecific: true },
     { id: "tpl-reuniao-frente", name: "Reunião da frente de trabalho", modality: "Interação em tempo real (Síncrona)", local: "Google Meet" },
     { id: "tpl-ata", name: "Elaboração de ata", modality: "Assíncrona", local: "-" },
