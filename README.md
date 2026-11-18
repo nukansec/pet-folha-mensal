@@ -141,7 +141,7 @@ Não use o prefixo `NEXT_PUBLIC_` (exporia o valor no navegador). Detalhes em
 
 ## Créditos
 
-Feito por [Brunno Bernardes](https://github.com/nukansec) · adaptado do
+Feito por [Brunno Bernardes](https://www.linkedin.com/in/brunnobernardes/) · adaptado do
 [projeto original](https://github.com/vvvvvdal/pet-folha-mensal) de
 [Felipe Gonçalves Vidal](https://www.linkedin.com/in/vvvvvdal/) e
 [Robert Francisco Taveira](https://www.linkedin.com/in/robert-taveira/).

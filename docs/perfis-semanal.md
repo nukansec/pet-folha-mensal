@@ -99,7 +99,7 @@ Nenhuma mudança de código decorrente.
 
 ## Decisões
 
-- **E1** — Autor em `PROGRAM.author` (nome e GitHub), ao lado de
+- **E1** — Autor em `PROGRAM.author` (nome e LinkedIn, como os créditos do original), ao lado de
   `PROGRAM.credits`; o rodapé não tem nome fixo. LICENSE intocada.
 - **E2** — Menu no padrão WAI-ARIA "menu button" (`role="menu"`,
   `menuitem`, foco móvel por setas/Home/End, Esc devolve o foco ao botão, Tab
