@@ -10,10 +10,11 @@ pelo próprio navegador via CSS `@media print`.
 ```
 src/
 ├── app/
-│   ├── layout.tsx            # metadados (da config), tema inicial, Vercel Analytics
+│   ├── layout.tsx            # metadados (metadataBase = PROGRAM.links.site), tema, Analytics
 │   ├── page.tsx              # estado da sessão, lançamentos, cópia, impressão
-│   ├── icon.svg              # selo provisório PET-SD (TODO(pet-sd))
+│   ├── favicon.ico, icon.png, apple-icon.png  # ícones gerados por scripts/brand/gerar-marca.py
 │   ├── globals.css           # tokens de tema, layout e regras de impressão
+│   ├── design-pet-sd.css     # layout do novo design (carregado depois do globals.css)
 │   └── api/admin/session/    # única rota de servidor: sessão do painel local
 ├── config/program.ts         # dados do programa (ver ADR 0001)
 ├── components/               # telas, formulários, modais e folha oficial
@@ -25,6 +26,9 @@ src/
 │   ├── admin-auth.ts         # hash da frase e sessão assinada (HMAC)
 │   └── releases.ts, theme.ts
 └── types/index.ts            # tipos e padrões derivados da config
+
+public/images/pet-sd/          # logo, símbolo e imagem de compartilhamento (gerados por
+                               # scripts/brand/gerar-marca.py) e faixa de logos da ficha
 ```
 
 ## 2. Configuração do programa

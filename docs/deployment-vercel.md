@@ -6,7 +6,7 @@ roda `npm run build`; não há outra infraestrutura.
 ## 1. Criar o projeto
 
 1. Faça push da branch e abra o PR para a `main` do fork; confira o CI
-   (`.github/workflows/ci.yml`: lint, test:ui, build, typecheck e e2e).
+   (`.github/workflows/ci.yml`: lint, test:ui, test:contrast, build, typecheck e e2e).
 2. Em [vercel.com/new](https://vercel.com/new), importe o repositório do fork.
 3. Configuração detectada: Framework `Next.js`, Root Directory `./`, Build
    Command `next build`. A versão do Node vem de `package.json` (`22.x`).
@@ -37,20 +37,31 @@ openssl rand -hex 32                                    # ADMIN_SESSION_SECRET
 - Para desenvolvimento local, copie `.env.example` para `.env.local` e preencha;
   `.env*` está no `.gitignore`.
 
-## 3. Analytics
+## 3. Endereço
+
+Produção: **https://pet-sd-folha-mensal.vercel.app**. O endereço anterior
+(`pet-folha-mensal-three.vercel.app`, endereço antigo) foi trocado em
+18/11/2026 no painel da Vercel, em **Settings → Domains**: o novo domínio entrou
+como principal e o antigo ficou com **redirect 308** (permanente) para ele, então
+links antigos continuam funcionando. No código, o endereço fica só em
+`PROGRAM.links.site` (`src/config/program.ts`), que alimenta o `metadataBase` de
+`src/app/layout.tsx` (URLs absolutas do Open Graph e da imagem de
+compartilhamento). Ao trocar de novo: atualizar o domínio na Vercel e esse
+campo; `npm run test:ui` falha se outro arquivo de `src/` tiver um `vercel.app`.
+
+## 4. Analytics
 
 `<Analytics />` (`@vercel/analytics`) está em `src/app/layout.tsx`. Para ver os
 dados, ative **Analytics** no painel do projeto na Vercel. A coleta é agregada e
 sem cookies.
 
-## 4. Impressão
+## 5. Impressão
 
 A folha é gerada no navegador do participante (`@page { size: letter landscape }`),
 sem funções serverless nem navegador no servidor.
 
-## 5. Antes de divulgar
+## 6. Antes de divulgar
 
 - Conferir o CI verde no PR e a pré-visualização da Vercel.
-- Aprovar a identidade visual (selo provisório, cores, faixa de logos) com a
-  coordenação do GAT, como pede o regimento.
-- Resolver as pendências `TODO(pet-sd)` listadas em `docs/adaptacao-pet-sd.md`.
+- Aprovar a identidade visual (logo, cores, faixa de logos) com a coordenação
+  do GAT, como pede o regimento.

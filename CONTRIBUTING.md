@@ -58,6 +58,7 @@ npm ci
 npm run lint
 npm run typecheck
 npm run test:ui
+npm run test:contrast
 npm run build
 npx playwright install chromium   # uma vez
 npm run test:e2e

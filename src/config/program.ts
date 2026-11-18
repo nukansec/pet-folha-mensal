@@ -72,8 +72,8 @@ export const PROGRAM = {
   weeklyReferenceHours: 8,
 
   /**
-   * Prazo exibido no app. A nota da folha reproduz o texto do modelo oficial
-   * (sheet.deadlineNote). TODO(pet-sd): confirmar o prazo com a coordenação.
+   * Prazo exibido no app: dia 19 (informado em 16/11/2026). A nota da folha
+   * reproduz o texto do modelo oficial (sheet.deadlineNote, 1º dia útil).
    */
   deadline: {
     day: 19,

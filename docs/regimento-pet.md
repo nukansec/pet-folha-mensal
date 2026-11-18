@@ -42,7 +42,8 @@ documentos oficiais; em caso de dúvida, vale o regimento.
 - **Assíncronas**: sem interação simultânea, com produto que comprove a atividade.
 
 No modelo da ficha, a coluna Modalidade usa "Interação em tempo real (Síncrona)" e
-"Assíncrona"; o app deixa essa lista configurável.
+"Assíncrona". O app oferece também "Interação em tempo real (In Loco)" para as
+atividades presenciais (desde 18/11/2026); a lista é configurável.
 
 ## Registro, comprovação e entrega
 
@@ -52,8 +53,9 @@ No modelo da ficha, a coluna Modalidade usa "Interação em tempo real (Síncron
   na pasta oficial do grupo; produtos das atividades síncronas e assíncronas vão
   para o Drive oficial.
 - Prazo: o regimento fala em entrega ao coordenador até o dia 25 para conferência;
-  o rodapé da ficha fala em envio até o primeiro dia útil do mês seguinte. O app
-  reproduz o rodapé e deixa o prazo exibido configurável (ver divergências em
+  o rodapé da ficha fala em envio até o primeiro dia útil do mês seguinte. O
+  prazo em uso no programa é o dia 19 (informado em 16/11/2026), e é o que o app
+  exibe; a nota da folha reproduz o rodapé do modelo (ver divergências em
   `docs/adaptacao-pet-sd.md`).
 - As fichas são validadas pelo coordenador(a) e/ou tutor(a) do GAT, que
   consolidam o compilado mensal para a coordenação geral.
