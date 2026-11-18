@@ -461,6 +461,10 @@
   color: var(--brand-text);
   font-variant-numeric: tabular-nums;
 }
+.hours-preview strong.is-empty {
+  color: var(--muted);
+  font-weight: 600;
+}
 .field-hint {
   margin-top: -6px;
   font-size: 14px;
@@ -827,8 +831,15 @@
   border: 0;
   padding: 0;
 }
+/* Os dois cartões (.pdf e .json) esticam até a altura da linha do grid; o
+   conteúdo fica no topo, então ícone, título e texto alinham entre eles. No
+   celular (uma coluna) cada um volta à altura do próprio conteúdo. */
 .file-guide-item {
   display: grid;
+  align-self: stretch;
+  align-content: start;
+  grid-template-rows: auto 1fr;
+  height: 100%;
   gap: 12px;
   padding: 22px;
   border: 1px solid var(--border);
@@ -1082,4 +1093,29 @@
 }
 .full-select:has(select:disabled) .full-select-display {
   opacity: 0.55;
+}
+
+/* ---------- Ações de modal ----------
+   Antes: linha flex sem quebra com justify-content: flex-end. Quando os
+   botões somavam mais que a caixa, o excesso saía pela esquerda (em 390 px,
+   "Continuar editando" começava em x = -91). Agora a linha quebra: em uma
+   linha os botões dividem a largura; sem espaço, cada um ocupa a linha toda,
+   na ordem do código (cancelar primeiro, primário por último). */
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.dialog-actions > * {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  justify-content: center;
+  text-align: center;
+  white-space: normal;
+}
+.dialog-actions > :only-child {
+  flex-grow: 0;
 }

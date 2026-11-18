@@ -8,7 +8,7 @@ Registro de progresso da adaptação deste fork para o PET-SD UFG 2025–2027
 | Épico | Status | Commits | Como verificar | Pendências |
 |---|---|---|---|---|
 | E0 Reconhecimento e linha de base | feito | `docs: inventário da adaptação para o PET-SD` | ler este arquivo | respostas às dúvidas abaixo |
-| E1 Identidade e textos | feito | `feat: identidade do PET-SD centralizada em config` | `npm run lint && npm run typecheck && npm run test:ui`; abrir `npm run dev` e ver marca, rodapé e FAQ | logo oficial (TODO(pet-sd)); links de Forms vazios |
+| E1 Identidade e textos | feito | `feat: identidade do PET-SD centralizada em config` | `npm run lint && npm run typecheck && npm run test:ui`; abrir `npm run dev` e ver marca, rodapé e FAQ | logo oficial (TODO(pet-sd)); links de Forms vazios (ambos resolvidos em 18/11/2026) |
 | E2 Domínio e regras | feito | `feat: regras e cadastro do PET-SD` | `npm run test:ui` (testes de CH, soma do mês, migração v2→v3 e cópias 1.0–1.3) | confirmar modalidades e prazo |
 | E3 Folha oficial | feito | `feat: folha oficial no modelo do PET-SD` | `npm run test:e2e` (folha extensa: Carta paisagem, cabeçalho repetido, assinaturas e instruções no fim); aba "Folha oficial" → "Imprimir / salvar PDF" | ver "Diferenças que restam" |
 | E4 Testes e validação visual | feito | `test: cobertura do PET-SD e validação visual` | `npm run test:ui` (24) e `npm run test:e2e` (26); capturas em `docs/validation/pet-sd-20261117/` | diferenças listadas no README da validação |
@@ -115,6 +115,9 @@ em branco ao lado foi exportado pelo Word a partir desse `.docx`.
 - **D2 — Modalidades.** Padrão = as duas do modelo preenchido
   ("Interação em tempo real (Síncrona)" e "Assíncrona"), configuráveis em
   `program.ts`. As instruções do modelo falam em "Presencial/Remota" (ver Divergências).
+  *Atualizado em 18/11/2026:* entrou "Interação em tempo real (In Loco)" (lista:
+  In Loco, Síncrona, Assíncrona; padrão do formulário: Síncrona). Nomes antigos
+  passam a ser mapeados por nome: "Síncrona presencial" → In Loco.
 - **D3 — Google Forms do Clima.** O pré-preenchimento (`form-report.ts` e
   `ActivityReportModal.tsx`) depende dos IDs de campo, das opções e até dos nomes
   de autorizadores do formulário do Clima. Não serve ao PET-SD e mantê-lo desligado
@@ -128,7 +131,8 @@ em branco ao lado foi exportado pelo Word a partir desse `.docx`.
 - **D5 — Total do mês.** "N horas" quando inteiro; "NhMM" quando há minutos (ex.: `33h30`).
 - **D6 — Prazo.** O rodapé da folha reproduz o texto do modelo (1º dia útil). O
   prazo exibido no app vem da config; padrão = dia 19 (informado pelo Brunno em
-  16/11/2026 como prazo de correção dos coordenadores).
+  16/11/2026 como prazo de correção dos coordenadores). *Atualizado em 18/11/2026:*
+  dia 19 é o prazo em uso; o `TODO` do prazo saiu da config.
 - **D7 — Cabeçalho.** A folha usa a faixa de logomarcas do próprio modelo, recortada
   como o Word recorta (`srcRect`). A faixa inclui SES/Governo de Goiás (ver Divergências).
 - **D8 — Logo do app.** Sem arquivo separado do logo PET-SD, uso selo textual
@@ -184,8 +188,8 @@ em branco ao lado foi exportado pelo Word a partir desse `.docx`.
 
 | Tema | Fonte A | Fonte B | Tratamento |
 |---|---|---|---|
-| Prazo de entrega | rodapé da ficha: 1º dia útil do mês posterior | regimento: dia 25; CLAUDE.md da pasta: dia 19 | rodapé igual ao modelo; prazo do app configurável (padrão 19) |
-| Modalidades | ficha preenchida: "Interação em tempo real (Síncrona)" / "Assíncrona" | instruções da ficha: "Presencial/Remota"; regimento: in loco / síncronas / assíncronas | padrão = ficha preenchida; lista configurável |
+| Prazo de entrega | rodapé da ficha: 1º dia útil do mês posterior | regimento: dia 25; CLAUDE.md da pasta: dia 19 | rodapé igual ao modelo; prazo do app: dia 19 (em uso desde 16/11/2026) |
+| Modalidades | ficha preenchida: "Interação em tempo real (Síncrona)" / "Assíncrona" | instruções da ficha: "Presencial/Remota"; regimento: in loco / síncronas / assíncronas | ficha preenchida + "Interação em tempo real (In Loco)" (18/11/2026); lista configurável |
 | Instituições | pedido do Brunno: MS, UFG, SMS Goiânia | faixa de logos da ficha: + SES/Governo de Goiás; projeto: + SES e SMS Cidade de Goiás; regimento: + Ministério da Educação | faixa do modelo intacta; texto do app com MS, UFG e SMS Goiânia |
 | Frequência mínima | regimento: "100% (setenta e cinco por cento)" | — | não usada no app; registrada |
 | Carga | regimento: 32 h/mês | edital: 8 h semanais | meta mensal de 32 h; nota de 8 h/semana |
@@ -280,15 +284,17 @@ depois `npm run dev`, criar perfil, lançar atividades (ex.: 16:30–18:00 deve 
 - `src/lib/storage.ts`: `migrateFromV2`, `normalizeActivity`, `inspectUserData`.
 - `src/components/OfficialSheet.tsx` e o bloco "Folha oficial PET-SD" em
   `src/app/globals.css`: comparar com o modelo (ver `docs/validation/pet-sd-20261117/`).
-- `src/config/program.ts`: textos, prazo e modalidades (há `TODO(pet-sd)`).
+- `src/config/program.ts`: textos, prazo e modalidades.
 - `public/templates/`: conferir que o modelo em branco não traz dado pessoal.
 
 ### e) Dúvidas, divergências e TODO(pet-sd) restantes
 
 - Dúvidas: seção "Dúvidas para o Brunno" acima (7 itens, nenhum respondido até o fim da sessão).
 - Divergências: seção "Divergências entre fontes" acima.
-- `TODO(pet-sd)` no código: prazo e links de formulários em
-  `src/config/program.ts`. (O selo provisório saiu em 18/11/2026.)
+- Marcadores `TODO` do PET-SD no código: nenhum desde 18/11/2026. O selo
+  textual saiu (logo oficial), o prazo ficou no dia 19, `feedbackForm` aponta
+  para o formulário de avaliação do PET-SD e `activityForm` fica vazio de
+  propósito (o programa não tem formulário de registro; commit `a38ef77`).
 - *Resolvido em 18/11/2026:* a paleta verde herdada foi trocada por branco e
   laranja, derivada do logo ([design-pet-sd.md](design-pet-sd.md)).
 

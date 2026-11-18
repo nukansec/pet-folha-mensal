@@ -72,16 +72,26 @@ export const PROGRAM = {
   weeklyReferenceHours: 8,
 
   /**
-   * Prazo exibido no app. A nota da folha reproduz o texto do modelo oficial
-   * (sheet.deadlineNote). TODO(pet-sd): confirmar o prazo com a coordenação.
+   * Prazo exibido no app: dia 19 (informado em 16/11/2026). A nota da folha
+   * reproduz o texto do modelo oficial (sheet.deadlineNote, 1º dia útil).
    */
   deadline: {
     day: 19,
     label: "Entregue a folha assinada ao coordenador do GAT até o dia 19.",
   },
 
-  /** Modalidades usadas no modelo preenchido. As instruções falam em Presencial/Remota. */
-  modalities: ["Interação em tempo real (Síncrona)", "Assíncrona"] as string[],
+  /**
+   * Modalidades na ordem dos menus. "In Loco" é a atividade presencial (exige
+   * registro fotográfico). As instruções da ficha falam em Presencial/Remota.
+   * Código e dados usam o nome, nunca a posição na lista.
+   */
+  modalities: [
+    "Interação em tempo real (In Loco)",
+    "Interação em tempo real (Síncrona)",
+    "Assíncrona",
+  ] as string[],
+  /** Modalidade inicial do formulário e de registros sem modalidade. */
+  defaultModality: "Interação em tempo real (Síncrona)",
 
   /** Perfis na ordem das caixas da ficha. */
   roles: [
@@ -107,8 +117,22 @@ export const PROGRAM = {
     }),
   ) as Record<string, ProgramGat>,
 
-  /** Modelos rápidos genéricos. {gatNumber} é trocado pelo GAT do participante. */
+  /**
+   * Modelos do preenchimento rápido: nome = Atividade desenvolvida.
+   * local vazio = a pessoa preenche (o campo fica vazio ao escolher o modelo).
+   * {gatNumber} no nome é trocado pelo GAT do participante.
+   */
   templates: [
+    { id: "tpl-reuniao-geral", name: "Reunião Geral", modality: "Interação em tempo real (In Loco)", local: "UFG" },
+    { id: "tpl-capacitacao-online", name: "Capacitação", modality: "Interação em tempo real (Síncrona)", local: "Online" },
+    { id: "tpl-visita-tecnica", name: "Visita Técnica", modality: "Interação em tempo real (In Loco)", local: "" },
+    { id: "tpl-pesquisa-estudos", name: "Pesquisa Bibliográfica e Estudos Autônomos", modality: "Assíncrona", local: "Online" },
+  ] as ProgramTemplate[],
+  /**
+   * Lista padrão até a versão de 18/11/2026. Se o navegador ainda guarda
+   * exatamente esta lista (sem edição), ela é lida como a lista nova acima.
+   */
+  legacyTemplates: [
     { id: "tpl-reuniao-gat", name: "Reunião semanal do GAT {gatNumber}", modality: "Interação em tempo real (Síncrona)", local: "UFG", isGatSpecific: true },
     { id: "tpl-reuniao-frente", name: "Reunião da frente de trabalho", modality: "Interação em tempo real (Síncrona)", local: "Google Meet" },
     { id: "tpl-ata", name: "Elaboração de ata", modality: "Assíncrona", local: "-" },
@@ -120,14 +144,20 @@ export const PROGRAM = {
 
   /** Links opcionais. Vazio = o botão correspondente não aparece. */
   links: {
-    /** Formulário de registro de atividades do programa, se houver. TODO(pet-sd) */
+    /**
+     * Formulário de registro de atividades: vazio de propósito. O PET-SD não
+     * tem formulário de registro (o registro é a própria folha assinada).
+     */
     activityForm: "" as string,
-    /** Formulário de avaliação do site, se houver. TODO(pet-sd) */
-    feedbackForm: "" as string,
+    /**
+     * Formulário de avaliação do site (Google Forms do PET-SD). Abre em nova
+     * aba, sem parâmetros: nenhum dado do usuário vai na URL.
+     */
+    feedbackForm: "https://forms.gle/tjpuiFpgJ2Njnx7F7" as string,
     /** Repositório deste fork. */
     repository: "https://github.com/nukansec/pet-folha-mensal",
     /** Endereço público do app (base das URLs absolutas do Open Graph). */
-    site: "https://pet-folha-mensal-three.vercel.app",
+    site: "https://pet-sd-folha-mensal.vercel.app",
   },
 
   /** Créditos do projeto original (este app é um fork). */

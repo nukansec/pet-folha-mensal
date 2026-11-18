@@ -77,9 +77,12 @@ de `src/app/globals.css`; nenhum tom bruto nem nome de cor herdado.
 - Cabeçalho em duas linhas: marca, perfil (nome completo; `title` com função e
   GAT) e ícones; depois as abas e as ações de cópia e Concluir.
 - O formulário fica numa coluna, à direita no desktop: Preenchimento rápido ·
-  opcional, Data, Início/Fim com a CH ao lado, a regra (“Conta o tempo exato.
-  Ex.: 16h30 às 18h = 1h30.”), Modalidade, Unidade/Local, Atividade
-  desenvolvida (obrigatória), Descrição e o botão primário.
+  opcional, Data, Início/Fim com a CH ao lado, Modalidade, Unidade/Local,
+  Atividade desenvolvida (obrigatória), Descrição e o botão primário. Sem início
+  ou fim, a CH mostra “—” em cor neutra; o laranja só aparece com a CH
+  calculada. A regra da CH fica na Ajuda e nas Dúvidas (desde 18/11/2026).
+- Modais: a linha de botões quebra quando não cabe (`.dialog-actions` em
+  `design-pet-sd.css`); cada botão ocupa a linha toda e o primário fica por último.
 - Selects mostram a opção escolhida inteira (`FullSelect`), mesmo com nomes
   longos de GAT ou modelo em 390 px.
 - A lista mostra data, horário, modalidade, local, CH e a descrição em até duas

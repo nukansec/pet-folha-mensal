@@ -4,7 +4,7 @@ import { PROGRAM } from "@/config/program";
 
 /**
  * Rodapé comum à entrada e ao painel: créditos do projeto original à esquerda
- * e links úteis à direita. “Avaliar” só aparece com link configurado.
+ * e links úteis à direita. “Avaliar o site” só aparece com link configurado.
  */
 export function SiteFooter({
   onHelp,
@@ -58,7 +58,7 @@ export function SiteFooter({
             </button>
             {PROGRAM.links.feedbackForm && (
               <button type="button" onClick={onFeedback}>
-                Avaliar
+                Avaliar o site
               </button>
             )}
           </nav>

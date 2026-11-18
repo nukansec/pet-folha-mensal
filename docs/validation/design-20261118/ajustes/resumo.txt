@@ -1,0 +1,25 @@
+ajustes · http://127.0.0.1:5000
+ok      entrada-topo-claro-1440
+ok      cartoes-pdf-json-claro-1440
+ok      painel-claro-1440
+ok      formulario-vazio-claro-1440
+ok      formulario-visita-tecnica-claro-1440
+ok      modal-rascunho-claro-1440
+ok      entrada-topo-claro-390
+ok      cartoes-pdf-json-claro-390
+ok      painel-claro-390
+ok      formulario-vazio-claro-390
+ok      formulario-visita-tecnica-claro-390
+ok      modal-rascunho-claro-390
+ok      entrada-topo-escuro-1440
+ok      cartoes-pdf-json-escuro-1440
+ok      painel-escuro-1440
+ok      formulario-vazio-escuro-1440
+ok      formulario-visita-tecnica-escuro-1440
+ok      modal-rascunho-escuro-1440
+ok      entrada-topo-escuro-390
+ok      cartoes-pdf-json-escuro-390
+ok      painel-escuro-390
+ok      formulario-vazio-escuro-390
+ok      formulario-visita-tecnica-escuro-390
+ok      modal-rascunho-escuro-390

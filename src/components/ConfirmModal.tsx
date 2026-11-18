@@ -60,7 +60,7 @@ export function ConfirmModal({
           </button>
         </div>
 
-        <div className="flex items-center justify-end gap-2.5 pt-2">
+        <div className="dialog-actions pt-2">
           <button
             type="button"
             onClick={onClose}

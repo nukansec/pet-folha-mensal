@@ -193,7 +193,7 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Ações */}
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-line">
+            <div className="dialog-actions pt-3 border-t border-line">
               {dialog.type === "confirm" && (
                 <button
                   type="button"

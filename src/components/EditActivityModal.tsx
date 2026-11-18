@@ -43,7 +43,7 @@ export function EditActivityModal({
   const [date, setDate] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
-  const [modality, setModality] = useState<ModalityType>(PROGRAM.modalities[0]);
+  const [modality, setModality] = useState<ModalityType>(PROGRAM.defaultModality);
   const [description, setDescription] = useState("");
   const [local, setLocal] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -166,7 +166,7 @@ export function EditActivityModal({
                     fillTemplateName(found.name, defaultGatNumber, defaultGatName),
                   );
                   setModality(found.modality);
-                  if (found.local) setLocal(found.local);
+                  setLocal(found.local);
                 }
                 e.target.value = "";
               }}
@@ -335,7 +335,7 @@ export function EditActivityModal({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
-                placeholder="Ex.: Reunião semanal do GAT"
+                placeholder="Ex.: Reunião Geral"
                 className="w-full min-h-[44px] px-3 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-brand-text transition-colors"
               />
             </div>
@@ -361,7 +361,7 @@ export function EditActivityModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-line">
+          <div className="dialog-actions pt-3 border-t border-line">
             <button
               type="button"
               onClick={onClose}

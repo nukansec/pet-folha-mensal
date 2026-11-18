@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import Module, { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -49,7 +49,7 @@ const {
 } = load("./src/lib/pet-calculator.ts");
 const storage = load("./src/lib/storage.ts");
 const { DEFAULT_GATS, DEFAULT_ROLES } = load("./src/types/index.ts");
-const { LandingPage } = load("./src/components/LandingPage.tsx");
+const { LandingPage, weekdayShort } = load("./src/components/LandingPage.tsx");
 const { FAQ, HelpModal } = load("./src/components/Help.tsx");
 const { DialogProvider } = load("./src/context/DialogContext.tsx");
 const { Navbar } = load("./src/components/Navbar.tsx");
@@ -274,6 +274,110 @@ test("exemplo antigo com atividades ou ativo é migrado; navegador sem v2 não g
   assert.ok(records.has("pet_folha_migrated_from_v2"));
 });
 
+test("modalidades antigas mapeiam por nome; In Loco é aceita em cópias e modelos", () => {
+  isolatedStorage();
+  const { PROGRAM } = load("./src/config/program.ts");
+  assert.deepEqual(PROGRAM.modalities, [
+    "Interação em tempo real (In Loco)",
+    "Interação em tempo real (Síncrona)",
+    "Assíncrona",
+  ]);
+  assert.equal(PROGRAM.defaultModality, "Interação em tempo real (Síncrona)");
+  assert.equal(storage.normalizeModality("Síncrona virtual"), "Interação em tempo real (Síncrona)");
+  assert.equal(storage.normalizeModality("Síncrona presencial"), "Interação em tempo real (In Loco)");
+  assert.equal(storage.normalizeModality("Assíncrona virtual"), "Assíncrona");
+  assert.equal(storage.normalizeModality(""), "Interação em tempo real (Síncrona)");
+  assert.equal(storage.normalizeModality("Interação em tempo real (In Loco)"), "Interação em tempo real (In Loco)");
+  // Cópia 1.2 com a modalidade presencial antiga abre como In Loco.
+  const copy = {
+    version: "1.2",
+    attachments: [],
+    user: sampleUser,
+    monthKey: "2026-10",
+    activities: [
+      { id: "p", date: "2026-10-06", start: "08:00", end: "12:00", modality: "Síncrona presencial", description: "Visita fictícia" },
+      { id: "n", date: "2026-10-07", start: "08:00", end: "09:00", modality: "Interação em tempo real (In Loco)", description: "Reunião fictícia" },
+    ],
+  };
+  const result = storage.inspectUserData(JSON.stringify(copy));
+  assert.equal(result.success, true);
+  assert.deepEqual(result.activities.map((a) => a.modality), [
+    "Interação em tempo real (In Loco)",
+    "Interação em tempo real (In Loco)",
+  ]);
+});
+
+test("modelos rápidos: lista padrão antiga vira a nova; lista editada é mantida", () => {
+  const { PROGRAM } = load("./src/config/program.ts");
+  assert.deepEqual(PROGRAM.templates.map((t) => [t.name, t.modality, t.local]), [
+    ["Reunião Geral", "Interação em tempo real (In Loco)", "UFG"],
+    ["Capacitação", "Interação em tempo real (Síncrona)", "Online"],
+    ["Visita Técnica", "Interação em tempo real (In Loco)", ""],
+    ["Pesquisa Bibliográfica e Estudos Autônomos", "Assíncrona", "Online"],
+  ]);
+  // Lista antiga salva sem edição (como o painel admin gravava).
+  const records = isolatedStorage();
+  const legacy = PROGRAM.legacyTemplates.map((t) => ({ ...t, isGatSpecific: Boolean(t.isGatSpecific) }));
+  records.set("pet_folha_config_templates_v3", JSON.stringify(legacy));
+  assert.deepEqual(storage.getStoredTemplates().map((t) => t.id), PROGRAM.templates.map((t) => t.id));
+  // A chave salva não é reescrita na leitura.
+  assert.equal(records.get("pet_folha_config_templates_v3"), JSON.stringify(legacy));
+  // Lista editada: um local diferente basta para manter a da pessoa.
+  const edited = legacy.map((t, i) => (i === 3 ? { ...t, local: "Sala fictícia" } : t));
+  records.set("pet_folha_config_templates_v3", JSON.stringify(edited));
+  assert.deepEqual(storage.getStoredTemplates().map((t) => [t.id, t.local]), edited.map((t) => [t.id, t.local]));
+  // Lista antiga com um modelo a menos também é da pessoa.
+  records.set("pet_folha_config_templates_v3", JSON.stringify(legacy.slice(1)));
+  assert.equal(storage.getStoredTemplates().length, 6);
+});
+
+test("cartão de exemplo da entrada: dia da semana vem da data e linhas em ordem", () => {
+  assert.equal(weekdayShort("2026-10-07"), "qua");
+  assert.equal(weekdayShort("2026-10-06"), "ter");
+  const html = render(
+    React.createElement(LandingPage, {
+      onLoginWithJson: noop, onCreateProfile: noop, gats: DEFAULT_GATS,
+      roles: DEFAULT_ROLES, onOpenAdmin: noop, onOpenFeedback: noop,
+    }),
+  );
+  const days = [...html.matchAll(/<li><span>(\w+)<br\/>(\d{2})<\/span>/g)].map((m) => m[1] + m[2]);
+  assert.deepEqual(days, ["ter06", "qua07"]);
+  // Sem o ícone "?" duplicado: a entrada já tem o link "Dúvidas".
+  assert.doesNotMatch(html, /aria-label="Abrir ajuda"/);
+  assert.match(html, /href="#perguntas">Dúvidas</);
+});
+
+test("endereço do site só na config; metadados usam PROGRAM.links.site", () => {
+  const { PROGRAM } = load("./src/config/program.ts");
+  assert.equal(PROGRAM.links.site, "https://pet-sd-folha-mensal.vercel.app");
+  const files = readdirSync(path.join(root, "src"), { recursive: true })
+    .filter((file) => /\.(ts|tsx|css)$/.test(file))
+    .filter((file) => readFileSync(path.join(root, "src", file), "utf8").includes("vercel.app"))
+    .map((file) => file.replaceAll("\\", "/"));
+  assert.deepEqual(files, ["config/program.ts"]);
+  assert.match(readFileSync(path.join(root, "src/app/layout.tsx"), "utf8"), /metadataBase: new URL\(PROGRAM\.links\.site\)/);
+});
+
+test("botão Avaliar o site depende do link configurado", () => {
+  const { PROGRAM } = load("./src/config/program.ts");
+  const { SiteFooter } = load("./src/components/SiteFooter.tsx");
+  const { FeedbackModal } = load("./src/components/FeedbackModal.tsx");
+  const footer = () => render(React.createElement(SiteFooter, { onHelp: noop, onFeedback: noop }));
+  assert.equal(PROGRAM.links.feedbackForm, "https://forms.gle/tjpuiFpgJ2Njnx7F7");
+  assert.equal(PROGRAM.links.activityForm, "");
+  assert.match(footer(), />Avaliar o site</);
+  const modal = render(React.createElement(FeedbackModal, { isOpen: true, onClose: noop }));
+  assert.match(modal, /href="https:\/\/forms\.gle\/tjpuiFpgJ2Njnx7F7" target="_blank" rel="noopener noreferrer"/);
+  const saved = PROGRAM.links.feedbackForm;
+  try {
+    PROGRAM.links.feedbackForm = "";
+    assert.doesNotMatch(footer(), /Avaliar/);
+    assert.equal(render(React.createElement(FeedbackModal, { isOpen: true, onClose: noop })), "");
+  } finally {
+    PROGRAM.links.feedbackForm = saved;
+  }
+});
+
 test("cópias 1.0 a 1.2 restauram com campos novos vazios e ignoram o Forms antigo", () => {
   isolatedStorage();
   const old = {
@@ -386,6 +490,10 @@ test("formulários e modais renderizam com campos rotulados e diálogos nativos"
   verifyLabelTargets(form);
   for (const field of ["Data", "Início", "Fim", "Unidade/Local", "Atividade desenvolvida", "Descrição"])
     assert.match(form, new RegExp('<label[^>]*for="[^"]+"[^>]*>' + field));
+  // A regra da CH fica na Ajuda; sem horários, a CH mostra um traço neutro.
+  assert.doesNotMatch(form, /Conta o tempo exato/);
+  assert.match(form, /<strong class="is-empty"><span aria-hidden="true">—<\/span>/);
+  assert.doesNotMatch(form, />0h</);
   const components = [
     [
       EditActivityModal,

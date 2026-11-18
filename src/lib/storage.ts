@@ -36,11 +36,14 @@ export const DEFAULT_TEMPLATES: ActivityTemplate[] = PROGRAM.templates.map(
   (template) => ({ ...template }),
 );
 
-/** Nomes antigos de modalidade (formato _v2 e cópias 1.0–1.2). */
+/**
+ * Nomes antigos de modalidade (formato _v2 e cópias 1.0–1.2), mapeados por
+ * nome: reordenar PROGRAM.modalities não pode mudar o que um dado antigo vira.
+ */
 const LEGACY_MODALITIES: Record<string, string> = {
-  "Síncrona virtual": PROGRAM.modalities[0],
-  "Síncrona presencial": PROGRAM.modalities[0],
-  "Assíncrona virtual": PROGRAM.modalities[1] ?? PROGRAM.modalities[0],
+  "Síncrona virtual": "Interação em tempo real (Síncrona)",
+  "Síncrona presencial": "Interação em tempo real (In Loco)",
+  "Assíncrona virtual": "Assíncrona",
 };
 
 /** Nomes antigos de perfil (formato _v2 e cópias 1.0–1.2). */
@@ -57,7 +60,7 @@ const text = (value: unknown): string =>
 
 export function normalizeModality(value: unknown): string {
   const name = text(value).trim();
-  if (!name) return PROGRAM.modalities[0];
+  if (!name) return PROGRAM.defaultModality;
   return LEGACY_MODALITIES[name] ?? name;
 }
 
@@ -513,6 +516,26 @@ export function updateRoleName(oldRole: string, newRole: string): void {
 // GESTÃO DINÂMICA DE MODELOS DE ATIVIDADES (ADMIN)
 // ============================================================
 
+const templateSignature = (templates: ActivityTemplate[]) =>
+  JSON.stringify(
+    templates.map((tpl) => [
+      tpl.id,
+      tpl.name,
+      tpl.modality,
+      tpl.local,
+      Boolean(tpl.isGatSpecific),
+    ]),
+  );
+const LEGACY_TEMPLATES_SIGNATURE = templateSignature(
+  PROGRAM.legacyTemplates.map((tpl) => ({ ...tpl })),
+);
+
+/**
+ * Lê os modelos salvos. A lista padrão antiga, sem edição, é lida como a lista
+ * padrão atual; a chave salva não é reescrita (a troca acontece na leitura).
+ * Lista editada pela pessoa (qualquer id, nome, modalidade ou local diferente)
+ * é mantida.
+ */
 export function getStoredTemplates(): ActivityTemplate[] {
   if (typeof window === "undefined") return DEFAULT_TEMPLATES;
   try {
@@ -520,24 +543,31 @@ export function getStoredTemplates(): ActivityTemplate[] {
     if (!raw) return DEFAULT_TEMPLATES;
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_TEMPLATES;
-    return parsed.map((item: unknown, idx: number) => {
-      const stored =
-        typeof item === "object" && item !== null
-          ? (item as Record<string, unknown>)
-          : {};
-      const name = text(stored.name).trim() || `Atividade modelo ${idx + 1}`;
-      return {
-        id: text(stored.id) || `tpl-${idx + 1}`,
-        name,
-        modality: normalizeModality(stored.modality),
-        local: text(stored.local),
-        isGatSpecific:
-          Boolean(stored.isGatSpecific) || name.includes("{gatNumber}"),
-      };
-    });
+    const stored = normalizeTemplates(parsed);
+    return templateSignature(stored) === LEGACY_TEMPLATES_SIGNATURE
+      ? DEFAULT_TEMPLATES
+      : stored;
   } catch {
     return DEFAULT_TEMPLATES;
   }
+}
+
+function normalizeTemplates(parsed: unknown[]): ActivityTemplate[] {
+  return parsed.map((item: unknown, idx: number) => {
+    const stored =
+      typeof item === "object" && item !== null
+        ? (item as Record<string, unknown>)
+        : {};
+    const name = text(stored.name).trim() || `Atividade modelo ${idx + 1}`;
+    return {
+      id: text(stored.id) || `tpl-${idx + 1}`,
+      name,
+      modality: normalizeModality(stored.modality),
+      local: text(stored.local),
+      isGatSpecific:
+        Boolean(stored.isGatSpecific) || name.includes("{gatNumber}"),
+    };
+  });
 }
 
 export function saveTemplates(templates: ActivityTemplate[]): void {

@@ -9,29 +9,31 @@ interface FeedbackModalProps {
   onClose: () => void;
 }
 
-// Sem link configurado, o modal não abre e o botão "Avaliar" não aparece.
+// Sem link configurado, o modal não abre e o botão "Avaliar o site" não aparece.
+// O link vai sem parâmetros: nada do perfil ou das atividades entra na URL.
 export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const url = PROGRAM.links.feedbackForm;
   if (!isOpen || !url) return null;
   return (
-    <Modal isOpen={isOpen} onClose={onClose} label="Avaliação e sugestões">
+    <Modal isOpen={isOpen} onClose={onClose} label="Avaliar o site">
       <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-6">
         <div className="flex items-center justify-between gap-4 mb-4">
-          <h2 className="text-lg font-semibold">Avaliação e sugestões</h2>
+          <h2 className="text-lg font-semibold">Avaliar o site</h2>
           <button className="icon-button" onClick={onClose} aria-label="Fechar">
             <X size={20} />
           </button>
         </div>
         <p className="text-sm text-muted mb-6">
-          Envie sugestões ou relate um problema pelo formulário.
+          Conte o que achou do app, envie sugestões ou relate um problema. O
+          formulário abre em uma nova aba e não recebe os dados da sua folha.
         </p>
         <a
           className="primary-button w-full"
           href={url}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
         >
-          Abrir formulário <ExternalLink size={16} />
+          Abrir formulário de avaliação <ExternalLink size={16} aria-hidden="true" />
         </a>
       </div>
     </Modal>

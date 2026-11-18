@@ -538,16 +538,32 @@ test("dados do formato antigo migram para o v3; exemplo sem uso não aparece; v2
   }));
   expect(stored.v2).toBe(2);
   expect(JSON.parse(stored.v2Activities!)).toEqual(old);
-  expect(stored.v3[0]).toMatchObject({ modality: "Interação em tempo real (Síncrona)", local: "", descricao: "", hours: 1.5 });
+  // "Síncrona presencial" era a atividade presencial: vira In Loco.
+  expect(stored.v3[0]).toMatchObject({ modality: "Interação em tempo real (In Loco)", local: "", descricao: "", hours: 1.5 });
 });
 
-test("sem links configurados, botões de Forms e avaliação não aparecem", async ({ page }) => {
+test("avaliação do site abre o formulário em nova aba; sem formulário de registro", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("button", { name: "Avaliar", exact: true })).toHaveCount(0);
   await expect(page.getByText(/Clima/)).toHaveCount(0);
   await expect(page.locator("footer")).toContainText("Felipe Gonçalves Vidal");
+  const rate = page.getByRole("button", { name: "Avaliar o site", exact: true });
+  await expect(rate).toBeVisible();
+  await rate.click();
+  const link = page
+    .getByRole("dialog", { name: "Avaliar o site" })
+    .getByRole("link", { name: /Abrir formulário de avaliação/ });
+  // Endereço exato, sem parâmetros: nenhum dado do usuário vai na URL.
+  await expect(link).toHaveAttribute("href", "https://forms.gle/tjpuiFpgJ2Njnx7F7");
+  await expect(link).toHaveAttribute("target", "_blank");
+  await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  await page.keyboard.press("Escape");
   await create(page);
   await add(page);
+  // Mesmo link no rodapé do painel, depois de criar a folha.
+  await page.getByRole("button", { name: "Avaliar o site", exact: true }).click();
+  await expect(link).toHaveAttribute("href", "https://forms.gle/tjpuiFpgJ2Njnx7F7");
+  await page.keyboard.press("Escape");
+  // O PET-SD não tem formulário de registro: nada de Forms no painel nem no Concluir.
   await expect(page.getByRole("button", { name: /Forms/ })).toHaveCount(0);
   await page.getByRole("button", { name: /^Concluir/ }).click();
   await expect(page.getByRole("link", { name: "Abrir formulário de atividades" })).toHaveCount(0);
@@ -734,9 +750,10 @@ test("cópias com comprovantes levam os originais e a restauração reverte falh
 test("novidades mostram data de publicação nos dois temas", async ({ page }, testInfo) => {
   await page.goto("/");
   const section = page.getByRole("region", { name: "Novidades do site" });
-  await expect(section.getByRole("heading", { name: "Novo visual com a marca do PET-SD" })).toBeVisible();
+  await expect(section.getByRole("heading", { name: "Ajustes no formulário e nova modalidade" })).toBeVisible();
   await expect(section.getByText("Última atualização", { exact: false })).toContainText("18 de novembro de 2026");
   await section.getByText("Ver histórico de atualizações", { exact: true }).click();
+  await expect(section.getByRole("heading", { name: "Novo visual com a marca do PET-SD" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Folha no modelo do PET-SD" })).toBeVisible();
   for (const theme of ["light", "dark"]) {
     await page.evaluate((theme) => { document.documentElement.dataset.theme = theme; }, theme);
@@ -801,7 +818,7 @@ test("sem texto cortado, foco visível e folha oficial em preto e branco", async
   await page.getByLabel("GAT", { exact: true }).selectOption("01");
   await create(page);
   await add(page);
-  // A modalidade padrão é a mais longa ("Interação em tempo real (Síncrona)").
+  // Modalidade padrão do formulário: Síncrona (PROGRAM.defaultModality).
   await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue(/Síncrona/);
   for (const theme of ["light", "dark"]) {
     await page.evaluate((theme) => {
@@ -852,6 +869,126 @@ test("sem texto cortado, foco visível e folha oficial em preto e branco", async
   }
   // Modelo rápido de nome longo, no celular.
   await page.setViewportSize({ width: 390, height: 1000 });
-  await page.getByLabel(/Preenchimento rápido/).selectOption({ label: "Pesquisa bibliográfica e estudo autônomo" });
+  await page.getByLabel(/Preenchimento rápido/).selectOption({ label: "Pesquisa Bibliográfica e Estudos Autônomos" });
   expect(await cutTexts(page), "modelo longo 390px").toEqual([]);
+});
+
+test("modelos rápidos novos; modelo sem local deixa o campo vazio", async ({ page }) => {
+  await create(page);
+  const template = page.getByLabel(/Preenchimento rápido/);
+  await expect(template.locator("option")).toHaveText([
+    "Em branco",
+    "Reunião Geral",
+    "Capacitação",
+    "Visita Técnica",
+    "Pesquisa Bibliográfica e Estudos Autônomos",
+  ]);
+  await template.selectOption({ label: "Reunião Geral" });
+  await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("UFG");
+  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Interação em tempo real (In Loco)");
+  await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Reunião Geral");
+  await template.selectOption({ label: "Visita Técnica" });
+  await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("");
+  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Interação em tempo real (In Loco)");
+  await template.selectOption({ label: "Pesquisa Bibliográfica e Estudos Autônomos" });
+  await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("Online");
+  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Assíncrona");
+});
+
+test("lista antiga de modelos salva sem edição abre com os modelos novos", async ({ page }) => {
+  const legacy = [
+    { id: "tpl-reuniao-gat", name: "Reunião semanal do GAT {gatNumber}", modality: "Interação em tempo real (Síncrona)", local: "UFG", isGatSpecific: true },
+    { id: "tpl-reuniao-frente", name: "Reunião da frente de trabalho", modality: "Interação em tempo real (Síncrona)", local: "Google Meet", isGatSpecific: false },
+    { id: "tpl-ata", name: "Elaboração de ata", modality: "Assíncrona", local: "-", isGatSpecific: false },
+    { id: "tpl-estudos", name: "Grupo de estudos", modality: "Interação em tempo real (Síncrona)", local: "UFG", isGatSpecific: false },
+    { id: "tpl-capacitacao", name: "Capacitação", modality: "Interação em tempo real (Síncrona)", local: "UFG", isGatSpecific: false },
+    { id: "tpl-visita", name: "Visita técnica", modality: "Interação em tempo real (Síncrona)", local: "Unidade de saúde", isGatSpecific: false },
+    { id: "tpl-estudo-assincrono", name: "Pesquisa bibliográfica e estudo autônomo", modality: "Assíncrona", local: "-", isGatSpecific: false },
+  ];
+  await page.addInitScript((legacy) => {
+    if (localStorage.getItem("test-seeded")) return;
+    localStorage.setItem("pet_folha_config_templates_v3", JSON.stringify(legacy));
+    localStorage.setItem("test-seeded", "1");
+  }, legacy);
+  await create(page);
+  const options = page.getByLabel(/Preenchimento rápido/).locator("option");
+  await expect(options).toHaveCount(5);
+  await expect(options.nth(1)).toHaveText("Reunião Geral");
+  // Lista editada pela pessoa: fica a dela.
+  await page.evaluate((legacy) => {
+    localStorage.setItem("pet_folha_config_templates_v3", JSON.stringify([{ ...legacy[2], name: "Ata da reunião (editada)" }]));
+  }, legacy);
+  await page.reload();
+  await expect(page.getByLabel(/Preenchimento rápido/).locator("option")).toHaveText(["Em branco", "Ata da reunião (editada)"]);
+});
+
+test("cartões .pdf e .json: mesma altura lado a lado, altura própria empilhados", async ({ page }, testInfo) => {
+  await page.goto("/");
+  const cards = await page.locator(".file-guide-item").evaluateAll((elements) =>
+    elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      const icon = element.querySelector("svg")!.getBoundingClientRect();
+      const title = element.querySelector("h3")!.getBoundingClientRect();
+      return { top: box.top, height: box.height, icon: icon.top - box.top, title: title.top - box.top };
+    }),
+  );
+  expect(cards).toHaveLength(2);
+  expect(cards[0].icon).toBeCloseTo(cards[1].icon, 0);
+  expect(cards[0].title).toBeCloseTo(cards[1].title, 0);
+  if (testInfo.project.name === "desktop") {
+    expect(cards[0].top).toBeCloseTo(cards[1].top, 0);
+    expect(cards[0].height).toBeCloseTo(cards[1].height, 0);
+  } else {
+    // Empilhados: o .pdf tem menos texto e fica mais baixo que o .json.
+    expect(cards[1].top).toBeGreaterThan(cards[0].top);
+    expect(cards[0].height).toBeLessThan(cards[1].height);
+  }
+});
+
+async function buttonsOutsideDialog(page: Page) {
+  const dialog = page.locator("dialog[open] > *").last();
+  await expect(dialog).toBeVisible();
+  return dialog.evaluate((box) => {
+    const outer = box.getBoundingClientRect();
+    return [...box.querySelectorAll("button, a")]
+      .filter((el) => el.getBoundingClientRect().width > 0)
+      .filter((el) => {
+        const r = el.getBoundingClientRect();
+        return r.left < outer.left - 0.5 || r.right > outer.right + 0.5 || r.top < outer.top - 0.5 || r.bottom > outer.bottom + 0.5;
+      })
+      .map((el) => el.textContent?.trim() || el.getAttribute("aria-label"));
+  });
+}
+
+test("modais: botões ficam dentro da caixa; aviso de rascunho só com rascunho", async ({ page }) => {
+  await create(page);
+  await add(page);
+  // Logo após adicionar com sucesso, trocar de aba não pede confirmação.
+  await page.getByRole("button", { name: "Folha oficial", exact: true }).click();
+  await expect(page.locator("dialog[open]")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Folha oficial", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Minha frequência", exact: true }).click();
+  await expect(page.locator("dialog[open]")).toHaveCount(0);
+  const draft = page.getByLabel("Atividade desenvolvida", { exact: true });
+  const triggers: Array<[string, () => Promise<void>]> = [
+    ["mês", () => page.getByLabel("Mês da folha").selectOption("2026-10").then(() => undefined)],
+    ["aba", () => page.getByRole("button", { name: "Folha oficial", exact: true }).click()],
+    ["concluir", () => page.getByRole("button", { name: /^Concluir/ }).click()],
+  ];
+  for (const [name, trigger] of triggers) {
+    await draft.fill(`Rascunho ${name}`);
+    await trigger();
+    await expect(page.getByRole("dialog", { name: "Atividade ainda não adicionada" })).toBeVisible();
+    expect(await buttonsOutsideDialog(page), name).toEqual([]);
+    await page.getByRole("button", { name: "Continuar editando", exact: true }).click();
+    await expect(draft).toHaveValue(`Rascunho ${name}`);
+  }
+  // Descartar e seguir para o Concluir: o modal de conclusão também cabe.
+  await page.getByRole("button", { name: /^Concluir/ }).click();
+  await page.getByRole("button", { name: "Descartar preenchimento", exact: true }).click();
+  expect(await buttonsOutsideDialog(page), "concluir").toEqual([]);
+  await page.keyboard.press("Escape");
+  // Confirmação de exclusão.
+  await page.getByRole("button", { name: /Excluir/ }).first().click();
+  expect(await buttonsOutsideDialog(page), "excluir").toEqual([]);
 });
