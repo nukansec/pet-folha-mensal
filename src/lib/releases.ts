@@ -8,7 +8,7 @@ export const RELEASES = [
       "O preenchimento rápido tem quatro modelos: Reunião Geral, Capacitação, Visita Técnica e Pesquisa Bibliográfica e Estudos Autônomos.",
       "Sem início ou fim, a CH mostra um traço em vez de “0h”.",
       "Os botões das janelas de confirmação não saem mais da caixa no celular.",
-      "O site mudou para pet-sd-folha-mensal.vercel.app (o endereço antigo redireciona), e o botão “Avaliar o site” abre o formulário de avaliação.",
+      "O site mudou de endereço (o antigo redireciona para o novo), e o botão “Avaliar o site” abre o formulário de avaliação.",
     ],
   },
   {
