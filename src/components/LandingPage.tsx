@@ -25,6 +25,17 @@ import { SiteFooter } from "./SiteFooter";
 import { Frame, FrameHeader, FramePanel, SegmentedControl, SegmentedControlItem } from "./ui/access-controls";
 import { FullSelect } from "@/components/ui/full-select";
 
+// Exemplo fictício do cartão da entrada, em ordem cronológica. O dia da
+// semana sai da data (fuso UTC fixo: servidor e navegador dão o mesmo texto).
+const PREVIEW_ROWS = [
+  { date: "2026-10-06", title: "Organização do repositório", detail: "16:30 às 18:00 · Assíncrona", ch: "1h30" },
+  { date: "2026-10-07", title: "Grupo de estudos", detail: "18:00 às 20:00 · Laboratório", ch: "2h" },
+];
+const weekdayFormat = new Intl.DateTimeFormat("pt-BR", { weekday: "short", timeZone: "UTC" });
+export function weekdayShort(isoDate: string) {
+  return weekdayFormat.format(new Date(`${isoDate}T12:00:00Z`)).replace(".", "");
+}
+
 interface LandingPageProps {
   onLoginWithJson: (file: File) => void;
   onCreateProfile: (name: string, gatNumber: string, role: UserRole) => void;
@@ -155,22 +166,20 @@ export function LandingPage({
                 <span style={{ width: `${(19 / PROGRAM.monthlyTargetHours) * 100}%` }} />
               </span>
               <ul>
-                <li>
-                  <span>qua<br />07</span>
-                  <span>
-                    <strong>Grupo de estudos</strong>
-                    <small>18:00 às 20:00 · Laboratório</small>
-                  </span>
-                  <strong>2h</strong>
-                </li>
-                <li>
-                  <span>ter<br />07</span>
-                  <span>
-                    <strong>Organização do repositório</strong>
-                    <small>16:30 às 18:00 · Assíncrona</small>
-                  </span>
-                  <strong>1h30</strong>
-                </li>
+                {PREVIEW_ROWS.map((row) => (
+                  <li key={row.date}>
+                    <span>
+                      {weekdayShort(row.date)}
+                      <br />
+                      {row.date.slice(8)}
+                    </span>
+                    <span>
+                      <strong>{row.title}</strong>
+                      <small>{row.detail}</small>
+                    </span>
+                    <strong>{row.ch}</strong>
+                  </li>
+                ))}
               </ul>
             </div>
             <div className="preview-rule" aria-hidden="true">

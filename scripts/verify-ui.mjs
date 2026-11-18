@@ -49,7 +49,7 @@ const {
 } = load("./src/lib/pet-calculator.ts");
 const storage = load("./src/lib/storage.ts");
 const { DEFAULT_GATS, DEFAULT_ROLES } = load("./src/types/index.ts");
-const { LandingPage } = load("./src/components/LandingPage.tsx");
+const { LandingPage, weekdayShort } = load("./src/components/LandingPage.tsx");
 const { FAQ, HelpModal } = load("./src/components/Help.tsx");
 const { DialogProvider } = load("./src/context/DialogContext.tsx");
 const { Navbar } = load("./src/components/Navbar.tsx");
@@ -329,6 +329,22 @@ test("modelos rápidos: lista padrão antiga vira a nova; lista editada é manti
   // Lista antiga com um modelo a menos também é da pessoa.
   records.set("pet_folha_config_templates_v3", JSON.stringify(legacy.slice(1)));
   assert.equal(storage.getStoredTemplates().length, 6);
+});
+
+test("cartão de exemplo da entrada: dia da semana vem da data e linhas em ordem", () => {
+  assert.equal(weekdayShort("2026-10-07"), "qua");
+  assert.equal(weekdayShort("2026-10-06"), "ter");
+  const html = render(
+    React.createElement(LandingPage, {
+      onLoginWithJson: noop, onCreateProfile: noop, gats: DEFAULT_GATS,
+      roles: DEFAULT_ROLES, onOpenAdmin: noop, onOpenFeedback: noop,
+    }),
+  );
+  const days = [...html.matchAll(/<li><span>(\w+)<br\/>(\d{2})<\/span>/g)].map((m) => m[1] + m[2]);
+  assert.deepEqual(days, ["ter06", "qua07"]);
+  // Sem o ícone "?" duplicado: a entrada já tem o link "Dúvidas".
+  assert.doesNotMatch(html, /aria-label="Abrir ajuda"/);
+  assert.match(html, /href="#perguntas">Dúvidas</);
 });
 
 test("cópias 1.0 a 1.2 restauram com campos novos vazios e ignoram o Forms antigo", () => {
