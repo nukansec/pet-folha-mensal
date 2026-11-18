@@ -132,6 +132,11 @@ Não use o prefixo `NEXT_PUBLIC_` (exporia o valor no navegador). Detalhes em
 
 ## Créditos
 
+Feito por [Brunno Bernardes](https://github.com/nukansec) · adaptado do
+[projeto original](https://github.com/vvvvvdal/pet-folha-mensal) de
+[Felipe Gonçalves Vidal](https://www.linkedin.com/in/vvvvvdal/) e
+[Robert Francisco Taveira](https://www.linkedin.com/in/robert-taveira/).
+
 Este projeto é um fork de
 [vvvvvdal/pet-folha-mensal](https://github.com/vvvvvdal/pet-folha-mensal),
 criado para o PET-Saúde Clima UFG por

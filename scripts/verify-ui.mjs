@@ -366,6 +366,9 @@ test("botão Avaliar o site depende do link configurado", () => {
   assert.equal(PROGRAM.links.feedbackForm, "https://forms.gle/tjpuiFpgJ2Njnx7F7");
   assert.equal(PROGRAM.links.activityForm, "");
   assert.match(footer(), />Avaliar o site</);
+  // Autoria desta versão vem de PROGRAM.author; créditos do original seguem.
+  assert.match(footer(), new RegExp(`Feito por <a href="${PROGRAM.author.url}"[^>]*>${PROGRAM.author.name}</a> · adaptado do <a href="${PROGRAM.credits.upstreamRepository}"`));
+  assert.match(footer(), /de <a href="https:\/\/www\.linkedin\.com\/in\/vvvvvdal\/"[^>]*>Felipe Gonçalves Vidal<\/a> e <a [^>]*>Robert Francisco Taveira<\/a>/);
   const modal = render(React.createElement(FeedbackModal, { isOpen: true, onClose: noop }));
   assert.match(modal, /href="https:\/\/forms\.gle\/tjpuiFpgJ2Njnx7F7" target="_blank" rel="noopener noreferrer"/);
   const saved = PROGRAM.links.feedbackForm;

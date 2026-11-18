@@ -160,6 +160,9 @@ export const PROGRAM = {
     site: "https://pet-sd-folha-mensal.vercel.app",
   },
 
+  /** Autor desta versão (adaptação PET-SD). Aparece no rodapé e no README. */
+  author: { name: "Brunno Bernardes", url: "https://github.com/nukansec" },
+
   /** Créditos do projeto original (este app é um fork). */
   credits: {
     upstreamRepository: "https://github.com/vvvvvdal/pet-folha-mensal",
