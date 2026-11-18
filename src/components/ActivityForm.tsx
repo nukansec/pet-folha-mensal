@@ -11,7 +11,8 @@ import {
   getDefaultActivityDate,
 } from "@/lib/pet-calculator";
 import { Plus } from "lucide-react";
-import { FullSelect } from "@/components/ui/full-select";
+import { ChoiceGroup } from "@/components/ui/choice-group";
+import { ModalityChoice } from "./ModalityChoice";
 
 interface ActivityFormProps {
   onSave: (
@@ -105,17 +106,17 @@ export function ActivityForm({
         </div>
         {templates.length > 0 && (
           <div className="field template-field">
-            <label htmlFor="activity-template">
+            <span className="field-legend" id="activity-template-label">
               Preenchimento rápido <span className="field-optional">· opcional</span>
-            </label>
-            <FullSelect
-              id="activity-template"
+            </span>
+            <ChoiceGroup
+              name="activity-template"
+              labelledBy="activity-template-label"
+              variant="chips"
               value={templateId}
-              onChange={(event) => {
-                setTemplateId(event.target.value);
-                const template = templates.find(
-                  (item) => item.id === event.target.value,
-                );
+              onChange={(value) => {
+                setTemplateId(value);
+                const template = templates.find((item) => item.id === value);
                 if (template) {
                   setDescription(
                     fillTemplateName(
@@ -130,18 +131,18 @@ export function ActivityForm({
                   dirty();
                 }
               }}
-            >
-              <option value="">Em branco</option>
-              {templates.map((template) => (
-                <option key={template.id} value={template.id}>
-                  {fillTemplateName(
+              options={[
+                { value: "", label: "Em branco" },
+                ...templates.map((template) => ({
+                  value: template.id,
+                  label: fillTemplateName(
                     template.name,
                     defaultGatNumber,
                     defaultGatName,
-                  )}
-                </option>
-              ))}
-            </FullSelect>
+                  ),
+                })),
+              ]}
+            />
           </div>
         )}
         <div className="field">
@@ -201,23 +202,14 @@ export function ActivityForm({
             )}
           </div>
         </div>
-        <div className="field">
-          <label htmlFor="activity-modality">Modalidade</label>
-          <FullSelect
-            id="activity-modality"
-            value={modality}
-            onChange={(event) => {
-              setModality(event.target.value);
-              dirty();
-            }}
-          >
-            {Array.from(new Set([...PROGRAM.modalities, modality])).map(
-              (item) => (
-                <option key={item}>{item}</option>
-              ),
-            )}
-          </FullSelect>
-        </div>
+        <ModalityChoice
+          id="activity-modality"
+          value={modality}
+          onChange={(value) => {
+            setModality(value);
+            dirty();
+          }}
+        />
         <div className="field">
           <label htmlFor="activity-local">Unidade/Local</label>
           <input

@@ -366,6 +366,9 @@ test("botão Avaliar o site depende do link configurado", () => {
   assert.equal(PROGRAM.links.feedbackForm, "https://forms.gle/tjpuiFpgJ2Njnx7F7");
   assert.equal(PROGRAM.links.activityForm, "");
   assert.match(footer(), />Avaliar o site</);
+  // Autoria desta versão vem de PROGRAM.author; créditos do original seguem.
+  assert.match(footer(), new RegExp(`Feito por <a href="${PROGRAM.author.url}"[^>]*>${PROGRAM.author.name}</a> · adaptado do <a href="${PROGRAM.credits.upstreamRepository}"`));
+  assert.match(footer(), /de <a href="https:\/\/www\.linkedin\.com\/in\/vvvvvdal\/"[^>]*>Felipe Gonçalves Vidal<\/a> e <a [^>]*>Robert Francisco Taveira<\/a>/);
   const modal = render(React.createElement(FeedbackModal, { isOpen: true, onClose: noop }));
   assert.match(modal, /href="https:\/\/forms\.gle\/tjpuiFpgJ2Njnx7F7" target="_blank" rel="noopener noreferrer"/);
   const saved = PROGRAM.links.feedbackForm;
@@ -447,15 +450,17 @@ test("entrada apresenta acesso e explicação visível do JSON e PDF antes do FA
   assert.doesNotMatch(html, /hubfrequencia@gmail.com|Ver preços/);
 });
 
-test("FAQ compartilhado tem sete perguntas e ajuda usa o diálogo comum", () => {
+test("FAQ compartilhado tem nove perguntas (perfis e visão semanal incluídas) e ajuda usa o diálogo comum", () => {
   const html = renderToStaticMarkup(React.createElement(FAQ));
-  assert.equal((html.match(/<details>/g) || []).length, 7);
+  assert.equal((html.match(/<details>/g) || []).length, 9);
+  assert.match(html, /Como troco, edito ou excluo um perfil\?/);
+  assert.match(html, /O que é a visão semanal\?/);
   const help = render(
     React.createElement(HelpModal, { isOpen: true, onClose: noop }),
   );
   assert.match(help, /<dialog/);
   assert.match(help, /class="pet-dialog screen-only"/);
-  assert.equal((help.match(/<details>/g) || []).length, 7);
+  assert.equal((help.match(/<details>/g) || []).length, 9);
 });
 
 test("painel mantém backup acessível sem ocultar ações em telas menores", () => {
@@ -759,4 +764,271 @@ test("GATs em ordem numérica e contagens no singular", () => {
   assert.equal(pluralize(1, "atividade", "atividades"), "1 atividade");
   assert.equal(pluralize(0, "atividade", "atividades"), "0 atividades");
   assert.equal(pluralize(3, "atividade", "atividades"), "3 atividades");
+});
+
+// ============================================================
+// E3: editar e excluir perfis na entrada
+// ============================================================
+function seedProfiles(records) {
+  const ana = { ...sampleUser, id: "ana", name: "Ana Fictícia" };
+  const ana2 = { ...sampleUser, id: "ana-2", name: "Ana Fictícia Dois" };
+  const outro = { ...sampleUser, id: "ana_b", name: "Outra Pessoa" };
+  records.set("pet_folha_profiles_v3", JSON.stringify([ana, ana2, outro]));
+  records.set("pet_folha_active_profile_id_v3", "ana");
+  const act = (id, date) => ({ ...sampleActivity, id, date });
+  records.set("pet_folha_activities_v3_ana_2026-10", JSON.stringify([act("a1", "2026-10-06"), act("a2", "2026-10-07")]));
+  records.set("pet_folha_activities_v3_ana_2026-11", JSON.stringify([act("a3", "2026-11-03")]));
+  records.set("pet_folha_activities_v3_ana_2026-12", JSON.stringify([]));
+  records.set("pet_folha_activities_v3_ana-2_2026-10", JSON.stringify([act("b1", "2026-10-08")]));
+  records.set("pet_folha_activities_v3_ana_b_2026-10", JSON.stringify([act("c1", "2026-10-09")]));
+  records.set("pet_folha_migrated_from_v2", "2026-10-01T00:00:00.000Z");
+  records.set("pet_folha_profiles_v2", JSON.stringify([{ id: "legado" }]));
+  records.set("pet_theme", "dark");
+  return { ana, ana2, outro };
+}
+
+test("resumo do perfil conta meses com atividades e atividades, só daquele id", () => {
+  const records = isolatedStorage();
+  seedProfiles(records);
+  assert.deepEqual(storage.getProfileActivitySummary("ana"), { months: 2, activities: 3 });
+  assert.deepEqual(storage.getProfileActivitySummary("ana-2"), { months: 1, activities: 1 });
+  assert.deepEqual(storage.listProfileMonths("ana"), ["2026-10", "2026-11"]);
+  assert.deepEqual(storage.getProfileActivitySummary("ninguem"), { months: 0, activities: 0 });
+});
+
+test("excluir remove só os dados daquele perfil no localStorage", () => {
+  const records = isolatedStorage();
+  seedProfiles(records);
+  const before = new Map(records);
+  const removed = storage.deleteUserProfile("ana");
+  assert.deepEqual(removed, { months: 2, activities: 3 });
+  assert.deepEqual(storage.getStoredProfiles().map((p) => p.id), ["ana-2", "ana_b"]);
+  for (const key of [...before.keys()]) {
+    const isAna = /^pet_folha_activities_v3_ana_\d{4}-\d{2}$/.test(key);
+    if (isAna) assert.equal(records.has(key), false, key);
+    else if (key !== "pet_folha_profiles_v3" && key !== "pet_folha_active_profile_id_v3")
+      assert.equal(records.get(key), before.get(key), key);
+  }
+  // Perfil ativo excluído: a entrada volta sem perfil aberto.
+  assert.equal(records.has("pet_folha_active_profile_id_v3"), false);
+  // Excluir um perfil não ativo preserva o ativo.
+  records.set("pet_folha_active_profile_id_v3", "ana_b");
+  storage.deleteUserProfile("ana-2");
+  assert.equal(records.get("pet_folha_active_profile_id_v3"), "ana_b");
+  assert.equal(records.has("pet_folha_activities_v3_ana_b_2026-10"), true);
+});
+
+test("editar nome não duplica perfil: mesmo id, e nome de outro perfil é recusado", () => {
+  const records = isolatedStorage();
+  const { ana } = seedProfiles(records);
+  const renamed = storage.updateUserProfileAdmin({ ...ana, name: "Ana Renomeada" });
+  assert.equal(renamed.success, true);
+  const profiles = storage.getStoredProfiles();
+  assert.equal(profiles.length, 3);
+  assert.equal(profiles.find((p) => p.id === "ana").name, "Ana Renomeada");
+  // Atividades continuam na mesma chave (o id não muda).
+  assert.equal(storage.getActivitiesForMonth("ana", "2026-10").length, 2);
+  const clash = storage.updateUserProfileAdmin({ ...ana, name: "  ANA FICTÍCIA dois " });
+  assert.equal(clash.success, false);
+  assert.equal(storage.getStoredProfiles().length, 3);
+  assert.equal(storage.getStoredProfiles().find((p) => p.id === "ana-2").name, "Ana Fictícia Dois");
+});
+
+test("cópia do perfil inteiro (1.4) restaura todos os meses depois de excluir", () => {
+  const records = isolatedStorage();
+  const { ana } = seedProfiles(records);
+  const attachment = { id: "f1", name: "foto.png", base64: "iVBORw0KGgo=" };
+  const json = storage.exportProfileData(ana, { "2026-11": [attachment], "2027-01": [attachment] });
+  const data = JSON.parse(json);
+  assert.equal(data.version, "1.4");
+  assert.deepEqual(data.months.map((m) => [m.monthKey, m.activities.length, m.attachments.length]), [
+    ["2026-10", 2, 0],
+    ["2026-11", 1, 1],
+    ["2027-01", 0, 1],
+  ]);
+  const before = {
+    oct: records.get("pet_folha_activities_v3_ana_2026-10"),
+    nov: records.get("pet_folha_activities_v3_ana_2026-11"),
+  };
+  storage.deleteUserProfile("ana");
+  const preview = storage.inspectUserData(json);
+  assert.equal(preview.success, true);
+  assert.equal(preview.monthKey, "2027-01");
+  assert.equal(preview.months.length, 3);
+  assert.deepEqual(preview.months[1].attachmentData, [attachment]);
+  // Sem IndexedDB, importUserData recusa cópias com comprovantes.
+  assert.equal(storage.importUserData(json).success, false);
+  const result = storage.applyUserData(preview);
+  assert.equal(result.success, true);
+  assert.equal(records.get("pet_folha_activities_v3_ana_2026-10"), before.oct);
+  assert.equal(records.get("pet_folha_activities_v3_ana_2026-11"), before.nov);
+  assert.equal(storage.getStoredProfiles().find((p) => p.id === "ana").name, "Ana Fictícia");
+  assert.deepEqual(storage.getProfileActivitySummary("ana"), { months: 2, activities: 3 });
+});
+
+test("cópia 1.4 inválida não grava nada", () => {
+  const records = isolatedStorage();
+  const { ana } = seedProfiles(records);
+  const valid = JSON.parse(storage.exportProfileData(ana));
+  const snapshot = JSON.stringify([...records]);
+  const broken = [
+    { ...valid, months: [] },
+    { ...valid, months: "x" },
+    { ...valid, months: [valid.months[0], valid.months[0]] },
+    { ...valid, months: [{ ...valid.months[0], monthKey: "2026-13" }] },
+    { ...valid, months: [{ ...valid.months[0], attachments: undefined }] },
+    { ...valid, months: [{ ...valid.months[0], monthKey: "2026-11" }] },
+    { ...valid, months: [{ ...valid.months[0], activities: [{ id: "x" }] }] },
+  ];
+  for (const data of broken) {
+    assert.equal(storage.inspectUserData(JSON.stringify(data)).success, false);
+  }
+  assert.equal(JSON.stringify([...records]), snapshot);
+});
+
+test("entrada mostra perfis em cartões com Abrir, Editar e Excluir rotulados", () => {
+  const { profileInitials, monthsWithActivities } = load("./src/components/LandingPage.tsx");
+  assert.equal(profileInitials("ana maria fictícia"), "AF");
+  assert.equal(profileInitials("Ícaro"), "Í");
+  assert.equal(monthsWithActivities(0), "Nenhum mês com atividades");
+  assert.equal(monthsWithActivities(1), "1 mês com atividades");
+  assert.equal(monthsWithActivities(3), "3 meses com atividades");
+  const html = render(
+    React.createElement(LandingPage, {
+      profiles: [sampleUser],
+      profileSummaries: { [sampleUser.id]: { months: 2, activities: 5 } },
+      onSelectProfile: noop,
+      onEditProfile: noop,
+      onDeleteProfile: noop,
+      onLoginWithJson: noop,
+      onCreateProfile: noop,
+      gats: DEFAULT_GATS,
+      roles: DEFAULT_ROLES,
+      onOpenAdmin: noop,
+      onOpenFeedback: noop,
+    }),
+  );
+  assert.match(html, /<ul class="profile-cards" aria-label="Perfis neste navegador">/);
+  assert.match(html, /aria-label="Abrir folha de Participante de teste"/);
+  assert.match(html, /aria-label="Editar perfil de Participante de teste"/);
+  assert.match(html, /aria-label="Excluir perfil de Participante de teste"/);
+  assert.match(html, /2 meses com atividades/);
+  assert.doesNotMatch(html, /<select[^>]*id="entry-profile"/);
+});
+
+// ============================================================
+// E5: visão semanal (faixas de segunda a domingo cortadas pelo mês)
+// ============================================================
+const weeks = load("./src/lib/weeks.ts");
+const bandLabels = (monthKey, activities = [], today = "") =>
+  weeks.getMonthWeekBands(monthKey, activities, today).map((band) => band.label);
+
+// Referência independente: anda dia a dia e fecha a faixa no domingo.
+function referenceBands(monthKey) {
+  const [year, month] = monthKey.split("-").map(Number);
+  const out = [];
+  let start = 1;
+  for (let day = 1; ; day++) {
+    const date = new Date(Date.UTC(year, month - 1, day));
+    if (date.getUTCMonth() !== month - 1) {
+      if (start < day) out.push(start === day - 1 ? `Dia ${start}` : `${start} a ${day - 1}`);
+      return out;
+    }
+    if (date.getUTCDay() === 0) {
+      out.push(start === day ? `Dia ${start}` : `${start} a ${day}`);
+      start = day + 1;
+    }
+  }
+}
+
+test("faixas de semana: mês que começa no domingo (nov/2026, 6 faixas, como o app original)", () => {
+  assert.deepEqual(bandLabels("2026-11"), ["Dia 1", "2 a 8", "9 a 15", "16 a 22", "23 a 29", "Dia 30"]);
+  const bands = weeks.getMonthWeekBands("2026-11");
+  assert.deepEqual(bands.map((b) => b.partial), [true, false, false, false, false, true]);
+  assert.deepEqual(bands.map((b) => b.days), [1, 7, 7, 7, 7, 1]);
+  assert.equal(bands[0].start, "2026-11-01");
+  assert.equal(bands[5].end, "2026-11-30");
+});
+
+test("faixas de semana: mês que começa no sábado e fevereiros", () => {
+  // 01/08/2026 é sábado.
+  assert.equal(new Date(Date.UTC(2026, 7, 1)).getUTCDay(), 6);
+  assert.deepEqual(bandLabels("2026-08"), ["1 a 2", "3 a 9", "10 a 16", "17 a 23", "24 a 30", "Dia 31"]);
+  // Fevereiro de 28 dias começando na segunda: quatro semanas inteiras.
+  assert.equal(new Date(Date.UTC(2027, 1, 1)).getUTCDay(), 1);
+  assert.deepEqual(bandLabels("2027-02"), ["1 a 7", "8 a 14", "15 a 21", "22 a 28"]);
+  assert.ok(weeks.getMonthWeekBands("2027-02").every((band) => !band.partial));
+  // Fevereiro bissexto.
+  assert.deepEqual(bandLabels("2028-02"), referenceBands("2028-02"));
+  assert.equal(weeks.getMonthWeekBands("2028-02").at(-1).end, "2028-02-29");
+  // Toda a vigência confere com a referência dia a dia.
+  for (const month of PROJECT_MONTHS) assert.deepEqual(bandLabels(month), referenceBands(month), month);
+  assert.deepEqual(weeks.getMonthWeekBands("2026-13"), []);
+  assert.deepEqual(weeks.getMonthWeekBands("x"), []);
+});
+
+test("faixas de semana: CH exata nos limites das faixas; outro mês é ignorado", () => {
+  const a = (date, start, end) => ({ date, start, end });
+  const bands = weeks.getMonthWeekBands("2026-11", [
+    a("2026-11-01", "08:00", "09:30"), // Dia 1 (domingo)
+    a("2026-11-08", "16:30", "18:00"), // último dia de "2 a 8"
+    a("2026-11-08", "18:00", "18:05"),
+    a("2026-11-09", "11:00", "13:00"), // primeiro dia de "9 a 15"
+    a("2026-11-30", "09:00", "17:00"), // Dia 30
+    a("2026-10-31", "09:00", "17:00"), // outro mês
+    a("2026-12-01", "09:00", "17:00"), // outro mês
+    a("2026-11-10", "10:00", "09:00"), // fim antes do início vale 0
+  ]);
+  assert.deepEqual(bands.map((b) => b.minutes), [90, 95, 120, 0, 0, 480]);
+  assert.equal(formatDuration(bands[1].minutes), "1h35");
+});
+
+test("semana atual vem da data de Brasília, não do fuso do aparelho", () => {
+  // 02:30 UTC de 19/11 ainda é 23:30 de 18/11 em Brasília.
+  assert.equal(weeks.todayInBrasilia(new Date("2026-11-19T02:30:00Z")), "2026-11-18");
+  assert.equal(weeks.todayInBrasilia(new Date("2026-11-19T03:30:00Z")), "2026-11-19");
+  const bands = weeks.getMonthWeekBands("2026-11", [], "2026-11-18");
+  assert.deepEqual(bands.map((b) => b.isCurrent), [false, false, false, true, false, false]);
+  assert.ok(weeks.getMonthWeekBands("2026-11", [], "2026-12-01").every((b) => !b.isCurrent));
+  assert.equal(weeks.getMonthWeekBands("2026-11", [], "2026-11-30").at(-1).isCurrent, true);
+});
+
+test("resumo mensal é o padrão e a visão semanal mostra as faixas com a meta semanal", () => {
+  const { StatsGrid } = load("./src/components/StatsGrid.tsx");
+  const props = { totalMinutes: 90, activitiesCount: 1, monthLabel: "Novembro/2026", monthKey: "2026-11", activities: [{ date: "2026-11-03", start: "16:30", end: "18:00" }] };
+  const monthly = renderToStaticMarkup(React.createElement(StatsGrid, props));
+  assert.match(monthly, /role="radiogroup"/);
+  assert.match(monthly, /checked="" value="monthly"/);
+  assert.match(monthly, /role="progressbar"/);
+  // Com a preferência salva, abre na visão semanal.
+  const records = isolatedStorage();
+  records.set("pet_folha_summary_view", "weekly");
+  const weekly = renderToStaticMarkup(React.createElement(StatsGrid, props));
+  assert.match(weekly, /checked="" value="weekly"/);
+  assert.equal([...weekly.matchAll(/class="week-band"/g)].length, 6);
+  assert.match(weekly, /2 a 8<\/strong>/);
+  assert.match(weekly, /1h30 de 8 h/);
+  assert.match(weekly, /Semana parcial/);
+  assert.match(weekly, /não é reduzida/);
+  // localStorage inacessível: volta ao padrão sem erro.
+  globalThis.localStorage = { getItem() { throw new Error("bloqueado"); } };
+  assert.match(renderToStaticMarkup(React.createElement(StatsGrid, props)), /checked="" value="monthly"/);
+});
+
+test("regra de ouro: fixture da main abre igual pelo storage e nada é reescrito", () => {
+  const fixture = JSON.parse(readFileSync(path.join(root, "tests/fixtures/dados-v3-main.json"), "utf8"));
+  const records = isolatedStorage();
+  for (const [key, value] of Object.entries(fixture.localStorage)) records.set(key, value);
+  const before = JSON.stringify([...records]);
+  const profiles = storage.getStoredProfiles();
+  assert.deepEqual(profiles, JSON.parse(fixture.localStorage.pet_folha_profiles_v3));
+  for (const [key, value] of Object.entries(fixture.localStorage)) {
+    const match = /^pet_folha_activities_v3_(.+)_(\d{4}-\d{2})$/.exec(key);
+    if (!match) continue;
+    const loaded = storage.getActivitiesForMonth(match[1], match[2]);
+    assert.deepEqual(loaded, JSON.parse(value), key);
+  }
+  assert.deepEqual(storage.getProfileActivitySummary(profiles[0].id), { months: 2, activities: 4 });
+  assert.deepEqual(storage.getProfileActivitySummary(profiles[1].id), { months: 1, activities: 1 });
+  assert.equal(JSON.stringify([...records]), before);
 });

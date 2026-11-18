@@ -90,6 +90,15 @@ export const PROGRAM = {
     "Interação em tempo real (Síncrona)",
     "Assíncrona",
   ] as string[],
+  /**
+   * Rótulo curto de cada modalidade nos botões de escolha. O nome completo
+   * continua sendo o valor gravado, o nome acessível e o texto da folha.
+   */
+  modalityShortLabels: {
+    "Interação em tempo real (In Loco)": "In Loco",
+    "Interação em tempo real (Síncrona)": "Síncrona",
+    "Assíncrona": "Assíncrona",
+  } as Record<string, string>,
   /** Modalidade inicial do formulário e de registros sem modalidade. */
   defaultModality: "Interação em tempo real (Síncrona)",
 
@@ -159,6 +168,9 @@ export const PROGRAM = {
     /** Endereço público do app (base das URLs absolutas do Open Graph). */
     site: "https://pet-sd-folha-mensal.vercel.app",
   },
+
+  /** Autor desta versão (adaptação PET-SD). Aparece no rodapé e no README. */
+  author: { name: "Brunno Bernardes", url: "https://github.com/nukansec" },
 
   /** Créditos do projeto original (este app é um fork). */
   credits: {

@@ -57,12 +57,20 @@ de `src/app/globals.css`; nenhum tom bruto nem nome de cor herdado.
 
 - Sequência da página: marca e prévia fictícia (hero), cartão “Vamos começar”
   com as abas, “Três passos por mês”, “Dois arquivos”, novidades e dúvidas.
-- “Continuar” lista os perfis guardados neste navegador; dá para abrir outro mês
-  sem restaurar arquivo. “Primeiro acesso” pede nome, **Perfil** (padrão
-  Monitor(a)) e **GAT** (padrão GAT 01). Navegador novo começa sem perfis.
+- “Continuar” lista os perfis guardados neste navegador em **cartões**
+  (iniciais, nome, perfil · GAT e meses com atividades). O cartão inteiro abre a
+  folha; **Editar** (lápis) abre a identificação e **Excluir** (lixeira, rótulo
+  “Excluir perfil de …”) abre a confirmação. No celular, Editar e Excluir ficam
+  numa linha abaixo do nome. Dá para abrir outro mês sem restaurar arquivo.
+- **Excluir perfil**: o diálogo lista o que sai do navegador (identificação,
+  atividades e meses, comprovantes), oferece “Salvar cópia antes” (o perfil
+  inteiro, formato 1.4) e só apaga pelo botão vermelho “Excluir perfil”.
+  Sem perfis, a entrada abre em “Primeiro acesso”.
+- “Primeiro acesso” pede nome, **Perfil** em cartões de rádio (padrão
+  Monitor(a)) e **GAT** em lista (padrão GAT 01). Navegador novo começa sem perfis.
 - Nome já cadastrado oferece “Continuar com este perfil”, sem recriar nem apagar
   meses anteriores.
-- “Restaurar cópia” aceita o .json salvo pelo app (versões 1.0 a 1.3). O PDF não
+- “Restaurar cópia” aceita o .json salvo pelo app (versões 1.0 a 1.4). O PDF não
   restaura registros. A entrada explica, sem expansão, a diferença entre JSON e PDF.
 - Frame e Segmented Control foram adaptados de componentes de terceiros;
   [origem e licença](THIRD-PARTY-UI.md).
@@ -74,17 +82,33 @@ de `src/app/globals.css`; nenhum tom bruto nem nome de cor herdado.
   selecionável.
 - O resumo mostra a **CH do mês** (`21 horas`, `33h30`), o número de atividades e
   quanto falta para o mínimo de 32 h. Não declara aptidão para envio.
-- Cabeçalho em duas linhas: marca, perfil (nome completo; `title` com função e
-  GAT) e ícones; depois as abas e as ações de cópia e Concluir.
+- **Mensal | Semanal** (grupo de rádio): Mensal mostra a barra até 32 h;
+  Semanal mostra as faixas de segunda a domingo cortadas pelo mês (“Dia 1”,
+  “2 a 8”…), cada uma com a CH exata (“1h30 de 8 h”) e barra laranja; a semana
+  atual tem borda, fundo e o texto “Semana atual”; faixas parciais dizem
+  “Semana parcial” e mantêm a referência de 8 h. Duas colunas no desktop, uma
+  no celular. A escolha fica em `pet_folha_summary_view` (padrão Mensal).
+- Cabeçalho em duas linhas: marca, **menu do participante** (nome completo;
+  `title` com função e GAT) e ícones; depois as abas e as ações de cópia e
+  Concluir. O menu (`aria-haspopup="menu"`, setas, Home/End, Esc devolve o foco)
+  tem Editar identificação, Trocar participante, Salvar cópia e Sair; Trocar e
+  Sair pedem confirmação com rascunho e, com alterações sem cópia, abrem a
+  janela do Concluir. No celular o menu ocupa a largura útil, itens de 44 px.
 - O formulário fica numa coluna, à direita no desktop: Preenchimento rápido ·
-  opcional, Data, Início/Fim com a CH ao lado, Modalidade, Unidade/Local,
+  opcional (pílulas; rolagem horizontal no celular), Data, Início/Fim com a CH ao lado, Modalidade, Unidade/Local,
   Atividade desenvolvida (obrigatória), Descrição e o botão primário. Sem início
   ou fim, a CH mostra “—” em cor neutra; o laranja só aparece com a CH
   calculada. A regra da CH fica na Ajuda e nas Dúvidas (desde 18/11/2026).
 - Modais: a linha de botões quebra quando não cabe (`.dialog-actions` em
   `design-pet-sd.css`); cada botão ocupa a linha toda e o primário fica por último.
-- Selects mostram a opção escolhida inteira (`FullSelect`), mesmo com nomes
-  longos de GAT ou modelo em 390 px.
+- **Grupos de opção** (`ui/choice-group.tsx`): rádios nativos transparentes
+  sobre cada cartão, em `role="radiogroup"` com rótulo visível. Modalidade:
+  ícone e rótulo curto (In Loco, Síncrona, Assíncrona), nome completo como nome
+  acessível e na folha; coluna em ≤ 480 px. Perfil: cartões em grade.
+  Marcado = borda, fundo e peso da fonte da marca; foco com o anel laranja.
+- Listas longas continuam em select: **GAT** (13) e **Mês**. O GAT usa o
+  `FullSelect` (opção inteira, mesma altura e foco dos campos); no modal de
+  identificação ele fica em uma linha com reticências e o nome inteiro no `title`.
 - A lista mostra data, horário, modalidade, local, CH e a descrição em até duas
   linhas, com “ver mais”. Editar e excluir têm nomes acessíveis; “Limpar mês” pede
   confirmação; exemplos são opcionais e identificados como fictícios.
@@ -119,7 +143,8 @@ pontos do modelo (Times New Roman 10 pt).
 
 ## Cópia, restauração e conclusão
 
-- “Salvar cópia” gera o .json com os comprovantes; “Imprimir / salvar PDF” abre a
+- “Salvar cópia” gera o .json do mês com os comprovantes (1.3); a cópia do
+  perfil inteiro (1.4) é oferecida antes de excluir um perfil; “Imprimir / salvar PDF” abre a
   impressão. O diálogo “Concluir” separa as duas ações e pede confirmação para
   sair com alterações sem cópia.
 - A restauração mostra participante, mês e quantidade de atividades antes de

@@ -102,14 +102,20 @@
   gap: 4px;
   margin-left: 8px;
 }
-.profile-button {
+/* Menu do participante: o wrapper ocupa o lugar que era do cartão. */
+.participant-menu {
+  position: relative;
   margin-left: auto;
   flex: 0 1 auto;
+  min-width: 0;
+  max-width: min(460px, 50vw);
+}
+.profile-button {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
   min-width: 0;
-  max-width: min(460px, 50vw);
   min-height: 48px;
   padding: 6px 12px 6px 6px;
   border: 1px solid var(--border);
@@ -118,9 +124,61 @@
   text-align: left;
   overflow: hidden;
 }
-.profile-button:hover {
+.profile-button:hover,
+.profile-button[aria-expanded="true"] {
   border-color: var(--control-border);
   background: var(--surface-raised);
+}
+.profile-button > span:nth-child(2) {
+  flex: 1 1 auto;
+}
+.profile-chevron {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+.profile-button[aria-expanded="true"] .profile-chevron {
+  transform: rotate(180deg);
+}
+.participant-menu-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  gap: 2px;
+  min-width: 260px;
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--page-shadow);
+}
+.participant-menu-list [role="menuitem"] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--foreground);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+}
+.participant-menu-list [role="menuitem"] svg {
+  flex-shrink: 0;
+  color: var(--brand-text);
+}
+.participant-menu-list [role="menuitem"]:hover,
+.participant-menu-list [role="menuitem"]:focus-visible {
+  background: var(--brand-soft);
+  color: var(--brand-text);
+}
+.participant-menu-list [role="menuitem"]:focus-visible {
+  outline-offset: -3px;
 }
 .profile-button > span:first-child {
   display: grid;
@@ -135,7 +193,7 @@
   font-size: 14px;
   font-weight: 700;
 }
-.profile-button > span:last-child {
+.profile-button > span:nth-child(2) {
   display: grid;
   min-width: 0;
 }
@@ -912,11 +970,17 @@
     gap: 0;
   }
   /* Perfil numa linha própria, com quebra no nome em vez de corte. */
-  .profile-button {
+  .participant-menu {
     order: 3;
     flex: 1 1 100%;
     max-width: none;
     margin-left: 0;
+  }
+  /* Menu na largura útil, abaixo do cartão. */
+  .participant-menu-list {
+    left: 0;
+    right: 0;
+    min-width: 0;
   }
   .profile-button strong {
     white-space: normal;
@@ -1036,6 +1100,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .profile-chevron,
   .progress-track > span,
   .primary-button,
   .secondary-button {
@@ -1065,6 +1130,16 @@
   line-height: 1.35;
   text-align: left;
   overflow-wrap: anywhere;
+}
+/* Variante de uma linha: reticências e texto inteiro no title. */
+.full-select--single .full-select-display {
+  overflow-wrap: normal;
+}
+.full-select--single .full-select-display > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .full-select-display > svg {
   flex-shrink: 0;
@@ -1118,4 +1193,416 @@
 }
 .dialog-actions > :only-child {
   flex-grow: 0;
+}
+
+/* ---------- Entrada: perfis em cartões (Abrir, Editar, Excluir) ---------- */
+.profile-cards {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.profile-card {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.profile-card:hover {
+  border-color: var(--brand-text);
+}
+.profile-card-open {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 64px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  text-align: left;
+  color: var(--foreground);
+}
+.profile-card-open:hover {
+  background: var(--brand-soft);
+}
+.profile-card-initials {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand-text);
+  font-size: 16px;
+  font-weight: 700;
+}
+.profile-card-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.profile-card-text strong {
+  font-size: 16px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.profile-card-text small {
+  font-size: 14px;
+  color: var(--muted);
+}
+.profile-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  color: var(--brand-text);
+  font-size: 15px;
+  font-weight: 600;
+}
+.profile-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 6px;
+  border-left: 1px solid var(--border);
+  padding-left: 6px;
+}
+.profile-card-actions .icon-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.profile-card-delete:hover {
+  color: var(--danger);
+}
+
+/* Ação destrutiva: vermelho, nunca o laranja da marca. */
+.danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--danger-fill);
+  border-radius: 10px;
+  background: var(--danger-fill);
+  color: var(--on-danger);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.danger-button:hover:not(:disabled) {
+  background: var(--danger-fill-strong);
+  border-color: var(--danger-fill-strong);
+}
+.danger-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.delete-profile-panel > p {
+  margin: 12px 0 4px;
+  color: var(--body);
+  font-size: 15px;
+}
+.delete-profile-list {
+  margin: 0 0 8px;
+  padding-left: 20px;
+  list-style: disc;
+  color: var(--foreground);
+  font-size: 15px;
+  line-height: 1.7;
+}
+.delete-profile-panel .dialog-actions {
+  margin-top: 8px;
+}
+
+@media (max-width: 767px) {
+  .profile-card-cta {
+    display: none;
+  }
+  .profile-card-sep {
+    display: none;
+  }
+  /* Celular: Editar e Excluir numa linha abaixo; o nome usa a largura toda. */
+  .profile-card {
+    flex-direction: column;
+    gap: 0;
+  }
+  .profile-card-actions {
+    justify-content: flex-end;
+    padding: 2px 6px;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+  .profile-card-months {
+    display: block;
+  }
+}
+
+/* ---------- Grupos de opção (rádios nativos sob cartões) ----------
+   O rádio fica transparente por cima do cartão inteiro: clique, toque,
+   setas e leitor de tela continuam nativos. Marcado = borda e fundo da marca
+   + peso da fonte (não depende só de cor). */
+/* Mesmo tamanho dos <label> do app (16 px, regra de leitura de globals.css). */
+.field-legend {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--foreground);
+}
+.choice-group {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.choice-group > label.choice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--control-border);
+  border-radius: 10px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.choice-group > label.choice > input[type="radio"],
+.activity-fields .field .choice-group > label.choice > input[type="radio"] {
+  /* -1px: cobre também a borda do cartão (alvo = cartão inteiro). */
+  position: absolute;
+  inset: -1px;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  opacity: 0;
+  cursor: pointer;
+  /* 16 px: o iOS não aproxima a tela no foco. */
+  font-size: 16px;
+  appearance: none;
+}
+.choice-group > label.choice:hover {
+  border-color: var(--brand-text);
+}
+.choice-group > label.choice[data-checked="true"] {
+  border-color: var(--brand-text);
+  background: var(--brand-soft);
+  color: var(--brand-text);
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px var(--brand-text);
+}
+.choice-group > label.choice:has(input:focus-visible) {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.choice-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.choice[data-checked="true"] .choice-icon {
+  color: var(--brand-text);
+}
+.choice-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Modalidade: três opções lado a lado; ícone acima do texto. */
+.choice-group--segmented {
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+}
+.choice-group--segmented > label.choice {
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-height: 64px;
+  padding: 8px;
+  text-align: center;
+}
+
+/* Perfil: cartões em grade. */
+.choice-group--cards {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+/* Preenchimento rápido: pílulas que quebram linha no desktop. */
+.choice-group--chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.choice-group--chips > label.choice {
+  min-height: 44px;
+  max-width: 100%;
+  padding: 8px 14px;
+  border-radius: 22px;
+  /* Desktop: um nome longo quebra dentro da pílula em vez de sair da coluna. */
+  white-space: normal;
+}
+
+@media (max-width: 480px) {
+  /* Modalidade em coluna: ícone à esquerda, texto inteiro. */
+  .choice-group--segmented {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .choice-group--segmented > label.choice {
+    flex-direction: row;
+    justify-content: flex-start;
+    min-height: 48px;
+    padding: 10px 12px;
+    text-align: left;
+  }
+  .choice-group--cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  /* Pílulas em uma linha com rolagem horizontal (sem rolar a página). */
+  .choice-group--chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 4px 4px 8px;
+    margin: -4px -4px 0;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+  .choice-group--chips > label.choice {
+    flex-shrink: 0;
+    max-width: none;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+}
+
+/* Mês: mesma altura, borda e anel de foco dos outros campos. */
+.workspace-month:has(select:focus-visible) {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.workspace-month select:focus-visible {
+  outline: none;
+}
+
+/* ---------- Resumo: alternância Mensal | Semanal e faixas de semana ---------- */
+.summary-progress-head {
+  align-items: center;
+}
+.choice-group--toggle {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: auto;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-raised);
+}
+.choice-group--toggle > label.choice {
+  min-height: 44px;
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+.choice-group--toggle > label.choice[data-checked="true"] {
+  border-color: var(--control-border);
+  background: var(--surface);
+  color: var(--brand-text);
+  font-weight: 700;
+  box-shadow: none;
+}
+.week-bands {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.week-band {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+.week-band[data-current="true"] {
+  border-color: var(--brand-text);
+  background: var(--brand-soft);
+}
+.week-band-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font-size: 15px;
+  color: var(--body);
+}
+.week-band-head strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.week-band-value {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+.week-band-tag {
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--brand-text);
+  color: var(--brand-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+.week-band-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.week-band-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brand-vivid);
+}
+.week-band-note {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+@media (max-width: 767px) {
+  .week-bands {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .choice-group--toggle {
+    margin-left: 0;
+    width: 100%;
+  }
+  .choice-group--toggle > label.choice {
+    flex: 1 1 0;
+    justify-content: center;
+  }
 }

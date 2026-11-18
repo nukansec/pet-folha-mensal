@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ArrowDown,
   ArrowRight,
@@ -11,9 +11,11 @@ import {
   FileText,
   Lock,
   Moon,
+  Pencil,
   Plus,
   Settings2,
   Sun,
+  Trash2,
 } from "lucide-react";
 import { UserProfile, UserRole, GATInfo, sortedGats } from "@/types";
 import { useTheme } from "@/lib/theme";
@@ -24,6 +26,22 @@ import { ReleaseNotes } from "./ReleaseNotes";
 import { SiteFooter } from "./SiteFooter";
 import { Frame, FrameHeader, FramePanel, SegmentedControl, SegmentedControlItem } from "./ui/access-controls";
 import { FullSelect } from "@/components/ui/full-select";
+import { RoleChoice } from "./RoleChoice";
+import type { ProfileActivitySummary } from "@/lib/storage";
+
+/** Iniciais do cartão: primeira letra do primeiro e do último nome. */
+export function profileInitials(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return "?";
+  const first = words[0][0];
+  const last = words.length > 1 ? words[words.length - 1][0] : "";
+  return (first + last).toLocaleUpperCase("pt-BR");
+}
+
+export function monthsWithActivities(months: number): string {
+  if (!months) return "Nenhum mês com atividades";
+  return `${months} ${months === 1 ? "mês" : "meses"} com atividades`;
+}
 
 // Exemplo fictício do cartão da entrada, em ordem cronológica. O dia da
 // semana sai da data (fuso UTC fixo: servidor e navegador dão o mesmo texto).
@@ -45,6 +63,14 @@ interface LandingPageProps {
   roles: string[];
   onOpenAdmin: () => void;
   onOpenFeedback: () => void;
+  /** Aba inicial; "Trocar participante" abre em "Continuar". */
+  initialTab?: "local" | "create" | "upload";
+  /** Leva o foco ao cartão de acesso (depois de "Trocar participante"). */
+  focusAccess?: boolean;
+  /** Meses e atividades de cada perfil, por id. */
+  profileSummaries?: Record<string, ProfileActivitySummary>;
+  onEditProfile?: (profile: UserProfile) => void;
+  onDeleteProfile?: (profile: UserProfile) => void;
 }
 
 export function LandingPage({
@@ -56,11 +82,22 @@ export function LandingPage({
   roles,
   onOpenAdmin,
   onOpenFeedback,
+  initialTab,
+  focusAccess = false,
+  profileSummaries = {},
+  onEditProfile,
+  onDeleteProfile,
 }: LandingPageProps) {
   const { theme, toggleTheme } = useTheme();
   const [tab, setTab] = useState<"local" | "create" | "upload">(
-    profiles.length ? "local" : "create",
+    initialTab ?? (profiles.length ? "local" : "create"),
   );
+  useEffect(() => {
+    if (!focusAccess) return;
+    const heading = document.getElementById("access-title");
+    heading?.scrollIntoView({ block: "start" });
+    heading?.focus({ preventScroll: true });
+  }, [focusAccess]);
   const [name, setName] = useState("");
   const gatList = sortedGats(gats);
   const [gat, setGat] = useState(
@@ -70,7 +107,8 @@ export function LandingPage({
     roles.includes(PROGRAM.defaultRole) ? PROGRAM.defaultRole : roles[0] || "",
   );
   const [helpOpen, setHelpOpen] = useState(false);
-  const [profileId, setProfileId] = useState(profiles[0]?.id || "");
+  // Sem perfis (ex.: o último foi excluído), "Continuar" vira "Primeiro acesso".
+  const currentTab = tab === "local" && !profiles.length ? "create" : tab;
   const fileRef = useRef<HTMLInputElement>(null);
 
   function createProfile(event: FormEvent) {
@@ -194,31 +232,78 @@ export function LandingPage({
         <div className="start-layout">
           <section id="acesso" aria-labelledby="access-title">
             <Frame>
-              <FrameHeader><h2 id="access-title">Vamos começar</h2></FrameHeader>
+              <FrameHeader><h2 id="access-title" tabIndex={-1}>Vamos começar</h2></FrameHeader>
               <FramePanel>
                 <SegmentedControl aria-label="Como deseja começar">
                   {profiles.length > 0 && (
-                    <SegmentedControlItem selected={tab === "local"} onClick={() => setTab("local")}>Continuar</SegmentedControlItem>
+                    <SegmentedControlItem selected={currentTab === "local"} onClick={() => setTab("local")}>Continuar</SegmentedControlItem>
                   )}
-                  <SegmentedControlItem selected={tab === "create"} onClick={() => setTab("create")}>Primeiro acesso</SegmentedControlItem>
-                  <SegmentedControlItem selected={tab === "upload"} onClick={() => setTab("upload")}>Restaurar cópia</SegmentedControlItem>
+                  <SegmentedControlItem selected={currentTab === "create"} onClick={() => setTab("create")}>Primeiro acesso</SegmentedControlItem>
+                  <SegmentedControlItem selected={currentTab === "upload"} onClick={() => setTab("upload")}>Restaurar cópia</SegmentedControlItem>
                 </SegmentedControl>
-                {tab === "local" ? (
-                  <form className="start-form" onSubmit={(event) => {
-                    event.preventDefault();
-                    const profile = profiles.find((item) => item.id === profileId);
-                    if (profile) onSelectProfile?.(profile);
-                  }}>
+                {currentTab === "local" ? (
+                  <div className="start-form">
                     <p className="access-hint">Abra seu perfil e escolha o mês. Você pode começar um novo mês sem o arquivo anterior.</p>
-                    <div className="field">
-                      <label htmlFor="entry-profile">Perfil neste navegador</label>
-                      <FullSelect id="entry-profile" value={profileId} onChange={(event) => setProfileId(event.target.value)} required>
-                        {profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name} · {profile.role} · GAT {profile.gatNumber}</option>)}
-                      </FullSelect>
-                    </div>
-                    <button className="primary-button w-full" type="submit">Continuar com este perfil <ArrowRight size={18} /></button>
-                  </form>
-                ) : tab === "create" ? (
+                    <ul className="profile-cards" aria-label="Perfis neste navegador">
+                      {profiles.map((profile) => {
+                        const detailId = `profile-card-${profile.id}`;
+                        const summary = profileSummaries[profile.id];
+                        return (
+                          <li key={profile.id} className="profile-card">
+                            <button
+                              type="button"
+                              className="profile-card-open"
+                              aria-label={`Abrir folha de ${profile.name}`}
+                              aria-describedby={detailId}
+                              onClick={() => onSelectProfile?.(profile)}
+                            >
+                              <span className="profile-card-initials" aria-hidden="true">
+                                {profileInitials(profile.name)}
+                              </span>
+                              <span className="profile-card-text">
+                                <strong>{profile.name}</strong>
+                                <small id={detailId}>
+                                  {profile.role} · GAT {profile.gatNumber}
+                                  <span className="profile-card-sep" aria-hidden="true"> · </span>
+                                  <span className="profile-card-months">
+                                    {monthsWithActivities(summary?.months ?? 0)}
+                                  </span>
+                                </small>
+                              </span>
+                              <span className="profile-card-cta" aria-hidden="true">
+                                Abrir <ArrowRight size={18} />
+                              </span>
+                            </button>
+                            <span className="profile-card-actions">
+                              {onEditProfile && (
+                                <button
+                                  type="button"
+                                  className="icon-button"
+                                  aria-label={`Editar perfil de ${profile.name}`}
+                                  title="Editar identificação"
+                                  onClick={() => onEditProfile(profile)}
+                                >
+                                  <Pencil size={18} />
+                                </button>
+                              )}
+                              {onDeleteProfile && (
+                                <button
+                                  type="button"
+                                  className="icon-button profile-card-delete"
+                                  aria-label={`Excluir perfil de ${profile.name}`}
+                                  title="Excluir perfil"
+                                  onClick={() => onDeleteProfile(profile)}
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              )}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ) : currentTab === "create" ? (
                   <form onSubmit={createProfile} className="start-form">
                     <p className="access-hint">
                       Informe sua identificação uma vez. Nos próximos meses,
@@ -237,35 +322,26 @@ export function LandingPage({
                         maxLength={150}
                       />
                     </div>
-                    <div className="start-field-row">
-                      <div className="field">
-                        <label htmlFor="entry-role">Perfil</label>
-                        <FullSelect
-                          id="entry-role"
-                          value={role}
-                          onChange={(event) => setRole(event.target.value)}
-                          required
-                        >
-                          {roles.map((item) => (
-                            <option key={item}>{item}</option>
-                          ))}
-                        </FullSelect>
-                      </div>
-                      <div className="field">
-                        <label htmlFor="entry-gat">GAT</label>
-                        <FullSelect
-                          id="entry-gat"
-                          value={gat}
-                          onChange={(event) => setGat(event.target.value)}
-                          required
-                        >
-                          {gatList.map((item) => (
-                            <option key={item.number} value={item.number}>
-                              GAT {item.number} · {item.name}
-                            </option>
-                          ))}
-                        </FullSelect>
-                      </div>
+                    <RoleChoice
+                      id="entry-role"
+                      roles={roles}
+                      value={role}
+                      onChange={setRole}
+                    />
+                    <div className="field">
+                      <label htmlFor="entry-gat">GAT</label>
+                      <FullSelect
+                        id="entry-gat"
+                        value={gat}
+                        onChange={(event) => setGat(event.target.value)}
+                        required
+                      >
+                        {gatList.map((item) => (
+                          <option key={item.number} value={item.number}>
+                            GAT {item.number} · {item.name}
+                          </option>
+                        ))}
+                      </FullSelect>
                     </div>
                     <button
                       className="primary-button w-full"

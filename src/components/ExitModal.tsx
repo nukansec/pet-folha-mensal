@@ -13,6 +13,8 @@ interface ExitModalProps {
   onDownloadPdf: () => Promise<boolean> | boolean | void;
   userName: string;
   hasChanges?: boolean;
+  /** Texto do botão principal: Concluir usa o padrão; o menu do topo, "Trocar participante" ou "Sair". */
+  leaveLabel?: string;
 }
 
 export function ExitModal(props: ExitModalProps) {
@@ -28,6 +30,7 @@ function Conclusion({
   onDownloadPdf,
   userName,
   hasChanges = false,
+  leaveLabel = "Sair / trocar participante",
 }: ExitModalProps) {
   const [jsonTriggered, setJsonTriggered] = useState(false);
   const [pdfTriggered, setPdfTriggered] = useState(false);
@@ -133,7 +136,7 @@ function Conclusion({
               Deseja sair mesmo assim?
             </p>
             <button className="secondary-button" onClick={onConfirmExit}>
-              Sair sem salvar cópia
+              {leaveLabel === "Trocar participante" ? "Trocar sem salvar cópia" : "Sair sem salvar cópia"}
             </button>
             <button
               className="secondary-button"
@@ -148,7 +151,7 @@ function Conclusion({
             Continuar editando
           </button>
           <button className="primary-button" disabled={busy} onClick={leave}>
-            Sair / trocar participante <ArrowRight size={18} />
+            {leaveLabel} <ArrowRight size={18} />
           </button>
         </div>
       </section>

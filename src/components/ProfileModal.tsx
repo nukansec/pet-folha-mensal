@@ -7,6 +7,7 @@ import { normalizeName } from "@/lib/storage";
 import { X, Check, User } from "lucide-react";
 import { useDialog } from "@/context/DialogContext";
 import { FullSelect } from "@/components/ui/full-select";
+import { RoleChoice } from "./RoleChoice";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -58,7 +59,7 @@ export function ProfileModal({
       )
     ) {
       await alert({
-        title: "Nome Duplicado",
+        title: "Nome duplicado",
         message: `Já existe outro participante cadastrado com o nome "${name.trim()}".`,
         variant: "warning",
       });
@@ -98,7 +99,7 @@ export function ProfileModal({
           <div className="flex items-center gap-2">
             <User className="size-4.5 text-brand-text" />
             <h3 className="text-sm sm:text-base font-bold text-ink">
-              Identificação do Participante
+              Identificação do participante
             </h3>
           </div>
           <button
@@ -128,36 +129,29 @@ export function ProfileModal({
               onChange={(event) => setEmail(event.target.value)} />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-4">
             <div className="field">
               <label htmlFor="profilemodal-field-2">Grupo tutorial (GAT)</label>
               <FullSelect
                 id="profilemodal-field-2"
+                singleLine
                 value={gatNumber}
                 onChange={(e) => setGatNumber(e.target.value)}
               >
                 {sortedGats(gats).map((info) => (
                   <option key={info.number} value={info.number}>
-                    GAT {info.number} ({info.name})
+                    GAT {info.number} · {info.name}
                   </option>
                 ))}
               </FullSelect>
             </div>
 
-            <div className="field">
-              <label htmlFor="profilemodal-field-3">Perfil</label>
-              <FullSelect
-                id="profilemodal-field-3"
-                value={role}
-                onChange={(e) => setRole(e.target.value as UserRole)}
-              >
-                {roles.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </FullSelect>
-            </div>
+            <RoleChoice
+              id="profilemodal-role"
+              roles={roles}
+              value={role}
+              onChange={(value) => setRole(value as UserRole)}
+            />
           </div>
 
           <p className="text-xs text-muted leading-relaxed">
@@ -178,7 +172,7 @@ export function ProfileModal({
               className="min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl text-on-brand bg-brand hover:bg-brand-strong cursor-pointer flex items-center justify-center gap-1.5 transition-colors shadow-[var(--page-shadow)]"
             >
               <Check className="size-4" />
-              <span>Salvar Alterações</span>
+              <span>Salvar alterações</span>
             </button>
           </div>
         </form>

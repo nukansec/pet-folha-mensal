@@ -17,7 +17,16 @@ function optionText(children: ReactNode): string {
  * por cima da caixa, então foco, teclado, rótulo e leitor de tela seguem
  * nativos; a caixa visível só repete o texto da opção (aria-hidden).
  */
-export function FullSelect({ className = "", children, value, ...props }: ComponentProps<"select">) {
+export function FullSelect({
+  className = "",
+  children,
+  value,
+  singleLine = false,
+  ...props
+}: ComponentProps<"select"> & {
+  /** Uma linha com reticências; o texto inteiro fica no title (ex.: GAT no modal). */
+  singleLine?: boolean;
+}) {
   // Como no select nativo: a opção com o valor atual ou, sem ela, a primeira.
   let first: string | undefined;
   let selected: string | undefined;
@@ -30,7 +39,10 @@ export function FullSelect({ className = "", children, value, ...props }: Compon
   });
   const label = selected ?? first ?? "";
   return (
-    <span className={`full-select ${className}`}>
+    <span
+      className={`full-select${singleLine ? " full-select--single" : ""} ${className}`}
+      title={singleLine ? label : undefined}
+    >
       <span className="full-select-display" aria-hidden="true">
         <span>{label}</span>
         <ChevronDown size={18} />

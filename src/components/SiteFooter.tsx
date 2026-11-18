@@ -3,8 +3,10 @@
 import { PROGRAM } from "@/config/program";
 
 /**
- * Rodapé comum à entrada e ao painel: créditos do projeto original à esquerda
- * e links úteis à direita. “Avaliar o site” só aparece com link configurado.
+ * Rodapé comum à entrada e ao painel: autoria desta versão e créditos do
+ * projeto original à esquerda (nomes e links de PROGRAM.author e
+ * PROGRAM.credits) e links úteis à direita. “Avaliar o site” só aparece com
+ * link configurado.
  */
 export function SiteFooter({
   onHelp,
@@ -19,7 +21,11 @@ export function SiteFooter({
       <div className="footer-inner">
         <div className="footer-bottom">
           <p>
-            {PROGRAM.acronym}/{PROGRAM.campus} · Adaptado do{" "}
+            Feito por{" "}
+            <a href={PROGRAM.author.url} target="_blank" rel="noreferrer">
+              {PROGRAM.author.name}
+            </a>{" "}
+            · adaptado do{" "}
             <a
               href={PROGRAM.credits.upstreamRepository}
               target="_blank"

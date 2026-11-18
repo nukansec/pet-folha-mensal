@@ -75,7 +75,7 @@ test("perfil repetido retoma sem arquivo e preserva meses anteriores", async ({
   );
   await page.goto("/");
   await expect(
-    page.getByLabel("Perfil neste navegador", { exact: true }),
+    page.getByRole("list", { name: "Perfis neste navegador" }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Primeiro acesso", exact: true })
@@ -100,7 +100,7 @@ test("perfil repetido retoma sem arquivo e preserva meses anteriores", async ({
   await page
     .getByRole("button", { name: "Sair / trocar participante", exact: true })
     .click();
-  await page.getByRole("button", { name: "Continuar com este perfil", exact: true }).click();
+  await page.getByRole("button", { name: `Abrir folha de ${user.name}`, exact: true }).click();
   await page.reload();
   const stored = await page.evaluate(
     (keys) => ({
@@ -456,8 +456,9 @@ test("erro em edição mantém o diálogo, o preenchimento e o foco", async ({
   await expect(edit.getByRole("button", { name: /Salvar/ })).toBeFocused();
   await edit.getByRole("button", { name: "Cancelar", exact: true }).click();
   await page
-    .getByRole("button", { name: /Participante sintético Monitor\(a\)/ })
+    .getByRole("button", { name: /Participante sintético Monitor\(a\).*menu do participante/ })
     .click();
+  await page.getByRole("menuitem", { name: "Editar identificação" }).click();
   const profile = page.getByRole("dialog", {
     name: "Identificação do participante",
     exact: true,
@@ -521,13 +522,14 @@ test("dados do formato antigo migram para o v3; exemplo sem uso não aparece; v2
     localStorage.setItem("pet_folha_activities_v2_pessoa-v2_2026-10", JSON.stringify(old));
   }, { legacy, used, old });
   await page.reload();
-  const select = page.getByLabel("Perfil neste navegador", { exact: true });
-  await expect(select.locator("option")).toHaveCount(1);
-  await expect(select).toHaveValue(used.id);
-  await expect(select.locator("option")).toHaveText(/Monitor\(a\)/);
+  const cards = page.getByRole("list", { name: "Perfis neste navegador" }).getByRole("listitem");
+  await expect(cards).toHaveCount(1);
+  await expect(cards).toContainText(used.name);
+  await expect(cards).toContainText(/Monitor\(a\)/);
+  await expect(cards).toContainText("1 mês com atividades");
   await expect(page.getByText(/O JSON é um arquivo que guarda sua identificação/)).toBeVisible();
   await expect(page.getByText(/Quem usa este navegador pode abrir/)).toBeVisible();
-  await page.getByRole("button", { name: "Continuar com este perfil", exact: true }).click();
+  await page.getByRole("button", { name: `Abrir folha de ${used.name}`, exact: true }).click();
   await page.getByLabel("Mês da folha").selectOption("2026-10");
   await expect(page.locator(".summary-total strong")).toHaveText("1h30");
   await expect(page.locator(".record-hours:visible, .record-meta strong:visible").first()).toHaveText("1h30");
@@ -750,9 +752,10 @@ test("cópias com comprovantes levam os originais e a restauração reverte falh
 test("novidades mostram data de publicação nos dois temas", async ({ page }, testInfo) => {
   await page.goto("/");
   const section = page.getByRole("region", { name: "Novidades do site" });
-  await expect(section.getByRole("heading", { name: "Ajustes no formulário e nova modalidade" })).toBeVisible();
+  await expect(section.getByRole("heading", { name: "Perfis, menu do participante e visão semanal" })).toBeVisible();
   await expect(section.getByText("Última atualização", { exact: false })).toContainText("18 de novembro de 2026");
   await section.getByText("Ver histórico de atualizações", { exact: true }).click();
+  await expect(section.getByRole("heading", { name: "Ajustes no formulário e nova modalidade" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Novo visual com a marca do PET-SD" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Folha no modelo do PET-SD" })).toBeVisible();
   for (const theme of ["light", "dark"]) {
@@ -819,7 +822,7 @@ test("sem texto cortado, foco visível e folha oficial em preto e branco", async
   await create(page);
   await add(page);
   // Modalidade padrão do formulário: Síncrona (PROGRAM.defaultModality).
-  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue(/Síncrona/);
+  await expect(page.getByRole("radio", { name: "Interação em tempo real (Síncrona)", exact: true })).toBeChecked();
   for (const theme of ["light", "dark"]) {
     await page.evaluate((theme) => {
       document.documentElement.dataset.theme = theme;
@@ -869,30 +872,36 @@ test("sem texto cortado, foco visível e folha oficial em preto e branco", async
   }
   // Modelo rápido de nome longo, no celular.
   await page.setViewportSize({ width: 390, height: 1000 });
-  await page.getByLabel(/Preenchimento rápido/).selectOption({ label: "Pesquisa Bibliográfica e Estudos Autônomos" });
+  await page.getByRole("radio", { name: "Pesquisa Bibliográfica e Estudos Autônomos", exact: true }).check();
   expect(await cutTexts(page), "modelo longo 390px").toEqual([]);
 });
 
 test("modelos rápidos novos; modelo sem local deixa o campo vazio", async ({ page }) => {
   await create(page);
-  const template = page.getByLabel(/Preenchimento rápido/);
-  await expect(template.locator("option")).toHaveText([
+  const template = page.getByRole("radiogroup", { name: /Preenchimento rápido/ });
+  await expect(template.getByRole("radio")).toHaveCount(5);
+  await expect(template.locator(".choice-text")).toHaveText([
     "Em branco",
     "Reunião Geral",
     "Capacitação",
     "Visita Técnica",
     "Pesquisa Bibliográfica e Estudos Autônomos",
   ]);
-  await template.selectOption({ label: "Reunião Geral" });
+  await expect(template.getByRole("radio", { name: "Em branco" })).toBeChecked();
+  const modality = (name: string) => page.getByRole("radio", { name, exact: true });
+  await template.getByRole("radio", { name: "Reunião Geral" }).check();
   await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("UFG");
-  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Interação em tempo real (In Loco)");
+  await expect(modality("Interação em tempo real (In Loco)")).toBeChecked();
   await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Reunião Geral");
-  await template.selectOption({ label: "Visita Técnica" });
+  await template.getByRole("radio", { name: "Visita Técnica" }).check();
   await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("");
-  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Interação em tempo real (In Loco)");
-  await template.selectOption({ label: "Pesquisa Bibliográfica e Estudos Autônomos" });
+  await expect(modality("Interação em tempo real (In Loco)")).toBeChecked();
+  await template.getByRole("radio", { name: "Pesquisa Bibliográfica e Estudos Autônomos" }).check();
   await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("Online");
-  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Assíncrona");
+  await expect(modality("Assíncrona")).toBeChecked();
+  // Digitar outra atividade volta a marcar "Em branco".
+  await page.getByLabel("Atividade desenvolvida", { exact: true }).fill("Outra atividade");
+  await expect(template.getByRole("radio", { name: "Em branco" })).toBeChecked();
 });
 
 test("lista antiga de modelos salva sem edição abre com os modelos novos", async ({ page }) => {
@@ -911,7 +920,7 @@ test("lista antiga de modelos salva sem edição abre com os modelos novos", asy
     localStorage.setItem("test-seeded", "1");
   }, legacy);
   await create(page);
-  const options = page.getByLabel(/Preenchimento rápido/).locator("option");
+  const options = page.getByRole("radiogroup", { name: /Preenchimento rápido/ }).locator(".choice-text");
   await expect(options).toHaveCount(5);
   await expect(options.nth(1)).toHaveText("Reunião Geral");
   // Lista editada pela pessoa: fica a dela.
@@ -919,7 +928,7 @@ test("lista antiga de modelos salva sem edição abre com os modelos novos", asy
     localStorage.setItem("pet_folha_config_templates_v3", JSON.stringify([{ ...legacy[2], name: "Ata da reunião (editada)" }]));
   }, legacy);
   await page.reload();
-  await expect(page.getByLabel(/Preenchimento rápido/).locator("option")).toHaveText(["Em branco", "Ata da reunião (editada)"]);
+  await expect(page.getByRole("radiogroup", { name: /Preenchimento rápido/ }).locator(".choice-text")).toHaveText(["Em branco", "Ata da reunião (editada)"]);
 });
 
 test("cartões .pdf e .json: mesma altura lado a lado, altura própria empilhados", async ({ page }, testInfo) => {

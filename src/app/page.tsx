@@ -12,7 +12,6 @@ import { PROGRAM } from "@/config/program";
 import {
   getStoredProfiles,
   getProfilesForAccess,
-  saveProfiles,
   getActiveProfile,
   setActiveProfileId,
   getActivitiesForMonth,
@@ -27,14 +26,21 @@ import {
   getStoredRoles,
   getStoredTemplates,
   registerProfile,
+  updateUserProfileAdmin,
+  deleteUserProfile,
+  getProfileActivitySummary,
 } from "@/lib/storage";
 import {
   decodeAttachments,
+  deleteProfileAttachments,
   encodeAttachments,
   listAttachments,
+  listProfileAttachments,
   prepareAttachmentPages,
+  type Attachment,
 } from "@/lib/attachments";
-import { restoreWithAttachments } from "@/lib/attachment-backup";
+import { buildProfileBackup, restoreWithAttachments } from "@/lib/attachment-backup";
+import { fileSlug, saveJsonFile } from "@/lib/download";
 import {
   calcPetHours,
   calcPetMinutes,
@@ -63,6 +69,10 @@ import { FeedbackModal } from "@/components/FeedbackModal";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HelpModal } from "@/components/Help";
 import {
+  DeleteProfileModal,
+  type DeleteProfileSummary,
+} from "@/components/DeleteProfileModal";
+import {
   Calendar,
   Download,
   Printer,
@@ -80,6 +90,14 @@ export default function Home() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  // Como a sessão termina: Concluir, Trocar participante ou Sair (menu).
+  const [exitMode, setExitMode] = useState<"conclude" | "switch" | "exit">(
+    "conclude",
+  );
+  // "switch" abre a entrada na aba Continuar, com foco na lista de perfis.
+  const [entryIntent, setEntryIntent] = useState<"default" | "switch">(
+    "default",
+  );
   const [monthKey, setMonthKey] = useState(getCurrentMonth);
   const [ready, setReady] = useState(false);
   const [draftDirty, setDraftDirty] = useState(false);
@@ -105,6 +123,13 @@ export default function Home() {
   const printAttachmentsRef = useRef<HTMLDivElement>(null);
   const clearPrintAttachments = useRef<(() => void) | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  // Perfil aberto no modal de identificação a partir da entrada (Editar).
+  const [entryEditing, setEntryEditing] = useState<UserProfile | null>(null);
+  // Perfil em exclusão e o que será apagado (attachments null = não foi possível ler).
+  const [deleting, setDeleting] = useState<{
+    profile: UserProfile;
+    summary: DeleteProfileSummary;
+  } | null>(null);
 
   const activeProfileId = activeUser?.id;
   useEffect(() => () => clearPrintAttachments.current?.(), [activeProfileId, monthKey, showBlankTemplate]);
@@ -207,8 +232,39 @@ export default function Home() {
   const openConclusion = async () => {
     if (await confirmDraft()) {
       setDraftDirty(false);
+      setExitMode("conclude");
       setIsExitModalOpen(true);
     }
+  };
+
+  const endSession = (mode: "conclude" | "switch" | "exit") => {
+    setDraftDirty(false);
+    setActiveTab("dashboard");
+    setIsExitModalOpen(false);
+    setActiveProfileId(null);
+    setActiveUser(null);
+    setActivities([]);
+    setEditingActivity(null);
+    setHasChanges(false);
+    setEntryIntent(mode === "switch" ? "switch" : "default");
+    if (mode !== "switch") showToast("Sessão encerrada com sucesso.");
+  };
+
+  /**
+   * Trocar participante e Sair (menu do topo) seguem as proteções do
+   * Concluir: rascunho no formulário pede confirmação (confirmDraft); com
+   * alterações sem cópia, abre a mesma janela do Concluir, que lembra de
+   * salvar a cópia sem impedir a saída.
+   */
+  const leaveSession = async (mode: "switch" | "exit") => {
+    if (!(await confirmDraft())) return;
+    setDraftDirty(false);
+    if (hasChanges) {
+      setExitMode(mode);
+      setIsExitModalOpen(true);
+      return;
+    }
+    endSession(mode);
   };
 
   const persistActivities = (next: Activity[], message: string): boolean => {
@@ -229,15 +285,22 @@ export default function Home() {
     }
   };
 
+  /**
+   * Grava a identificação pelo storage, que recusa nome igual ao de outro
+   * perfil (normalizeName): saveProfiles desduplica por nome e, sem essa
+   * checagem, um nome repetido apagaria o outro perfil.
+   */
   const handleSaveProfile = (updated: UserProfile) => {
     try {
-      const updatedProfiles = profiles.map((profile) =>
-        profile.id === updated.id ? updated : profile,
-      );
-      saveProfiles(updatedProfiles);
-      setProfiles(updatedProfiles);
-      setActiveUser(updated);
-      setHasChanges(true);
+      const result = updateUserProfileAdmin(updated);
+      if (!result.success) return false;
+      const stored = getStoredProfiles();
+      setProfiles(stored);
+      const saved = stored.find((profile) => profile.id === updated.id) ?? updated;
+      if (activeUser?.id === updated.id) {
+        setActiveUser(saved);
+        setHasChanges(true);
+      }
       showToast("Identificação atualizada.");
       return true;
     } catch {
@@ -459,67 +522,104 @@ export default function Home() {
       );
       return false;
     }
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const filename = `backup-frequencia-${activeUser.name.toLowerCase().replace(/\s+/g, "-")}-${monthKey}.json`;
-
-    // 1. Tenta API moderna showSaveFilePicker (Chromium/Edge) se suportada
-    if (typeof window !== "undefined" && "showSaveFilePicker" in window) {
-      try {
-        const fileHandle = await (
-          window as Window & {
-            showSaveFilePicker: (options: {
-              suggestedName: string;
-              types: {
-                description: string;
-                accept: Record<string, string[]>;
-              }[];
-            }) => Promise<{
-              createWritable: () => Promise<{
-                write: (data: Blob) => Promise<void>;
-                close: () => Promise<void>;
-              }>;
-            }>;
-          }
-        ).showSaveFilePicker({
-          suggestedName: filename,
-          types: [
-            {
-              description: "Cópia de segurança (.json)",
-              accept: { "application/json": [".json"] },
-            },
-          ],
-        });
-        const writable = await fileHandle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-        setHasChanges(false);
-        showToast("Cópia da folha salva com sucesso!");
-        return true;
-      } catch (err: unknown) {
-        if (err instanceof Error && err.name === "AbortError") {
-          showToast("Salvamento cancelado.");
-          return false;
-        }
-        // The standard download remains available when the file picker is unsupported.
-      }
+    const filename = `backup-frequencia-${fileSlug(activeUser.name)}-${monthKey}.json`;
+    const outcome = await saveJsonFile(jsonString, filename);
+    if (outcome === "saved") {
+      setHasChanges(false);
+      showToast("Cópia da folha salva com sucesso!");
+      return true;
     }
-
-    // 2. Download direto padrão (Brave, Firefox, Safari, Mobile)
-    try {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    if (outcome === "cancelled") {
+      showToast("Salvamento cancelado.");
+      return false;
+    }
+    if (outcome === "downloaded") {
       showToast("Download da cópia de segurança iniciado.");
       return true;
+    }
+    setStorageError(
+      "O download não foi iniciado. Tente salvar a cópia novamente.",
+    );
+    return false;
+  };
+
+  /** Cópia do perfil inteiro (1.4), oferecida antes de excluir. */
+  const handleExportProfile = async (profile: UserProfile): Promise<boolean> => {
+    let json: string;
+    try {
+      json = await buildProfileBackup(profile);
+    } catch {
+      await alert({
+        title: "Cópia não criada",
+        message:
+          "Não foi possível ler os registros ou comprovantes deste perfil. Nada foi apagado.",
+        variant: "warning",
+      });
+      return false;
+    }
+    const outcome = await saveJsonFile(
+      json,
+      `backup-perfil-completo-${fileSlug(profile.name)}.json`,
+    );
+    if (outcome === "saved" || outcome === "downloaded") {
+      showToast(
+        outcome === "saved"
+          ? "Cópia do perfil salva."
+          : "Download da cópia do perfil iniciado.",
+      );
+      return true;
+    }
+    if (outcome === "cancelled") showToast("Salvamento cancelado.");
+    return false;
+  };
+
+  const requestDeleteProfile = async (profile: UserProfile) => {
+    const { months, activities } = getProfileActivitySummary(profile.id);
+    let attachments: number | null = null;
+    try {
+      const stored = await listProfileAttachments(profile.id);
+      attachments = Object.values(stored).reduce((total, items) => total + items.length, 0);
+    } catch {
+      attachments = null;
+    }
+    setDeleting({ profile, summary: { months, activities, attachments } });
+  };
+
+  /**
+   * Exclui perfil, atividades de todos os meses e comprovantes. Comprovantes
+   * primeiro: se o IndexedDB falhar, nada é apagado e o aviso explica.
+   */
+  const confirmDeleteProfile = async (): Promise<boolean> => {
+    if (!deleting) return false;
+    const { profile } = deleting;
+    try {
+      await deleteProfileAttachments(profile.id);
+    } catch {
+      await alert({
+        title: "Perfil não excluído",
+        message:
+          "O navegador não conseguiu apagar os comprovantes deste perfil. Nada foi apagado; tente novamente.",
+        variant: "warning",
+      });
+      return false;
+    }
+    try {
+      deleteUserProfile(profile.id);
     } catch {
       setStorageError(
-        "O download não foi iniciado. Tente salvar a cópia novamente.",
+        "Os comprovantes foram apagados, mas o navegador não conseguiu apagar o perfil e as atividades. Tente excluir novamente.",
       );
       return false;
     }
+    setProfiles(getStoredProfiles());
+    if (activeUser?.id === profile.id) {
+      setActiveUser(null);
+      setActivities([]);
+      setHasChanges(false);
+    }
+    setDeleting(null);
+    showToast(`Perfil de ${profile.name} excluído.`);
+    return true;
   };
 
   // Importar Backup Local em JSON
@@ -539,10 +639,15 @@ export default function Home() {
         setRestoreIssue({ code: preview.code, message: preview.error! });
         return;
       }
-      let attachments;
+      const months = preview.months ?? [];
+      // Comprovantes por mês; mês sem o campo preserva os já salvos.
+      let attachments: Record<string, Attachment[]> | undefined;
       try {
-        if (preview.attachmentData)
-          attachments = await decodeAttachments(preview.attachmentData);
+        for (const month of months) {
+          if (!month.attachmentData) continue;
+          attachments ??= {};
+          attachments[month.monthKey] = await decodeAttachments(month.attachmentData);
+        }
       } catch (error) {
         setRestoreIssue({
           code: "INVALID_BACKUP",
@@ -555,10 +660,23 @@ export default function Home() {
       );
       const contents = attachments === undefined
         ? "A cópia antiga preserva os comprovantes já salvos."
-        : "Comprovantes na cópia: " + attachments.length + ".";
+        : "Comprovantes na cópia: " +
+          Object.values(attachments).reduce((total, items) => total + items.length, 0) +
+          ".";
+      const whole = months.length > 1 || preview.months?.[0]?.monthKey !== preview.monthKey;
+      const scope = whole
+        ? `${pluralize(months.length, "mês", "meses")} · ${pluralize(
+            months.reduce((total, month) => total + month.activities.length, 0),
+            "atividade",
+            "atividades",
+          )}`
+        : `${getMonthYearLabel(preview.monthKey!)} · ${pluralize(preview.activities!.length, "atividade", "atividades")}`;
+      const replaced = whole
+        ? "Os dados deste perfil nos meses da cópia serão substituídos. Os outros meses serão preservados."
+        : "Os dados deste perfil e deste mês serão substituídos pela cópia. Os outros meses serão preservados.";
       const accepted = await confirm({
         title: "Restaurar esta cópia?",
-        message: `${preview.user!.name} · ${getMonthYearLabel(preview.monthKey!)} · ${pluralize(preview.activities!.length, "atividade", "atividades")}. ${contents} ${existing ? "Os dados deste perfil e deste mês serão substituídos pela cópia. Os outros meses serão preservados." : "O perfil e os registros desta cópia serão adicionados neste navegador."}`,
+        message: `${preview.user!.name} · ${scope}. ${contents} ${existing ? replaced : "O perfil e os registros desta cópia serão adicionados neste navegador."}`,
         confirmText: "Restaurar cópia",
         cancelText: "Cancelar",
         variant: "warning",
@@ -566,7 +684,7 @@ export default function Home() {
       if (!accepted) return;
       const result = attachments === undefined
         ? applyUserData(preview)
-        : await restoreWithAttachments(preview, preview.user!.id, preview.monthKey!, attachments);
+        : await restoreWithAttachments(preview, attachments);
       if (!result.success) {
         setRestoreIssue({ code: result.code, message: result.error! });
         return;
@@ -642,12 +760,45 @@ export default function Home() {
         <LandingPage
           profiles={getProfilesForAccess(profiles)}
           onSelectProfile={handleSelectProfile}
+          initialTab={entryIntent === "switch" ? "local" : undefined}
+          focusAccess={entryIntent === "switch"}
+          profileSummaries={Object.fromEntries(
+            profiles.map((profile) => [
+              profile.id,
+              getProfileActivitySummary(profile.id),
+            ]),
+          )}
+          onEditProfile={setEntryEditing}
+          onDeleteProfile={(profile) => void requestDeleteProfile(profile)}
           onLoginWithJson={handleImportBackup}
           onCreateProfile={handleCreateNewProfile}
           gats={gats}
           roles={roles}
           onOpenAdmin={() => setIsAdminModalOpen(true)}
           onOpenFeedback={() => setIsFeedbackModalOpen(true)}
+        />
+
+        {entryEditing && (
+          <ProfileModal
+            isOpen
+            onClose={() => setEntryEditing(null)}
+            currentUser={entryEditing}
+            allProfiles={profiles}
+            gats={gats}
+            roles={roles}
+            onSaveProfile={handleSaveProfile}
+          />
+        )}
+
+        <DeleteProfileModal
+          isOpen={Boolean(deleting)}
+          profile={deleting?.profile ?? null}
+          summary={deleting?.summary ?? null}
+          onClose={() => setDeleting(null)}
+          onSaveCopy={() =>
+            deleting ? handleExportProfile(deleting.profile) : Promise.resolve(false)
+          }
+          onConfirm={confirmDeleteProfile}
         />
 
         {/* Modal de configurações locais */}
@@ -711,6 +862,8 @@ export default function Home() {
           onOpenExitModal={openConclusion}
           onOpenFeedback={() => setIsFeedbackModalOpen(true)}
           onOpenHelp={() => setIsHelpOpen(true)}
+          onSwitchParticipant={() => void leaveSession("switch")}
+          onSignOut={() => void leaveSession("exit")}
         />
 
         <main id="conteudo" className="workspace-main" data-tab={activeTab}>
@@ -755,6 +908,8 @@ export default function Home() {
                 activitiesCount={activities.length}
                 targetHours={PROGRAM.monthlyTargetHours}
                 monthLabel={monthLabel}
+                monthKey={monthKey}
+                activities={activities}
               />
               <div className="frequency-workbench">
                 <ActivityForm
@@ -952,16 +1107,14 @@ export default function Home() {
           <ExitModal
             isOpen={isExitModalOpen}
             onClose={() => setIsExitModalOpen(false)}
-            onConfirmExit={() => {
-              setDraftDirty(false);
-              setActiveTab("dashboard");
-              setIsExitModalOpen(false);
-              setActiveProfileId(null);
-              setActiveUser(null);
-              setActivities([]);
-              setHasChanges(false);
-              showToast("Sessão encerrada com sucesso.");
-            }}
+            onConfirmExit={() => endSession(exitMode)}
+            leaveLabel={
+              exitMode === "switch"
+                ? "Trocar participante"
+                : exitMode === "exit"
+                  ? "Sair"
+                  : undefined
+            }
             onDownloadJson={handleExportBackup}
             onDownloadPdf={printParticipantSheet}
             userName={activeUser.name}

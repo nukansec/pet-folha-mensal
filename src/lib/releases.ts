@@ -2,6 +2,17 @@
 export const RELEASES = [
   {
     date: "2026-11-18",
+    title: "Perfis, menu do participante e visão semanal",
+    changes: [
+      "Na entrada, cada perfil aparece num cartão com Abrir, Editar e Excluir. Antes de excluir, o app mostra o que será apagado e oferece uma cópia do perfil inteiro.",
+      "O seu nome no topo abre um menu: editar identificação, trocar participante, salvar cópia e sair.",
+      "Modalidade, perfil e preenchimento rápido viraram opções visíveis, mais fáceis de tocar no celular.",
+      "O resumo do mês ganhou a visão Semanal, com a CH de cada semana e a semana atual destacada.",
+      "Nada muda nos seus registros: os dados salvos continuam abrindo iguais.",
+    ],
+  },
+  {
+    date: "2026-11-18",
     title: "Ajustes no formulário e nova modalidade",
     changes: [
       "Nova modalidade “Interação em tempo real (In Loco)” para as atividades presenciais. Registros antigos de “Síncrona presencial” passam a aparecer como In Loco.",

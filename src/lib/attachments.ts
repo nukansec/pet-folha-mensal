@@ -88,6 +88,88 @@ export function replaceAttachments(
   return withMonth(scope, () => attachments, beforeCommit);
 }
 
+/**
+ * Faixa de chaves [profileId, *] do store. Chaves-array comparam elemento a
+ * elemento e um array vem depois de qualquer string, então [id, []] fecha a
+ * faixa de todos os meses (strings) daquele perfil, e só dele.
+ */
+function profileRange(profileId: string) {
+  return IDBKeyRange.bound([profileId], [profileId, []]);
+}
+
+/** Comprovantes de todos os meses de um perfil, por mês (AAAA-MM). */
+export async function listProfileAttachments(
+  profileId: string,
+): Promise<Record<string, Attachment[]>> {
+  const db = await openDatabase();
+  try {
+    return await new Promise((resolve, reject) => {
+      const result: Record<string, Attachment[]> = {};
+      const transaction = db.transaction(STORE, "readonly");
+      const request = transaction.objectStore(STORE).openCursor(profileRange(profileId));
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (!cursor) return;
+        const [, monthKey] = cursor.key as [string, string];
+        if (Array.isArray(cursor.value) && cursor.value.length) result[monthKey] = cursor.value;
+        cursor.continue();
+      };
+      transaction.oncomplete = () => resolve(result);
+      transaction.onabort = () => reject(transaction.error);
+    });
+  } finally {
+    db.close();
+  }
+}
+
+/** Apaga os comprovantes de todos os meses de um perfil; não toca nos outros. */
+export async function deleteProfileAttachments(profileId: string): Promise<void> {
+  const db = await openDatabase();
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction(STORE, "readwrite");
+      transaction.objectStore(STORE).delete(profileRange(profileId));
+      transaction.oncomplete = () => resolve();
+      transaction.onabort = () => reject(transaction.error);
+    });
+  } finally {
+    db.close();
+  }
+}
+
+/**
+ * Substitui os comprovantes de vários meses de um perfil numa só transação.
+ * beforeCommit roda com a transação ativa: se lançar, nada é gravado.
+ */
+export async function replaceMonthsAttachments(
+  profileId: string,
+  byMonth: Record<string, Attachment[]>,
+  beforeCommit: () => void,
+): Promise<void> {
+  const db = await openDatabase();
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction(STORE, "readwrite");
+      const store = transaction.objectStore(STORE);
+      let operationError: unknown;
+      transaction.oncomplete = () => resolve();
+      transaction.onabort = () => reject(operationError ?? transaction.error);
+      try {
+        for (const [monthKey, attachments] of Object.entries(byMonth)) {
+          if (attachments.length) store.put(attachments, [profileId, monthKey]);
+          else store.delete([profileId, monthKey]);
+        }
+        beforeCommit();
+      } catch (error) {
+        operationError = error;
+        transaction.abort();
+      }
+    });
+  } finally {
+    db.close();
+  }
+}
+
 export function removeAttachment(scope: AttachmentScope, id: string) {
   return withMonth(scope, (items) => items.filter((item) => item.id !== id));
 }

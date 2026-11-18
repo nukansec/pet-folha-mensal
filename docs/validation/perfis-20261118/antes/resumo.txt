@@ -1,0 +1,25 @@
+antes · http://127.0.0.1:5000
+ok      entrada-continuar-claro-1440
+ok      entrada-primeiro-acesso-claro-1440
+ok      painel-claro-1440
+ok      resumo-mensal-claro-1440
+ok      formulario-claro-1440
+ok      modal-identificacao-claro-1440
+ok      entrada-continuar-claro-390
+ok      entrada-primeiro-acesso-claro-390
+ok      painel-claro-390
+ok      resumo-mensal-claro-390
+ok      formulario-claro-390
+ok      modal-identificacao-claro-390
+ok      entrada-continuar-escuro-1440
+ok      entrada-primeiro-acesso-escuro-1440
+ok      painel-escuro-1440
+ok      resumo-mensal-escuro-1440
+ok      formulario-escuro-1440
+ok      modal-identificacao-escuro-1440
+ok      entrada-continuar-escuro-390
+ok      entrada-primeiro-acesso-escuro-390
+ok      painel-escuro-390
+ok      resumo-mensal-escuro-390
+ok      formulario-escuro-390
+ok      modal-identificacao-escuro-390
