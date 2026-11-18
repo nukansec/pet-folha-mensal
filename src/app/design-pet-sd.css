@@ -461,6 +461,10 @@
   color: var(--brand-text);
   font-variant-numeric: tabular-nums;
 }
+.hours-preview strong.is-empty {
+  color: var(--muted);
+  font-weight: 600;
+}
 .field-hint {
   margin-top: -6px;
   font-size: 14px;

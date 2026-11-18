@@ -443,6 +443,10 @@ test("formulários e modais renderizam com campos rotulados e diálogos nativos"
   verifyLabelTargets(form);
   for (const field of ["Data", "Início", "Fim", "Unidade/Local", "Atividade desenvolvida", "Descrição"])
     assert.match(form, new RegExp('<label[^>]*for="[^"]+"[^>]*>' + field));
+  // A regra da CH fica na Ajuda; sem horários, a CH mostra um traço neutro.
+  assert.doesNotMatch(form, /Conta o tempo exato/);
+  assert.match(form, /<strong class="is-empty"><span aria-hidden="true">—<\/span>/);
+  assert.doesNotMatch(form, />0h</);
   const components = [
     [
       EditActivityModal,

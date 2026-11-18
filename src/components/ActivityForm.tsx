@@ -171,7 +171,7 @@ export function ActivityForm({
                 setStart(event.target.value);
                 dirty();
               }}
-              aria-describedby={`activity-ch-rule${error ? " activity-error" : ""}`}
+              aria-describedby={error ? "activity-error" : undefined}
             />
           </div>
           <div className="field">
@@ -185,17 +185,22 @@ export function ActivityForm({
                 setEnd(event.target.value);
                 dirty();
               }}
-              aria-describedby={`activity-ch-rule${error ? " activity-error" : ""}`}
+              aria-describedby={error ? "activity-error" : undefined}
             />
           </div>
           <div className="hours-preview" aria-live="polite">
             <span>CH</span>
-            <strong>{formatDuration(minutes)}</strong>
+            {/* Sem início ou fim ainda não há CH: traço neutro, sem laranja. */}
+            {start && end ? (
+              <strong>{formatDuration(minutes)}</strong>
+            ) : (
+              <strong className="is-empty">
+                <span aria-hidden="true">—</span>
+                <span className="sr-only">a calcular</span>
+              </strong>
+            )}
           </div>
         </div>
-        <p id="activity-ch-rule" className="field-hint">
-          Conta o tempo exato. Ex.: 16h30 às 18h = 1h30.
-        </p>
         <div className="field">
           <label htmlFor="activity-modality">Modalidade</label>
           <FullSelect
