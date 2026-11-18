@@ -165,17 +165,17 @@ export function ProfileModal({
             navegador).
           </p>
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-line">
+          <div className="dialog-actions pt-2 border-t border-line">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 sm:flex-none min-h-[44px] px-4 py-2 text-xs sm:text-sm font-medium rounded-xl border border-line text-body hover:bg-raised cursor-pointer transition-colors"
+              className="min-h-[44px] px-4 py-2 text-xs sm:text-sm font-medium rounded-xl border border-line text-body hover:bg-raised cursor-pointer transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 sm:flex-none min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl text-on-brand bg-brand hover:bg-brand-strong cursor-pointer flex items-center justify-center gap-1.5 transition-colors shadow-[var(--page-shadow)]"
+              className="min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl text-on-brand bg-brand hover:bg-brand-strong cursor-pointer flex items-center justify-center gap-1.5 transition-colors shadow-[var(--page-shadow)]"
             >
               <Check className="size-4" />
               <span>Salvar Alterações</span>

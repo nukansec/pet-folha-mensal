@@ -361,7 +361,7 @@ export function EditActivityModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-line">
+          <div className="dialog-actions pt-3 border-t border-line">
             <button
               type="button"
               onClick={onClose}

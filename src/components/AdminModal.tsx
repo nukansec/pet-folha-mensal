@@ -881,7 +881,7 @@ export function AdminModal({
                           className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text"
                         />
                       </div>
-                      <div className="flex justify-end gap-2.5 pt-1">
+                      <div className="dialog-actions pt-1">
                         <button
                           type="button"
                           onClick={() => {

@@ -1083,3 +1083,28 @@
 .full-select:has(select:disabled) .full-select-display {
   opacity: 0.55;
 }
+
+/* ---------- Ações de modal ----------
+   Antes: linha flex sem quebra com justify-content: flex-end. Quando os
+   botões somavam mais que a caixa, o excesso saía pela esquerda (em 390 px,
+   "Continuar editando" começava em x = -91). Agora a linha quebra: em uma
+   linha os botões dividem a largura; sem espaço, cada um ocupa a linha toda,
+   na ordem do código (cancelar primeiro, primário por último). */
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.dialog-actions > * {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  justify-content: center;
+  text-align: center;
+  white-space: normal;
+}
+.dialog-actions > :only-child {
+  flex-grow: 0;
+}
