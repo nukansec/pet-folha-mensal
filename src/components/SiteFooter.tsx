@@ -2,18 +2,20 @@
 
 import { PROGRAM } from "@/config/program";
 
+/**
+ * Rodapé comum à entrada e ao painel: créditos do projeto original à esquerda
+ * e links úteis à direita. “Avaliar” só aparece com link configurado.
+ */
 export function SiteFooter({
-  compact = false,
   onHelp,
   onFeedback,
 }: {
-  compact?: boolean;
   onHelp: () => void;
   onFeedback: () => void;
 }) {
   const [first, second] = PROGRAM.credits.authors;
   return (
-    <footer className="site-footer screen-only compact">
+    <footer className="site-footer screen-only">
       <div className="footer-inner">
         <div className="footer-bottom">
           <p>
@@ -35,23 +37,29 @@ export function SiteFooter({
             </a>
           </p>
           <nav className="footer-utilities" aria-label="Links do rodapé">
-            {!compact && (
-              <>
-                <a
-                  href={PROGRAM.links.repository}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Código-fonte
-                </a>
-                <a href={PROGRAM.sheet.blankTemplateDocx} download>
-                  Modelo em branco
-                </a>
-              </>
-            )}
-            <button onClick={onHelp}>Ajuda</button>
+            <a
+              href={PROGRAM.links.repository}
+              target="_blank"
+              rel="noreferrer"
+              title="Código-fonte deste app no GitHub"
+            >
+              Projeto
+            </a>
+            <a
+              href={PROGRAM.sheet.blankTemplatePdf}
+              target="_blank"
+              rel="noreferrer"
+              title="Abrir o modelo oficial em branco (PDF)"
+            >
+              Modelo em branco
+            </a>
+            <button type="button" onClick={onHelp}>
+              Ajuda
+            </button>
             {PROGRAM.links.feedbackForm && (
-              <button onClick={onFeedback}>Avaliar</button>
+              <button type="button" onClick={onFeedback}>
+                Avaliar
+              </button>
             )}
           </nav>
         </div>

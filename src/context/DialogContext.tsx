@@ -128,25 +128,25 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
     switch (dialog.variant) {
       case "danger":
         return (
-          <div className="size-11 rounded-2xl bg-[#DE3831]/10 text-danger border border-[#DE3831]/20 flex items-center justify-center shrink-0">
+          <div className="size-11 rounded-2xl bg-danger/10 text-danger border border-danger/20 flex items-center justify-center shrink-0">
             <Trash2 className="size-5" />
           </div>
         );
       case "warning":
         return (
-          <div className="size-11 rounded-2xl bg-amber-500/10 text-warning border border-amber-500/20 flex items-center justify-center shrink-0">
+          <div className="size-11 rounded-2xl bg-warning/10 text-warning border border-warning/20 flex items-center justify-center shrink-0">
             <AlertTriangle className="size-5" />
           </div>
         );
       case "success":
         return (
-          <div className="size-11 rounded-2xl bg-accent/10 text-accent  border border-accent/20 flex items-center justify-center shrink-0">
+          <div className="size-11 rounded-2xl bg-brand-text/10 text-brand-text  border border-brand-text/20 flex items-center justify-center shrink-0">
             <CheckCircle2 className="size-5" />
           </div>
         );
       default:
         return (
-          <div className="size-11 rounded-2xl bg-[#00A3E0]/10 text-info border border-info/20 flex items-center justify-center shrink-0">
+          <div className="size-11 rounded-2xl bg-info/10 text-info border border-info/20 flex items-center justify-center shrink-0">
             <Info className="size-5" />
           </div>
         );
@@ -198,7 +198,7 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="px-4 py-2.5 rounded-xl border border-line hover:border-line bg-canvas hover:bg-raised text-xs font-semibold text-body hover:text-ink cursor-pointer transition-colors"
+                  className="min-h-[44px] px-4 py-2.5 rounded-xl border border-[var(--control-border)] bg-surface hover:bg-raised text-sm font-semibold text-body hover:text-ink cursor-pointer transition-colors"
                 >
                   {dialog.cancelText || "Cancelar"}
                 </button>
@@ -206,10 +206,10 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
               <button
                 type="button"
                 onClick={handleConfirm}
-                className={`px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 text-white ${
+                className={`min-h-[44px] px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer transition-all flex items-center gap-1.5 ${
                   dialog.variant === "danger"
-                    ? "bg-[#DE3831] hover:bg-[#b82a24] shadow-[var(--page-shadow)]"
-                    : "bg-primary hover:bg-[var(--primary-hover)] shadow-[var(--page-shadow)]"
+                    ? "bg-danger-fill hover:bg-danger-fill-strong text-on-danger shadow-[var(--page-shadow)]"
+                    : "bg-brand hover:bg-brand-strong text-on-brand shadow-[var(--page-shadow)]"
                 }`}
               >
                 <span>{dialog.confirmText || "Confirmar"}</span>

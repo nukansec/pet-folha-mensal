@@ -6,7 +6,8 @@ export type ThemeMode = "dark" | "light";
 const themeEvent = "pet-theme-change";
 
 function getSnapshot(): ThemeMode {
-  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+  // Claro é o padrão para quem nunca escolheu um tema.
+  return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
 }
 
 function subscribe(callback: () => void) {
@@ -22,7 +23,7 @@ export function useTheme() {
   const theme = useSyncExternalStore(
     subscribe,
     getSnapshot,
-    () => "dark" as const,
+    () => "light" as const,
   );
   const toggleTheme = () => {
     const next = getSnapshot() === "dark" ? "light" : "dark";

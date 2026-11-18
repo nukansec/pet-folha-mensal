@@ -2,10 +2,11 @@
 
 import { Modal } from "./Modal";
 import React, { useState, useEffect } from "react";
-import { UserProfile, UserRole, GATInfo } from "@/types";
+import { UserProfile, UserRole, GATInfo, sortedGats } from "@/types";
 import { normalizeName } from "@/lib/storage";
 import { X, Check, User } from "lucide-react";
 import { useDialog } from "@/context/DialogContext";
+import { FullSelect } from "@/components/ui/full-select";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -95,7 +96,7 @@ export function ProfileModal({
       >
         <div className="flex items-center justify-between pb-3.5 border-b border-line mb-4">
           <div className="flex items-center gap-2">
-            <User className="size-4.5" style={{ color: "#10B981" }} />
+            <User className="size-4.5 text-brand-text" />
             <h3 className="text-sm sm:text-base font-bold text-ink">
               Identificação do Participante
             </h3>
@@ -130,22 +131,22 @@ export function ProfileModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="field">
               <label htmlFor="profilemodal-field-2">Grupo tutorial (GAT)</label>
-              <select
+              <FullSelect
                 id="profilemodal-field-2"
                 value={gatNumber}
                 onChange={(e) => setGatNumber(e.target.value)}
               >
-                {Object.entries(gats).map(([num, info]) => (
-                  <option key={num} value={num}>
-                    GAT {num} ({info.name})
+                {sortedGats(gats).map((info) => (
+                  <option key={info.number} value={info.number}>
+                    GAT {info.number} ({info.name})
                   </option>
                 ))}
-              </select>
+              </FullSelect>
             </div>
 
             <div className="field">
               <label htmlFor="profilemodal-field-3">Perfil</label>
-              <select
+              <FullSelect
                 id="profilemodal-field-3"
                 value={role}
                 onChange={(e) => setRole(e.target.value as UserRole)}
@@ -155,7 +156,7 @@ export function ProfileModal({
                     {r}
                   </option>
                 ))}
-              </select>
+              </FullSelect>
             </div>
           </div>
 
@@ -174,7 +175,7 @@ export function ProfileModal({
             </button>
             <button
               type="submit"
-              className="flex-1 sm:flex-none min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl text-white bg-primary hover:bg-[var(--primary-hover)] cursor-pointer flex items-center justify-center gap-1.5 transition-colors shadow-[var(--page-shadow)]"
+              className="flex-1 sm:flex-none min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl text-on-brand bg-brand hover:bg-brand-strong cursor-pointer flex items-center justify-center gap-1.5 transition-colors shadow-[var(--page-shadow)]"
             >
               <Check className="size-4" />
               <span>Salvar Alterações</span>

@@ -327,7 +327,14 @@ test("entrada apresenta acesso e explicação visível do JSON e PDF antes do FA
   assert.match(html, /O JSON é um arquivo que guarda sua identificação/);
   assert.match(html, /O PDF não permite restaurar/);
   assert.match(html, /Quem usa este navegador pode abrir/);
-  assert.doesNotMatch(html, /Veja como sua folha|preview-disclosure|Sua frequência,|Vamos começar/);
+  assert.doesNotMatch(html, /Veja como sua folha|preview-disclosure|Sua frequência,|Clima/);
+  // Estrutura da entrada no padrão de referência: marca, cartão de acesso,
+  // três passos, dois arquivos e dúvidas, nesta ordem.
+  assert.match(html, /Logo do PET-Saúde: Informação e Saúde Digital/);
+  assert.match(html, /Vamos começar/);
+  assert.ok(html.indexOf('id="acesso"') < html.indexOf('id="como-funciona"'));
+  assert.ok(html.indexOf('id="como-funciona"') < html.indexOf('id="o-que-guardar"'));
+  assert.match(html, /16:30 às 18:00 = 1h30/);
   verifyLabelTargets(html);
   assert.match(html, /Felipe Gonçalves Vidal/);
   assert.match(html, /Robert Francisco Taveira/);
@@ -633,4 +640,15 @@ test("entrada oferece os perfis locais sem exigir cópia e resumo não promete a
   );
   assert.doesNotMatch(summary, /Apta|Média semanal/);
   assert.match(summary, /distribuição semanal/);
+});
+
+test("GATs em ordem numérica e contagens no singular", () => {
+  const { sortedGats, DEFAULT_GATS } = load("./src/types/index.ts");
+  const numbers = sortedGats(DEFAULT_GATS).map((gat) => gat.number);
+  assert.equal(numbers[0], "01");
+  assert.deepEqual(numbers, [...numbers].sort());
+  const { pluralize } = load("./src/lib/pet-calculator.ts");
+  assert.equal(pluralize(1, "atividade", "atividades"), "1 atividade");
+  assert.equal(pluralize(0, "atividade", "atividades"), "0 atividades");
+  assert.equal(pluralize(3, "atividade", "atividades"), "3 atividades");
 });

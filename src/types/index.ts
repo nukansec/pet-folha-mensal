@@ -22,6 +22,19 @@ export const DEFAULT_GATS: Record<string, GATInfo> = Object.fromEntries(
 
 export const GATS = DEFAULT_GATS;
 
+/**
+ * GATs em ordem numérica. Em JavaScript, chaves como "10".."13" são índices
+ * inteiros e vêm antes de "01".."09" em Object.keys/values/entries; por isso
+ * listas e o GAT padrão nunca devem depender da ordem do objeto.
+ */
+export function sortedGats<T extends { number: string }>(
+  gats: Record<string, T>,
+): T[] {
+  return Object.values(gats).sort((a, b) =>
+    a.number.localeCompare(b.number, "pt-BR", { numeric: true }),
+  );
+}
+
 /** Modalidade da atividade; os valores válidos vêm de PROGRAM.modalities. */
 export type ModalityType = string;
 

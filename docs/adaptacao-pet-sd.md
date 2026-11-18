@@ -132,7 +132,9 @@ em branco ao lado foi exportado pelo Word a partir desse `.docx`.
 - **D7 — Cabeçalho.** A folha usa a faixa de logomarcas do próprio modelo, recortada
   como o Word recorta (`srcRect`). A faixa inclui SES/Governo de Goiás (ver Divergências).
 - **D8 — Logo do app.** Sem arquivo separado do logo PET-SD, uso selo textual
-  "PET-SD" provisório com `TODO(pet-sd)`.
+  "PET-SD" provisório com `TODO(pet-sd)`. *Resolvido em 18/11/2026: logo
+  oficial recortado por `scripts/brand/gerar-marca.py`; ver
+  [design-pet-sd.md](design-pet-sd.md).*
 - **D9 — Remoções.** Arquivos do Clima e do fluxo pessoal do autor original saem
   com `git rm` (recuperáveis pelo histórico do git): imagens e manual de identidade
   do Clima, 7 modelos em `public/templates/`, `src/lib/form-report.ts`,
@@ -285,10 +287,10 @@ depois `npm run dev`, criar perfil, lançar atividades (ex.: 16:30–18:00 deve 
 
 - Dúvidas: seção "Dúvidas para o Brunno" acima (7 itens, nenhum respondido até o fim da sessão).
 - Divergências: seção "Divergências entre fontes" acima.
-- `TODO(pet-sd)` no código: selo provisório em `src/app/icon.svg` e
-  `src/components/Brand.tsx`; prazo e links de formulários em `src/config/program.ts`.
-- A paleta de cores (verde) é herdada do projeto original; a faixa de logos e o
-  selo usam azul. Vale decidir com a coordenação.
+- `TODO(pet-sd)` no código: prazo e links de formulários em
+  `src/config/program.ts`. (O selo provisório saiu em 18/11/2026.)
+- *Resolvido em 18/11/2026:* a paleta verde herdada foi trocada por branco e
+  laranja, derivada do logo ([design-pet-sd.md](design-pet-sd.md)).
 
 ### f) Antes de publicar
 

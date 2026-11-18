@@ -3,7 +3,7 @@
 import { Modal } from "./Modal";
 import { PROGRAM } from "@/config/program";
 import React, { useEffect, useState } from "react";
-import { UserProfile, GATInfo, ActivityTemplate, ModalityType } from "@/types";
+import { UserProfile, GATInfo, ActivityTemplate, ModalityType, sortedGats } from "@/types";
 import {
   saveGats,
   saveRoles,
@@ -499,12 +499,12 @@ export function AdminModal({
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-5 border-b border-line bg-canvas">
           <div className="flex items-center gap-2.5 sm:gap-3">
-            <Shield className="size-5 sm:size-6 text-accent shrink-0" />
+            <Shield className="size-5 sm:size-6 text-brand-text shrink-0" />
             <h3 className="text-base sm:text-lg font-bold text-ink">
               Configurações Locais
             </h3>
             {accessStatus === "authenticated" && (
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 font-semibold hidden sm:inline-block">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-brand-text/10 text-brand-text border border-brand-text/20 font-semibold hidden sm:inline-block">
                 Sessão validada
               </span>
             )}
@@ -540,13 +540,13 @@ export function AdminModal({
             className="p-6 sm:p-10 flex flex-col items-center justify-center text-center space-y-4"
             role="status"
           >
-            <Lock className="size-7 text-accent animate-pulse" />
+            <Lock className="size-7 text-brand-text animate-pulse" />
             <p className="text-sm text-body">Verificando sessão do painel...</p>
           </div>
         ) : accessStatus !== "authenticated" ? (
           /* TELA DE BLOQUEIO LOCAL VALIDADO PELO SERVIDOR */
           <div className="p-6 sm:p-10 flex flex-col items-center justify-center text-center space-y-5">
-            <div className="size-14 sm:size-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent">
+            <div className="size-14 sm:size-16 rounded-2xl bg-brand-text/10 border border-brand-text/20 flex items-center justify-center text-brand-text">
               <Lock className="size-6 sm:size-7" />
             </div>
             <div>
@@ -561,7 +561,7 @@ export function AdminModal({
 
             {accessStatus === "unconfigured" ? (
               <p
-                className="w-full max-w-md rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-warning"
+                className="w-full max-w-md rounded-xl border border-warning/30 bg-warning/10 p-4 text-sm text-warning"
                 role="alert"
               >
                 Bloqueio indisponível: configure ADMIN_PIN_HASH e
@@ -569,7 +569,7 @@ export function AdminModal({
               </p>
             ) : accessStatus === "unavailable" ? (
               <p
-                className="w-full max-w-md rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-danger"
+                className="w-full max-w-md rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger"
                 role="alert"
               >
                 Não foi possível consultar o servidor. Feche o painel e tente
@@ -595,9 +595,9 @@ export function AdminModal({
                     }}
                     className={`w-full text-center px-4 py-3 min-h-[48px] text-base sm:text-lg tracking-widest font-mono rounded-xl bg-canvas border ${
                       pinError
-                        ? "border-red-500 text-danger"
+                        ? "border-danger text-danger"
                         : "border-line text-ink"
-                    } outline-none focus:border-accent transition-colors`}
+                    } outline-none focus:border-brand-text transition-colors`}
                   />
                   {pinError && (
                     <p className="text-xs text-danger mt-2 flex items-center justify-center gap-1.5">
@@ -609,7 +609,7 @@ export function AdminModal({
                 <button
                   type="submit"
                   disabled={isSubmitting || !pinInput.trim()}
-                  className="w-full min-h-[48px] py-3 px-6 text-sm sm:text-base font-bold rounded-xl bg-primary text-white hover:bg-[var(--primary-hover)] transition-all cursor-pointer shadow-[var(--page-shadow)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full min-h-[48px] py-3 px-6 text-sm sm:text-base font-bold rounded-xl bg-brand text-on-brand hover:bg-brand-strong transition-all cursor-pointer shadow-[var(--page-shadow)] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? "Validando..." : "Acessar Painel"}
                 </button>
@@ -625,7 +625,7 @@ export function AdminModal({
                 onClick={() => setActiveTab("roles")}
                 className={`min-h-[48px] py-3 px-3.5 sm:px-4 flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
                   activeTab === "roles"
-                    ? "border-accent text-accent"
+                    ? "border-brand-text text-brand-text"
                     : "border-transparent text-muted hover:text-body"
                 }`}
               >
@@ -636,7 +636,7 @@ export function AdminModal({
                 onClick={() => setActiveTab("gats")}
                 className={`min-h-[48px] py-3 px-3.5 sm:px-4 flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
                   activeTab === "gats"
-                    ? "border-accent text-accent"
+                    ? "border-brand-text text-brand-text"
                     : "border-transparent text-muted hover:text-body"
                 }`}
               >
@@ -647,7 +647,7 @@ export function AdminModal({
                 onClick={() => setActiveTab("templates")}
                 className={`min-h-[48px] py-3 px-3.5 sm:px-4 flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
                   activeTab === "templates"
-                    ? "border-accent text-accent"
+                    ? "border-brand-text text-brand-text"
                     : "border-transparent text-muted hover:text-body"
                 }`}
               >
@@ -681,11 +681,11 @@ export function AdminModal({
                       placeholder="Ex: Pesquisador, Bolsista de Extensão, Coordenador de Eixo..."
                       value={newRoleName}
                       onChange={(e) => setNewRoleName(e.target.value)}
-                      className="flex-1 min-h-[46px] px-4 py-2.5 text-sm sm:text-base rounded-xl bg-canvas border border-line text-ink outline-none focus:border-accent transition-colors"
+                      className="flex-1 min-h-[46px] px-4 py-2.5 text-sm sm:text-base rounded-xl bg-canvas border border-line text-ink outline-none focus:border-brand-text transition-colors"
                     />
                     <button
                       type="submit"
-                      className="min-h-[46px] px-5 py-2.5 text-sm sm:text-base font-semibold rounded-xl bg-primary text-white hover:bg-[var(--primary-hover)] cursor-pointer flex items-center justify-center gap-2 transition-all shadow-[var(--page-shadow)]"
+                      className="min-h-[46px] px-5 py-2.5 text-sm sm:text-base font-semibold rounded-xl bg-brand text-on-brand hover:bg-brand-strong cursor-pointer flex items-center justify-center gap-2 transition-all shadow-[var(--page-shadow)]"
                     >
                       <Plus className="size-4" />
                       <span>Adicionar perfil</span>
@@ -702,7 +702,7 @@ export function AdminModal({
                           <form
                             key={r}
                             onSubmit={handleSaveEditRole}
-                            className="p-3 rounded-xl border border-accent/40 bg-accent/10 flex items-center gap-2"
+                            className="p-3 rounded-xl border border-brand-text/40 bg-brand-text/10 flex items-center gap-2"
                           >
                             <input
                               type="text"
@@ -712,12 +712,12 @@ export function AdminModal({
                               onChange={(e) =>
                                 setEditingRoleNewName(e.target.value)
                               }
-                              className="flex-1 min-h-[40px] px-3 py-1.5 text-sm rounded-lg bg-surface border border-line text-ink outline-none focus:border-accent"
+                              className="flex-1 min-h-[40px] px-3 py-1.5 text-sm rounded-lg bg-surface border border-line text-ink outline-none focus:border-brand-text"
                             />
                             <button
                               aria-label="Salvar alteração"
                               type="submit"
-                              className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg bg-primary text-white hover:bg-[var(--primary-hover)] cursor-pointer"
+                              className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg bg-brand text-on-brand hover:bg-brand-strong cursor-pointer"
                               title="Salvar alteração"
                             >
                               <Check className="size-4" />
@@ -750,7 +750,7 @@ export function AdminModal({
                               aria-label="Editar nome do perfil"
                               type="button"
                               onClick={() => handleStartEditRole(r)}
-                              className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-accent hover:bg-raised cursor-pointer transition-colors"
+                              className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-brand-text hover:bg-raised cursor-pointer transition-colors"
                               title="Editar nome do perfil"
                             >
                               <Edit2 className="size-4" />
@@ -788,9 +788,9 @@ export function AdminModal({
                   {editingGat && (
                     <form
                       onSubmit={handleSaveEditGat}
-                      className="p-4 sm:p-5 rounded-2xl border border-accent/40 bg-accent/10 space-y-4 animate-fade-in"
+                      className="p-4 sm:p-5 rounded-2xl border border-brand-text/40 bg-brand-text/10 space-y-4 animate-fade-in"
                     >
-                      <div className="font-bold text-base text-accent">
+                      <div className="font-bold text-base text-brand-text">
                         Editando GAT {editingGatOriginalNumber}:{" "}
                         {editingGat.name}
                       </div>
@@ -813,7 +813,7 @@ export function AdminModal({
                                 number: e.target.value,
                               })
                             }
-                            className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent"
+                            className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text"
                           />
                         </div>
                         <div>
@@ -834,7 +834,7 @@ export function AdminModal({
                                 name: e.target.value,
                               })
                             }
-                            className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent"
+                            className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text"
                           />
                         </div>
                         <div>
@@ -853,7 +853,7 @@ export function AdminModal({
                                 axis: e.target.value,
                               })
                             }
-                            className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent cursor-pointer"
+                            className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text cursor-pointer"
                           >
                             {Array.from(new Set([...AXIS_OPTIONS, editingGat.axis])).map((axis) => (
                               <option key={axis} value={axis}>{axis}</option>
@@ -878,7 +878,7 @@ export function AdminModal({
                               description: e.target.value,
                             })
                           }
-                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent"
+                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text"
                         />
                       </div>
                       <div className="flex justify-end gap-2.5 pt-1">
@@ -894,7 +894,7 @@ export function AdminModal({
                         </button>
                         <button
                           type="submit"
-                          className="min-h-[44px] px-5 py-2 font-semibold text-sm rounded-xl bg-primary text-white hover:bg-[var(--primary-hover)] cursor-pointer transition-all"
+                          className="min-h-[44px] px-5 py-2 font-semibold text-sm rounded-xl bg-brand text-on-brand hover:bg-brand-strong cursor-pointer transition-all"
                         >
                           Salvar GAT
                         </button>
@@ -925,7 +925,7 @@ export function AdminModal({
                           placeholder="06"
                           value={newGatNumber}
                           onChange={(e) => setNewGatNumber(e.target.value)}
-                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent"
+                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text"
                         />
                       </div>
                       <div>
@@ -942,7 +942,7 @@ export function AdminModal({
                           placeholder="Nome do fruto ou árvore..."
                           value={newGatName}
                           onChange={(e) => setNewGatName(e.target.value)}
-                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent"
+                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text"
                         />
                       </div>
                       <div>
@@ -956,7 +956,7 @@ export function AdminModal({
                           id="adminmodal-field-7"
                           value={newGatAxis}
                           onChange={(e) => setNewGatAxis(e.target.value)}
-                          className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent cursor-pointer"
+                          className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text cursor-pointer"
                         >
                           {Array.from(new Set([...AXIS_OPTIONS, newGatAxis])).map((axis) => (
                             <option key={axis} value={axis}>{axis}</option>
@@ -977,13 +977,13 @@ export function AdminModal({
                         placeholder="Ex: Vigilância de arboviroses na Região Norte..."
                         value={newGatDesc}
                         onChange={(e) => setNewGatDesc(e.target.value)}
-                        className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent"
+                        className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text"
                       />
                     </div>
                     <div className="flex justify-end pt-1">
                       <button
                         type="submit"
-                        className="min-h-[44px] px-5 py-2.5 font-semibold text-sm rounded-xl bg-primary text-white hover:bg-[var(--primary-hover)] cursor-pointer flex items-center gap-2 transition-all shadow-[var(--page-shadow)]"
+                        className="min-h-[44px] px-5 py-2.5 font-semibold text-sm rounded-xl bg-brand text-on-brand hover:bg-brand-strong cursor-pointer flex items-center gap-2 transition-all shadow-[var(--page-shadow)]"
                       >
                         <Plus className="size-4" />
                         <span>Adicionar GAT</span>
@@ -993,7 +993,8 @@ export function AdminModal({
 
                   {/* Cards de GATs Atuais com Edição */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
-                    {Object.entries(gats).map(([num, info]) => {
+                    {sortedGats(gats).map((info) => {
+                      const num = info.number;
                       return (
                         <div
                           key={num}
@@ -1001,7 +1002,7 @@ export function AdminModal({
                         >
                           <div>
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm sm:text-base font-bold text-accent">
+                              <span className="text-sm sm:text-base font-bold text-brand-text">
                                 GAT {num}: {info.name}
                               </span>
                               <span className="text-xs px-2.5 py-0.5 rounded-md bg-raised text-body font-medium">
@@ -1018,7 +1019,7 @@ export function AdminModal({
                                 aria-label="Editar GAT"
                                 type="button"
                                 onClick={() => handleStartEditGat(num, info)}
-                                className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-accent hover:bg-raised cursor-pointer transition-colors"
+                                className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-brand-text hover:bg-raised cursor-pointer transition-colors"
                                 title="Editar GAT"
                               >
                                 <Edit2 className="size-4" />
@@ -1065,9 +1066,9 @@ export function AdminModal({
                   {editingTemplate && (
                     <form
                       onSubmit={handleSaveEditTemplate}
-                      className="p-4 sm:p-5 rounded-2xl border border-accent/40 bg-accent/10 space-y-4 animate-fade-in"
+                      className="p-4 sm:p-5 rounded-2xl border border-brand-text/40 bg-brand-text/10 space-y-4 animate-fade-in"
                     >
-                      <div className="font-bold text-base text-accent">
+                      <div className="font-bold text-base text-brand-text">
                         Editando Modelo de Atividade
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
@@ -1094,7 +1095,7 @@ export function AdminModal({
                                 name: e.target.value,
                               })
                             }
-                            className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent disabled:opacity-50"
+                            className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text disabled:opacity-50"
                           />
                         </div>
                         <div>
@@ -1113,7 +1114,7 @@ export function AdminModal({
                                 modality: e.target.value as ModalityType,
                               })
                             }
-                            className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent cursor-pointer"
+                            className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text cursor-pointer"
                           >
                             {Array.from(new Set([...PROGRAM.modalities, editingTemplate.modality])).map((item) => (
                               <option key={item} value={item}>{item}</option>
@@ -1138,7 +1139,7 @@ export function AdminModal({
                               local: e.target.value,
                             })
                           }
-                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent"
+                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text"
                         />
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
@@ -1152,7 +1153,7 @@ export function AdminModal({
                                 isGatSpecific: e.target.checked,
                               })
                             }
-                            className="size-4 rounded accent-[#008D4C]"
+                            className="size-4 rounded accent-[var(--brand)]"
                           />
                           <span>Atividade própria do GAT (dinâmica)</span>
                         </label>
@@ -1166,7 +1167,7 @@ export function AdminModal({
                           </button>
                           <button
                             type="submit"
-                            className="min-h-[44px] px-5 py-2 font-semibold text-sm rounded-xl bg-primary text-white hover:bg-[var(--primary-hover)] cursor-pointer transition-all"
+                            className="min-h-[44px] px-5 py-2 font-semibold text-sm rounded-xl bg-brand text-on-brand hover:bg-brand-strong cursor-pointer transition-all"
                           >
                             Salvar Modelo
                           </button>
@@ -1207,7 +1208,7 @@ export function AdminModal({
                               : newTplName
                           }
                           onChange={(e) => setNewTplName(e.target.value)}
-                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent disabled:opacity-50"
+                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text disabled:opacity-50"
                         />
                       </div>
                       <div>
@@ -1223,7 +1224,7 @@ export function AdminModal({
                           onChange={(e) =>
                             setNewTplModality(e.target.value as ModalityType)
                           }
-                          className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent cursor-pointer"
+                          className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text cursor-pointer"
                         >
                           {Array.from(new Set([...PROGRAM.modalities, newTplModality])).map((item) => (
                             <option key={item} value={item}>{item}</option>
@@ -1244,7 +1245,7 @@ export function AdminModal({
                         placeholder="Ex.: UFG, Google Meet ou -"
                         value={newTplLocal}
                         onChange={(e) => setNewTplLocal(e.target.value)}
-                        className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-accent"
+                        className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text"
                       />
                     </div>
 
@@ -1256,7 +1257,7 @@ export function AdminModal({
                           onChange={(e) =>
                             setNewTplGatSpecific(e.target.checked)
                           }
-                          className="size-4 rounded accent-[#008D4C]"
+                          className="size-4 rounded accent-[var(--brand)]"
                         />
                         <span>
                           Atividade própria do GAT (injeta número e nome
@@ -1266,7 +1267,7 @@ export function AdminModal({
 
                       <button
                         type="submit"
-                        className="min-h-[44px] px-5 py-2.5 font-semibold text-sm rounded-xl bg-primary text-white hover:bg-[var(--primary-hover)] cursor-pointer flex items-center justify-center gap-2 transition-all shadow-[var(--page-shadow)]"
+                        className="min-h-[44px] px-5 py-2.5 font-semibold text-sm rounded-xl bg-brand text-on-brand hover:bg-brand-strong cursor-pointer flex items-center justify-center gap-2 transition-all shadow-[var(--page-shadow)]"
                       >
                         <Plus className="size-4" />
                         <span>Adicionar Modelo</span>
@@ -1287,7 +1288,7 @@ export function AdminModal({
                           </div>
                           <div className="text-xs sm:text-sm text-body mt-1">
                             Tipo:{" "}
-                            <span className="text-accent font-medium">
+                            <span className="text-brand-text font-medium">
                               {tpl.modality}
                             </span>
                             {tpl.local && (
@@ -1305,7 +1306,7 @@ export function AdminModal({
                             aria-label="Editar modelo"
                             type="button"
                             onClick={() => handleStartEditTemplate(tpl)}
-                            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-accent hover:bg-raised cursor-pointer transition-colors"
+                            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-brand-text hover:bg-raised cursor-pointer transition-colors"
                             title="Editar modelo"
                           >
                             <Edit2 className="size-4" />

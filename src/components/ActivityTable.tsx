@@ -8,6 +8,7 @@ import {
   formatDateBR,
   formatDuration,
   formatTotalHours,
+  pluralize,
 } from "@/lib/pet-calculator";
 import { Pencil, Trash2, ListChecks } from "lucide-react";
 import { ConfirmModal } from "./ConfirmModal";
@@ -36,7 +37,41 @@ export function ActivityTable({
   onClearMonth,
 }: ActivityTableProps) {
   const [confirmClear, setConfirmClear] = useState(false);
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const visibleActivities = activities;
+  const toggle = (id: string) =>
+    setExpanded((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  // Descrição em até 2 linhas; “ver mais” só quando o texto passa do limite.
+  const detail = (activity: Activity, place: "card" | "row") => {
+    if (!activity.descricao) return null;
+    const id = `detail-${place}-${activity.id}`;
+    const open = expanded.has(activity.id);
+    const long = activity.descricao.length > 90 || activity.descricao.includes("\n");
+    const Tag = place === "card" ? "p" : "small";
+    return (
+      <>
+        <Tag id={id} className="record-detail" data-expanded={open}>
+          {activity.descricao}
+        </Tag>
+        {long && (
+          <button
+            type="button"
+            className="detail-toggle"
+            aria-expanded={open}
+            aria-controls={id}
+            onClick={() => toggle(activity.id)}
+          >
+            {open ? "ver menos" : "ver mais"}
+          </button>
+        )}
+      </>
+    );
+  };
   const actions = (activity: Activity) => {
     return (
       <div className="record-actions">
@@ -44,6 +79,7 @@ export function ActivityTable({
           className="icon-button"
           onClick={() => onEdit(activity)}
           aria-label={`Editar atividade: ${cleanActivityDescription(activity.description)}`}
+          title="Editar"
         >
           <Pencil size={18} />
         </button>
@@ -51,6 +87,7 @@ export function ActivityTable({
           className="icon-button"
           onClick={() => onDelete(activity.id)}
           aria-label={`Excluir atividade: ${cleanActivityDescription(activity.description)}`}
+          title="Excluir"
         >
           <Trash2 size={18} />
         </button>
@@ -67,7 +104,11 @@ export function ActivityTable({
         </div>
         {activities.length > 0 && (
           <div className="records-tools">
-            <button className="text-button" onClick={() => setConfirmClear(true)}>
+            <button
+              className="text-button"
+              onClick={() => setConfirmClear(true)}
+              title={`Remover ${pluralize(activities.length, "atividade", "atividades")} de ${monthLabel}`}
+            >
               Limpar mês
             </button>
           </div>
@@ -114,9 +155,7 @@ export function ActivityTable({
                   {activity.start} às {activity.end} · {activity.modality}
                   {activity.local && <> · {activity.local}</>}
                 </p>
-                {activity.descricao && (
-                  <p className="record-detail">{activity.descricao}</p>
-                )}
+                {detail(activity, "card")}
                 {actions(activity)}
               </article>
             ))}
@@ -155,9 +194,7 @@ export function ActivityTable({
                         {cleanActivityDescription(activity.description)}
                       </strong>
                       <small>{activity.modality}</small>
-                      {activity.descricao && (
-                        <small className="record-detail">{activity.descricao}</small>
-                      )}
+                      {detail(activity, "row")}
                     </td>
                     <td className="record-hours">
                       {formatDuration(calcPetMinutes(activity.start, activity.end))}
@@ -182,7 +219,11 @@ export function ActivityTable({
           setConfirmClear(false);
         }}
         title="Limpar atividades deste mês?"
-        message={`As ${activities.length} atividades de ${monthLabel} serão removidas. Os outros meses serão preservados. Salve uma cópia antes de continuar.`}
+        message={`${
+          activities.length === 1
+            ? `A atividade de ${monthLabel} será removida.`
+            : `As ${activities.length} atividades de ${monthLabel} serão removidas.`
+        } Os outros meses serão preservados. Salve uma cópia antes de continuar.`}
         confirmLabel="Limpar mês"
         isDestructive
       />

@@ -2,23 +2,29 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import {
+  ArrowDown,
   ArrowRight,
+  BarChart3,
+  Clock,
   Download,
   FileJson,
   FileText,
   HelpCircle,
+  Lock,
   Moon,
+  Plus,
   Settings2,
   Sun,
 } from "lucide-react";
-import { UserProfile, UserRole, GATInfo } from "@/types";
+import { UserProfile, UserRole, GATInfo, sortedGats } from "@/types";
 import { useTheme } from "@/lib/theme";
 import { PROGRAM } from "@/config/program";
-import { Brand } from "./Brand";
+import { Brand, BrandMark } from "./Brand";
 import { FAQ, HelpModal } from "./Help";
 import { ReleaseNotes } from "./ReleaseNotes";
 import { SiteFooter } from "./SiteFooter";
 import { Frame, FrameHeader, FramePanel, SegmentedControl, SegmentedControlItem } from "./ui/access-controls";
+import { FullSelect } from "@/components/ui/full-select";
 
 interface LandingPageProps {
   onLoginWithJson: (file: File) => void;
@@ -46,7 +52,10 @@ export function LandingPage({
     profiles.length ? "local" : "create",
   );
   const [name, setName] = useState("");
-  const [gat, setGat] = useState(Object.keys(gats)[0] || "");
+  const gatList = sortedGats(gats);
+  const [gat, setGat] = useState(
+    gats[PROGRAM.defaultGat] ? PROGRAM.defaultGat : gatList[0]?.number || "",
+  );
   const [role, setRole] = useState(
     roles.includes(PROGRAM.defaultRole) ? PROGRAM.defaultRole : roles[0] || "",
   );
@@ -67,11 +76,26 @@ export function LandingPage({
       <header className="entry-header">
         <div className="entry-header-inner">
           <Brand />
-          <nav aria-label="Ajuda e preferências">
+          <nav className="entry-anchors" aria-label="Seções da página">
+            <a href="#como-funciona">Como funciona</a>
+            <a href="#o-que-guardar">O que guardar</a>
+            <a href="#perguntas">Dúvidas</a>
+          </nav>
+          <nav className="entry-tools" aria-label="Ajuda e preferências">
+            {profiles.length > 0 && (
+              <a
+                className="secondary-button entry-continue"
+                href="#acesso"
+                onClick={() => setTab("local")}
+              >
+                Continuar minha folha
+              </a>
+            )}
             <button
               className="icon-button"
               onClick={() => setHelpOpen(true)}
               aria-label="Abrir ajuda"
+              title="Ajuda"
             >
               <HelpCircle size={20} />
             </button>
@@ -81,6 +105,7 @@ export function LandingPage({
               aria-label={
                 theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"
               }
+              title={theme === "dark" ? "Tema claro" : "Tema escuro"}
             >
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -88,6 +113,7 @@ export function LandingPage({
               className="icon-button"
               onClick={onOpenAdmin}
               aria-label="Abrir configurações locais"
+              title="Configurações"
             >
               <Settings2 size={20} />
             </button>
@@ -95,15 +121,80 @@ export function LandingPage({
         </div>
       </header>
       <main className="start-main">
-        <div className="start-heading">
-          <p className="section-kicker">{PROGRAM.name} · {PROGRAM.campus}</p>
-          <h1>Folha de frequência</h1>
-          <p>Registre suas atividades e prepare a folha mensal para assinatura.</p>
-        </div>
+        <section className="entry-hero" aria-labelledby="entry-title">
+          <div className="entry-hero-text">
+            <BrandMark className="start-brand" />
+            <p className="section-kicker">
+              {PROGRAM.name} · {PROGRAM.campus}
+            </p>
+            <h1 id="entry-title">Sua folha do mês, pronta para assinar.</h1>
+            <p className="entry-lead">
+              Registre cada atividade quando ela acontece. O app soma a CH
+              exata e monta a folha oficial do {PROGRAM.acronym} em PDF.
+            </p>
+            <div className="entry-actions">
+              <a
+                className="secondary-button"
+                href="#acesso"
+                onClick={() => setTab(profiles.length ? "local" : "create")}
+              >
+                {profiles.length ? "Continuar minha folha" : "Começar agora"}
+                <ArrowDown size={18} aria-hidden="true" />
+              </a>
+            </div>
+            <p className="entry-privacy">
+              <Lock size={16} aria-hidden="true" />
+              Sem cadastro e sem senha. Os registros ficam neste aparelho.
+            </p>
+          </div>
+          <figure className="entry-preview" aria-labelledby="entry-preview-caption">
+            <figcaption id="entry-preview-caption" className="sr-only">
+              Exemplo fictício do resumo do mês: 19 h de {PROGRAM.monthlyTargetHours} h
+              e duas atividades.
+            </figcaption>
+            <div className="preview-card" aria-hidden="true">
+              <div className="preview-head">
+                <span>Outubro de 2026</span>
+                <span className="preview-chip">GAT 01</span>
+              </div>
+              <p className="preview-total">
+                <strong>19</strong> de {PROGRAM.monthlyTargetHours} horas no mês
+              </p>
+              <span className="preview-bar">
+                <span style={{ width: `${(19 / PROGRAM.monthlyTargetHours) * 100}%` }} />
+              </span>
+              <ul>
+                <li>
+                  <span>qua<br />07</span>
+                  <span>
+                    <strong>Grupo de estudos</strong>
+                    <small>18:00 às 20:00 · Laboratório</small>
+                  </span>
+                  <strong>2h</strong>
+                </li>
+                <li>
+                  <span>ter<br />07</span>
+                  <span>
+                    <strong>Organização do repositório</strong>
+                    <small>16:30 às 18:00 · Assíncrona</small>
+                  </span>
+                  <strong>1h30</strong>
+                </li>
+              </ul>
+            </div>
+            <div className="preview-rule" aria-hidden="true">
+              <Clock size={18} />
+              <span>
+                <strong>16:30 às 18:00 = 1h30</strong>
+                <small>a CH conta o tempo exato</small>
+              </span>
+            </div>
+          </figure>
+        </section>
         <div className="start-layout">
           <section id="acesso" aria-labelledby="access-title">
             <Frame>
-              <FrameHeader><h2 id="access-title">Abrir minha folha</h2></FrameHeader>
+              <FrameHeader><h2 id="access-title">Vamos começar</h2></FrameHeader>
               <FramePanel>
                 <SegmentedControl aria-label="Como deseja começar">
                   {profiles.length > 0 && (
@@ -121,9 +212,9 @@ export function LandingPage({
                     <p className="access-hint">Abra seu perfil e escolha o mês. Você pode começar um novo mês sem o arquivo anterior.</p>
                     <div className="field">
                       <label htmlFor="entry-profile">Perfil neste navegador</label>
-                      <select id="entry-profile" value={profileId} onChange={(event) => setProfileId(event.target.value)} required>
+                      <FullSelect id="entry-profile" value={profileId} onChange={(event) => setProfileId(event.target.value)} required>
                         {profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.name} · {profile.role} · GAT {profile.gatNumber}</option>)}
-                      </select>
+                      </FullSelect>
                     </div>
                     <button className="primary-button w-full" type="submit">Continuar com este perfil <ArrowRight size={18} /></button>
                   </form>
@@ -149,7 +240,7 @@ export function LandingPage({
                     <div className="start-field-row">
                       <div className="field">
                         <label htmlFor="entry-role">Perfil</label>
-                        <select
+                        <FullSelect
                           id="entry-role"
                           value={role}
                           onChange={(event) => setRole(event.target.value)}
@@ -158,22 +249,22 @@ export function LandingPage({
                           {roles.map((item) => (
                             <option key={item}>{item}</option>
                           ))}
-                        </select>
+                        </FullSelect>
                       </div>
                       <div className="field">
                         <label htmlFor="entry-gat">GAT</label>
-                        <select
+                        <FullSelect
                           id="entry-gat"
                           value={gat}
                           onChange={(event) => setGat(event.target.value)}
                           required
                         >
-                          {Object.values(gats).map((item) => (
+                          {gatList.map((item) => (
                             <option key={item.number} value={item.number}>
                               GAT {item.number} · {item.name}
                             </option>
                           ))}
-                        </select>
+                        </FullSelect>
                       </div>
                     </div>
                     <button
@@ -224,26 +315,50 @@ export function LandingPage({
               </FramePanel>
             </Frame>
           </section>
-          <aside className="file-guide" aria-labelledby="files-title">
-            <h2 id="files-title">JSON e PDF: o que guardar</h2>
-            <div className="file-guide-item">
-              <FileJson size={24} aria-hidden="true" />
-              <div>
-                <h3><span className="file-extension">.json</span> Cópia para continuar</h3>
-                <p>O JSON é um arquivo que guarda sua identificação, as atividades e os comprovantes da folha. Ele permite continuar editando ou levar os registros para outro aparelho.</p>
-                <p>Na sua folha, use <strong>Salvar cópia</strong>. Para abrir o arquivo aqui, escolha <strong>Restaurar cópia</strong>. Não precisa abrir nem editar o JSON por conta própria; guarde-o em local seguro.</p>
-              </div>
-            </div>
-            <div className="file-guide-item">
-              <FileText size={24} aria-hidden="true" />
-              <div>
-                <h3><span className="file-extension">.pdf</span> Folha para assinar</h3>
-                <p>Em <strong>Folha oficial</strong>, use <strong>Imprimir / salvar PDF</strong> para gerar o documento de assinatura. O PDF não permite restaurar as atividades no sistema.</p>
-              </div>
-            </div>
-            <p className="file-guide-tip">Ao terminar o mês, guarde os dois: o PDF para assinatura e o JSON para manter uma cópia editável.</p>
-          </aside>
         </div>
+        <section className="entry-steps" id="como-funciona" aria-labelledby="steps-title">
+          <p className="section-kicker">Como funciona</p>
+          <h2 id="steps-title">Três passos por mês.</h2>
+          <ol>
+            <li>
+              <span className="step-icon" aria-hidden="true"><Plus size={18} /></span>
+              <h3>1. Registre as atividades</h3>
+              <p>Data, início, fim, local e o que foi feito. A CH aparece antes de você salvar.</p>
+            </li>
+            <li>
+              <span className="step-icon" aria-hidden="true"><BarChart3 size={18} /></span>
+              <h3>2. Acompanhe a CH do mês</h3>
+              <p>Veja quanto falta para o mínimo de {PROGRAM.monthlyTargetHours} h. O excedente não passa para o mês seguinte.</p>
+            </li>
+            <li>
+              <span className="step-icon" aria-hidden="true"><FileText size={18} /></span>
+              <h3>3. Gere a folha e assine</h3>
+              <p>O PDF sai no modelo oficial do {PROGRAM.acronym}, em Carta paisagem. Assine pelo Gov.br. {PROGRAM.deadline.label}</p>
+            </li>
+          </ol>
+        </section>
+        <section className="file-guide" id="o-que-guardar" aria-labelledby="files-title">
+          <div className="file-guide-intro">
+            <p className="section-kicker">O que guardar</p>
+            <h2 id="files-title">Dois arquivos, cada um com sua função.</h2>
+            <p className="file-guide-tip">Ao terminar o mês, guarde os dois: o PDF para assinatura e o JSON para manter uma cópia editável. Não há sincronização entre aparelhos.</p>
+          </div>
+          <div className="file-guide-item">
+            <FileText size={24} aria-hidden="true" />
+            <div>
+              <h3><span className="file-extension">.pdf</span> Folha para assinar</h3>
+              <p>Em <strong>Folha oficial</strong>, use <strong>Imprimir / salvar PDF</strong> para gerar o documento de assinatura. O PDF não permite restaurar as atividades no sistema.</p>
+            </div>
+          </div>
+          <div className="file-guide-item">
+            <FileJson size={24} aria-hidden="true" />
+            <div>
+              <h3><span className="file-extension">.json</span> Cópia para continuar</h3>
+              <p>O JSON é um arquivo que guarda sua identificação, as atividades e os comprovantes da folha. Ele permite continuar editando ou levar os registros para outro aparelho.</p>
+              <p>Na sua folha, use <strong>Salvar cópia</strong>. Para abrir o arquivo aqui, escolha <strong>Restaurar cópia</strong>.</p>
+            </div>
+          </div>
+        </section>
         <ReleaseNotes />
         <section
           className="faq-section"

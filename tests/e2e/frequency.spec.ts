@@ -734,12 +734,124 @@ test("cópias com comprovantes levam os originais e a restauração reverte falh
 test("novidades mostram data de publicação nos dois temas", async ({ page }, testInfo) => {
   await page.goto("/");
   const section = page.getByRole("region", { name: "Novidades do site" });
+  await expect(section.getByRole("heading", { name: "Novo visual com a marca do PET-SD" })).toBeVisible();
+  await expect(section.getByText("Última atualização", { exact: false })).toContainText("18 de novembro de 2026");
+  await section.getByText("Ver histórico de atualizações", { exact: true }).click();
   await expect(section.getByRole("heading", { name: "Folha no modelo do PET-SD" })).toBeVisible();
-  await expect(section.getByText("Última atualização", { exact: false })).toContainText("17 de novembro de 2026");
-  await expect(section.getByText("Ver histórico de atualizações", { exact: true })).toHaveCount(0);
   for (const theme of ["light", "dark"]) {
     await page.evaluate((theme) => { document.documentElement.dataset.theme = theme; }, theme);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await section.screenshot({ path: testInfo.outputPath("novidades-" + theme + ".png") });
   }
+});
+
+test("primeiro acesso começa no GAT 01, lista os GATs em ordem e conta no singular", async ({ page }) => {
+  await page.goto("/");
+  // Chaves "10".."13" vêm antes de "01" em Object.keys; o padrão deve ser o 01.
+  await expect(page.getByLabel("GAT", { exact: true })).toHaveValue("01");
+  const numbers = await page
+    .getByLabel("GAT", { exact: true })
+    .locator("option")
+    .evaluateAll((options) => options.map((option) => (option as HTMLOptionElement).value));
+  expect(numbers).toEqual([...numbers].sort((a, b) => Number(a) - Number(b)));
+  await create(page);
+  await expect(page.getByRole("button", { name: /Participante sintético Monitor\(a\) · GAT 01/ })).toBeVisible();
+  await add(page);
+  await page.getByRole("button", { name: "Limpar mês", exact: true }).click();
+  await expect(page.getByText(/^A atividade de .+ será removida\./)).toBeVisible();
+});
+
+// Rótulos, botões e textos cortados (scrollWidth > clientWidth) e selects cuja
+// opção escolhida não cabe. Reticências só valem com title (texto completo).
+async function cutTexts(page: Page) {
+  return page.evaluate(() => {
+    const ctx = document.createElement("canvas").getContext("2d")!;
+    const visible = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden";
+    };
+    const out: string[] = [];
+    for (const el of document.querySelectorAll(".screen-only :is(label, button, a, h1, h2, h3, strong, small, th, td, .full-select-display span)")) {
+      if (!visible(el) || el.closest("[title], .official-sheet, .skip-link, .sr-only")) continue;
+      if (el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).overflowX !== "visible")
+        out.push(`${el.tagName}: ${el.textContent?.trim().slice(0, 40)}`);
+    }
+    // Selects nativos (os do FullSelect ficam transparentes sob a caixa visível).
+    for (const el of document.querySelectorAll<HTMLSelectElement>(".screen-only select")) {
+      if (!visible(el) || el.closest(".full-select")) continue;
+      const style = getComputedStyle(el);
+      ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      const text = el.selectedOptions[0]?.text ?? "";
+      const room = el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 20;
+      if (ctx.measureText(text).width > room) out.push(`SELECT: ${text}`);
+    }
+    return out;
+  });
+}
+
+test("sem texto cortado, foco visível e folha oficial em preto e branco", async ({ page }) => {
+  await page.goto("/");
+  // GAT com o nome mais longo: o texto precisa aparecer inteiro.
+  await page.getByLabel("GAT", { exact: true }).selectOption("11");
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    expect(await cutTexts(page), `entrada ${width}px`).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await page.getByLabel("GAT", { exact: true }).selectOption("01");
+  await create(page);
+  await add(page);
+  // A modalidade padrão é a mais longa ("Interação em tempo real (Síncrona)").
+  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue(/Síncrona/);
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate((theme) => {
+      document.documentElement.dataset.theme = theme;
+    }, theme);
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const cut = await cutTexts(page);
+      expect(cut, `${theme} ${width}px`).toEqual([]);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
+  }
+  // Foco por teclado: anel visível (contorno sólido de pelo menos 2 px).
+  await page.getByLabel("Descrição", { exact: true }).focus();
+  await page.keyboard.press("Tab");
+  const ring = await page.evaluate(() => {
+    const el = document.activeElement as HTMLElement;
+    const style = getComputedStyle(el);
+    return { text: el.textContent?.trim(), style: style.outlineStyle, width: parseFloat(style.outlineWidth) };
+  });
+  expect(ring.text).toContain("Adicionar atividade");
+  expect(ring.style).not.toBe("none");
+  expect(ring.width).toBeGreaterThanOrEqual(2);
+  // A folha oficial não herda a paleta da interface: só tons de cinza.
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate((theme) => {
+      document.documentElement.dataset.theme = theme;
+    }, theme);
+    await openSheet(page);
+    const colored = await page.locator(".sheet-stage .official-sheet").evaluate((sheet) => {
+      const gray = (value: string) => {
+        const m = value.match(/rgba?\(([^)]+)\)/);
+        if (!m) return true;
+        const [r, g, b, a = "1"] = m[1].split(/[ ,/]+/).filter(Boolean);
+        return Number(a) === 0 || (r === g && g === b);
+      };
+      const out: string[] = [];
+      for (const el of [sheet, ...sheet.querySelectorAll("*")]) {
+        if (el.tagName === "IMG") continue;
+        const s = getComputedStyle(el);
+        for (const prop of ["color", "backgroundColor", "borderTopColor", "borderBottomColor"] as const)
+          if (!gray(s[prop])) out.push(`${el.tagName}.${el.className} ${prop}=${s[prop]}`);
+      }
+      return out.slice(0, 5);
+    });
+    expect(colored, theme).toEqual([]);
+    await page.getByRole("button", { name: "Minha frequência", exact: true }).click();
+  }
+  // Modelo rápido de nome longo, no celular.
+  await page.setViewportSize({ width: 390, height: 1000 });
+  await page.getByLabel(/Preenchimento rápido/).selectOption({ label: "Pesquisa bibliográfica e estudo autônomo" });
+  expect(await cutTexts(page), "modelo longo 390px").toEqual([]);
 });

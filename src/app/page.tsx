@@ -46,6 +46,7 @@ import {
   sortActivitiesChronologically,
   getCurrentMonth,
   PROJECT_MONTHS,
+  pluralize,
 } from "@/lib/pet-calculator";
 import { Navbar } from "@/components/Navbar";
 import { ProfileModal } from "@/components/ProfileModal";
@@ -327,7 +328,7 @@ export default function Home() {
     if (!activeUser) return;
     const act = activities.find((a) => a.id === id);
     const confirmed = await confirm({
-      title: "Excluir Atividade?",
+      title: "Excluir atividade?",
       message: act
         ? `Deseja realmente remover o registro "${cleanActivityDescription(act.description)}" de ${formatDateBR(act.date)} (${formatDuration(calcPetMinutes(act.start, act.end))})?`
         : "Deseja realmente remover esta atividade da sua folha mensal?",
@@ -557,7 +558,7 @@ export default function Home() {
         : "Comprovantes na cópia: " + attachments.length + ".";
       const accepted = await confirm({
         title: "Restaurar esta cópia?",
-        message: `${preview.user!.name} · ${getMonthYearLabel(preview.monthKey!)} · ${preview.activities!.length} atividades. ${contents} ${existing ? "Os dados deste perfil e deste mês serão substituídos pela cópia. Os outros meses serão preservados." : "O perfil e os registros desta cópia serão adicionados neste navegador."}`,
+        message: `${preview.user!.name} · ${getMonthYearLabel(preview.monthKey!)} · ${pluralize(preview.activities!.length, "atividade", "atividades")}. ${contents} ${existing ? "Os dados deste perfil e deste mês serão substituídos pela cópia. Os outros meses serão preservados." : "O perfil e os registros desta cópia serão adicionados neste navegador."}`,
         confirmText: "Restaurar cópia",
         cancelText: "Cancelar",
         variant: "warning",
@@ -675,9 +676,9 @@ export default function Home() {
         {toastMessage && (
           <div
             role="status"
-            className="fixed bottom-4 right-4 left-4 sm:left-auto px-3.5 py-2 rounded-lg border border-accent/25 bg-surface shadow-[var(--page-shadow)] text-xs font-medium text-body z-50 flex items-center gap-2 animate-fade-in"
+            className="fixed bottom-4 right-4 left-4 sm:left-auto px-3.5 py-2 rounded-lg border border-brand-text/25 bg-surface shadow-[var(--page-shadow)] text-sm font-medium text-body z-50 flex items-center gap-2 animate-fade-in"
           >
-            <CheckCircle2 className="size-3.5 text-accent shrink-0" />
+            <CheckCircle2 className="size-3.5 text-brand-text shrink-0" />
             <span>{toastMessage}</span>
           </div>
         )}
@@ -727,15 +728,8 @@ export default function Home() {
                   : "Confira os dados antes de imprimir e assinar."}
               </p>
             </div>
-            {activeTab === "dashboard" && (
-              <StatsGrid
-                totalMinutes={totalMinutes}
-                activitiesCount={activities.length}
-                targetHours={PROGRAM.monthlyTargetHours}
-              />
-            )}
             <label className="workspace-month">
-              <Calendar className="size-4 text-accent" />
+              <Calendar className="size-4 text-brand-text" />
               <span>Mês</span>
               <select
                 aria-label="Mês da folha"
@@ -756,6 +750,12 @@ export default function Home() {
           {/* ABA 1: PAINEL DE LANÇAMENTOS */}
           {activeTab === "dashboard" && (
             <div>
+              <StatsGrid
+                totalMinutes={totalMinutes}
+                activitiesCount={activities.length}
+                targetHours={PROGRAM.monthlyTargetHours}
+                monthLabel={monthLabel}
+              />
               <div className="frequency-workbench">
                 <ActivityForm
                   key={`${activeUser.id}-${monthKey}-${formRevision}`}
@@ -861,7 +861,7 @@ export default function Home() {
                     onClick={() => void handlePrint()}
                     disabled={preparingPrint || attachmentsBusy}
                     aria-busy={preparingPrint}
-                    className="px-3.5 py-1.5 rounded-xl font-semibold bg-primary text-white hover:bg-[var(--primary-hover)] cursor-pointer flex items-center gap-1.5 transition-all text-xs shadow-[var(--page-shadow)]"
+                    className="px-3.5 py-1.5 rounded-xl font-semibold bg-brand text-on-brand hover:bg-brand-strong cursor-pointer flex items-center gap-1.5 transition-all text-xs shadow-[var(--page-shadow)]"
                   >
                     <Printer className="size-3.5" />
                     <span>{preparingPrint ? "Preparando PDF…" : "Imprimir / salvar PDF"}</span>
@@ -978,16 +978,15 @@ export default function Home() {
           {toastMessage && (
             <div
               role="status"
-              className="fixed bottom-4 right-4 left-4 sm:left-auto px-3.5 py-2 rounded-lg border border-accent/25 bg-surface shadow-[var(--page-shadow)] text-xs font-medium text-body z-50 flex items-center gap-2 animate-fade-in"
+              className="fixed bottom-4 right-4 left-4 sm:left-auto px-3.5 py-2 rounded-lg border border-brand-text/25 bg-surface shadow-[var(--page-shadow)] text-sm font-medium text-body z-50 flex items-center gap-2 animate-fade-in"
             >
-              <CheckCircle2 className="size-3.5 text-accent shrink-0" />
+              <CheckCircle2 className="size-3.5 text-brand-text shrink-0" />
               <span>{toastMessage}</span>
             </div>
           )}
         </main>
 
         <SiteFooter
-          compact
           onHelp={() => setIsHelpOpen(true)}
           onFeedback={() => setIsFeedbackModalOpen(true)}
         />

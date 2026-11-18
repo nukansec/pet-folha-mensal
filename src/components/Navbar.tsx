@@ -44,6 +44,7 @@ export function Navbar({
 }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const fileRef = useRef<HTMLInputElement>(null);
+  const gatName = user.gatName || GATS[user.gatNumber]?.name || "PET";
   return (
     <header className="workspace-nav">
       <a href="#conteudo" className="skip-link">
@@ -54,14 +55,13 @@ export function Navbar({
         <button
           className="profile-button"
           onClick={onOpenProfileModal}
-          title="Editar identificação"
+          title={`${user.name} · ${user.role} · GAT ${user.gatNumber} ${gatName}. Clique para editar a identificação.`}
         >
           <span aria-hidden="true">{user.gatNumber}</span>
           <span>
             <strong>{user.name}</strong>
             <small>
-              {user.role} · GAT {user.gatNumber} ·{" "}
-              {user.gatName || GATS[user.gatNumber]?.name || "PET"}
+              {user.role} · GAT {user.gatNumber} · {gatName}
             </small>
           </span>
         </button>
@@ -70,6 +70,7 @@ export function Navbar({
             className="icon-button"
             onClick={onOpenHelp}
             aria-label="Abrir ajuda"
+            title="Ajuda"
           >
             <HelpCircle size={20} />
           </button>
@@ -79,6 +80,7 @@ export function Navbar({
             aria-label={
               theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"
             }
+            title={theme === "dark" ? "Tema claro" : "Tema escuro"}
           >
             {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
           </button>
@@ -86,6 +88,7 @@ export function Navbar({
             className="icon-button"
             onClick={onOpenAdmin}
             aria-label="Abrir configurações locais"
+            title="Configurações"
           >
             <Settings2 size={20} />
           </button>
@@ -109,15 +112,15 @@ export function Navbar({
           </button>
         </nav>
         <div className="backup-tools" aria-label="Cópia de segurança">
-          <button onClick={onExportBackup}>
+          <button onClick={onExportBackup} title="Baixar a cópia de segurança (.json) deste perfil">
             <Download size={17} />
             Salvar cópia
           </button>
-          <button onClick={() => fileRef.current?.click()}>
+          <button onClick={() => fileRef.current?.click()} title="Abrir uma cópia de segurança (.json)">
             <Upload size={17} />
             Restaurar cópia
           </button>
-          <button className="conclude-button" onClick={onOpenExitModal}>
+          <button className="conclude-button" onClick={onOpenExitModal} title="Guardar a cópia e o PDF, ou sair">
             Concluir
             {hasChanges && (
               <span

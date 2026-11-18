@@ -35,6 +35,11 @@ export function sumActivityMinutes(activities: Pick<Activity, "start" | "end">[]
 }
 
 /** Formato da coluna CH (h) da ficha: "2h", "1h30", "0h05". */
+/** "1 atividade", "3 atividades". */
+export function pluralize(count: number, singular: string, plural: string): string {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
 export function formatDuration(totalMinutes: number): string {
   const safe = Math.max(0, Math.round(totalMinutes));
   const hours = Math.floor(safe / 60);
