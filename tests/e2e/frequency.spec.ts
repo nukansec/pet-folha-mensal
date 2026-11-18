@@ -538,7 +538,8 @@ test("dados do formato antigo migram para o v3; exemplo sem uso não aparece; v2
   }));
   expect(stored.v2).toBe(2);
   expect(JSON.parse(stored.v2Activities!)).toEqual(old);
-  expect(stored.v3[0]).toMatchObject({ modality: "Interação em tempo real (Síncrona)", local: "", descricao: "", hours: 1.5 });
+  // "Síncrona presencial" era a atividade presencial: vira In Loco.
+  expect(stored.v3[0]).toMatchObject({ modality: "Interação em tempo real (In Loco)", local: "", descricao: "", hours: 1.5 });
 });
 
 test("sem links configurados, botões de Forms e avaliação não aparecem", async ({ page }) => {

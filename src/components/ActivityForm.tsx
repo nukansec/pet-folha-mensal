@@ -49,7 +49,7 @@ export function ActivityForm({
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [modality, setModality] = useState<ModalityType>(
-    PROGRAM.modalities[0],
+    PROGRAM.defaultModality,
   );
   const [local, setLocal] = useState("");
   const [description, setDescription] = useState("");

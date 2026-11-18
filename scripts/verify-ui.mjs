@@ -274,6 +274,39 @@ test("exemplo antigo com atividades ou ativo é migrado; navegador sem v2 não g
   assert.ok(records.has("pet_folha_migrated_from_v2"));
 });
 
+test("modalidades antigas mapeiam por nome; In Loco é aceita em cópias e modelos", () => {
+  isolatedStorage();
+  const { PROGRAM } = load("./src/config/program.ts");
+  assert.deepEqual(PROGRAM.modalities, [
+    "Interação em tempo real (In Loco)",
+    "Interação em tempo real (Síncrona)",
+    "Assíncrona",
+  ]);
+  assert.equal(PROGRAM.defaultModality, "Interação em tempo real (Síncrona)");
+  assert.equal(storage.normalizeModality("Síncrona virtual"), "Interação em tempo real (Síncrona)");
+  assert.equal(storage.normalizeModality("Síncrona presencial"), "Interação em tempo real (In Loco)");
+  assert.equal(storage.normalizeModality("Assíncrona virtual"), "Assíncrona");
+  assert.equal(storage.normalizeModality(""), "Interação em tempo real (Síncrona)");
+  assert.equal(storage.normalizeModality("Interação em tempo real (In Loco)"), "Interação em tempo real (In Loco)");
+  // Cópia 1.2 com a modalidade presencial antiga abre como In Loco.
+  const copy = {
+    version: "1.2",
+    attachments: [],
+    user: sampleUser,
+    monthKey: "2026-10",
+    activities: [
+      { id: "p", date: "2026-10-06", start: "08:00", end: "12:00", modality: "Síncrona presencial", description: "Visita fictícia" },
+      { id: "n", date: "2026-10-07", start: "08:00", end: "09:00", modality: "Interação em tempo real (In Loco)", description: "Reunião fictícia" },
+    ],
+  };
+  const result = storage.inspectUserData(JSON.stringify(copy));
+  assert.equal(result.success, true);
+  assert.deepEqual(result.activities.map((a) => a.modality), [
+    "Interação em tempo real (In Loco)",
+    "Interação em tempo real (In Loco)",
+  ]);
+});
+
 test("cópias 1.0 a 1.2 restauram com campos novos vazios e ignoram o Forms antigo", () => {
   isolatedStorage();
   const old = {

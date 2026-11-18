@@ -43,7 +43,7 @@ export function EditActivityModal({
   const [date, setDate] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
-  const [modality, setModality] = useState<ModalityType>(PROGRAM.modalities[0]);
+  const [modality, setModality] = useState<ModalityType>(PROGRAM.defaultModality);
   const [description, setDescription] = useState("");
   const [local, setLocal] = useState("");
   const [descricao, setDescricao] = useState("");

@@ -36,11 +36,14 @@ export const DEFAULT_TEMPLATES: ActivityTemplate[] = PROGRAM.templates.map(
   (template) => ({ ...template }),
 );
 
-/** Nomes antigos de modalidade (formato _v2 e cópias 1.0–1.2). */
+/**
+ * Nomes antigos de modalidade (formato _v2 e cópias 1.0–1.2), mapeados por
+ * nome: reordenar PROGRAM.modalities não pode mudar o que um dado antigo vira.
+ */
 const LEGACY_MODALITIES: Record<string, string> = {
-  "Síncrona virtual": PROGRAM.modalities[0],
-  "Síncrona presencial": PROGRAM.modalities[0],
-  "Assíncrona virtual": PROGRAM.modalities[1] ?? PROGRAM.modalities[0],
+  "Síncrona virtual": "Interação em tempo real (Síncrona)",
+  "Síncrona presencial": "Interação em tempo real (In Loco)",
+  "Assíncrona virtual": "Assíncrona",
 };
 
 /** Nomes antigos de perfil (formato _v2 e cópias 1.0–1.2). */
@@ -57,7 +60,7 @@ const text = (value: unknown): string =>
 
 export function normalizeModality(value: unknown): string {
   const name = text(value).trim();
-  if (!name) return PROGRAM.modalities[0];
+  if (!name) return PROGRAM.defaultModality;
   return LEGACY_MODALITIES[name] ?? name;
 }
 

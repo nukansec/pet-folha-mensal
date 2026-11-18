@@ -112,7 +112,7 @@ export function AdminModal({
   // Formulário de Edição / Novo Template (Sem datas nem horários!)
   const [newTplName, setNewTplName] = useState("");
   const [newTplModality, setNewTplModality] = useState<ModalityType>(
-    PROGRAM.modalities[0],
+    PROGRAM.defaultModality,
   );
   const [newTplLocal, setNewTplLocal] = useState("");
   const [newTplGatSpecific, setNewTplGatSpecific] = useState(false);

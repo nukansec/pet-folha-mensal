@@ -80,8 +80,18 @@ export const PROGRAM = {
     label: "Entregue a folha assinada ao coordenador do GAT até o dia 19.",
   },
 
-  /** Modalidades usadas no modelo preenchido. As instruções falam em Presencial/Remota. */
-  modalities: ["Interação em tempo real (Síncrona)", "Assíncrona"] as string[],
+  /**
+   * Modalidades na ordem dos menus. "In Loco" é a atividade presencial (exige
+   * registro fotográfico). As instruções da ficha falam em Presencial/Remota.
+   * Código e dados usam o nome, nunca a posição na lista.
+   */
+  modalities: [
+    "Interação em tempo real (In Loco)",
+    "Interação em tempo real (Síncrona)",
+    "Assíncrona",
+  ] as string[],
+  /** Modalidade inicial do formulário e de registros sem modalidade. */
+  defaultModality: "Interação em tempo real (Síncrona)",
 
   /** Perfis na ordem das caixas da ficha. */
   roles: [
