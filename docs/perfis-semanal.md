@@ -12,6 +12,7 @@ progresso por épico e do relatório final.
 | E2 Menu do participante | feito | `feat(ui): menu do participante no topo` | clique no cartão do topo; `tests/e2e/perfis.spec.ts` › "menu do participante" | — |
 | E3 Gerenciar perfis | feito | `feat: editar e excluir perfis na entrada` | entrada › Continuar; `test:ui` (resumo, exclusão, edição, cópia 1.4); `perfis.spec.ts` › "gerenciar perfis na entrada" | — |
 | E4 Seletores | feito | `feat(ui): seletores em grupos de opção` | formulário, modal de edição, primeiro acesso, modal de identificação; `perfis.spec.ts` › "seletores em grupos de opção"; `frequency.spec.ts` › "modelos rápidos…" | — |
+| E5 Visão semanal | feito | `feat: visão semanal da carga horária` | resumo › Semanal; `test:ui` "faixas de semana…", "semana atual…"; `perfis.spec.ts` › "visão semanal" | — |
 
 ## E0 — Diagnóstico
 
@@ -79,6 +80,10 @@ Outros achados:
    que "Salvar cópia" passe a salvar todos os meses?
 2. Faixas parciais da visão semanal usam a mesma meta de 8 h (como o app
    original), com o rótulo "semana parcial". Prefere meta proporcional?
+5. (achado no E5) O pedido fala em semanas "de domingo a sábado", mas o
+   exemplo (nov/2026 → Dia 1, 2 a 8 … Dia 30) e o app original usam **segunda
+   a domingo** (1/11/2026 é domingo; 30/11 é segunda). Segui o exemplo e o app
+   original. Quer domingo a sábado? É uma linha em `src/lib/weeks.ts`.
 3. O modal de edição de atividade mantém o "Preenchimento rápido" como lista
    (ação pontual, não um valor); só o formulário principal vira chips. Ok?
 4. "Trocar participante" e "Sair" com alterações sem cópia abrem a mesma
@@ -144,3 +149,25 @@ Outros achados:
 - **E4** — Bug encontrado nos testes: `.activity-fields .field label
   { position: static }` vencia a regra do cartão e o rádio escapava; os
   seletores dos grupos usam `> label.choice` para ganhar especificidade.
+- **E5** — Semanas de **segunda a domingo** cortadas pelo mês. O texto do
+  pedido dizia "domingo a sábado", mas o exemplo dado (nov/2026 → Dia 1, 2 a 8,
+  9 a 15, 16 a 22, 23 a 29, Dia 30) só sai com segunda a domingo, e é o que o app
+  original mostra (capturas `vidal-semanal-*`). Venceram o exemplo e a
+  referência; registrado como pergunta 5.
+- **E5** — Faixas parciais com a **mesma meta de 8 h**, marcadas "Semana
+  parcial" e explicadas no texto de ajuda. Motivo: o Edital (9.1.4) fala em
+  8 h por **semana**; a semana cortada continua no mês vizinho e precisa das
+  mesmas 8 h no total. Reduzir a meta inventaria uma regra (8 × dias/7) que
+  nenhuma fonte prevê. Para a folha, o que vale é o mínimo de 32 h no mês.
+- **E5** — Cálculo em `src/lib/weeks.ts` (função pura): datas como texto
+  AAAA-MM-DD, dia da semana por `Date.UTC` (nada depende do fuso do aparelho)
+  e minutos inteiros (`calcPetMinutes`). "Semana atual" usa a data de Brasília
+  (`Intl` com `America/Sao_Paulo`). Testado contra uma referência dia a dia em
+  todos os meses da vigência, fevereiro comum e bissexto, meses que começam no
+  domingo e no sábado, 6 faixas e atividades nos limites.
+- **E5** — Preferência em `pet_folha_summary_view` (`monthly`/`weekly`),
+  leitura e escrita em try/catch; padrão Mensal. Não é dado da folha, por isso
+  não segue o sufixo `_v3`.
+- **E5** — Semana atual destacada por borda, fundo **e** o texto "Semana
+  atual" (`aria-current="date"`), não só por cor. Barras laranja decorativas
+  (`aria-hidden`); o valor vem em texto ("1h30 de 8 h").

@@ -18,7 +18,8 @@ export interface ChoiceOption {
  * O rótulo do grupo é um elemento visível ligado por aria-labelledby.
  *
  * variant: "segmented" (poucas opções lado a lado), "cards" (cartões em
- * grade) ou "chips" (pílulas; rolagem horizontal no celular).
+ * grade), "chips" (pílulas; rolagem horizontal no celular) ou "toggle"
+ * (alternância compacta, ex.: Mensal | Semanal).
  */
 export function ChoiceGroup({
   name,
@@ -34,7 +35,7 @@ export function ChoiceGroup({
   value: string;
   options: ChoiceOption[];
   onChange: (value: string) => void;
-  variant: "segmented" | "cards" | "chips";
+  variant: "segmented" | "cards" | "chips" | "toggle";
   className?: string;
 }) {
   return (

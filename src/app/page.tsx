@@ -908,6 +908,8 @@ export default function Home() {
                 activitiesCount={activities.length}
                 targetHours={PROGRAM.monthlyTargetHours}
                 monthLabel={monthLabel}
+                monthKey={monthKey}
+                activities={activities}
               />
               <div className="frequency-workbench">
                 <ActivityForm

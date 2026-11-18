@@ -913,3 +913,102 @@ test("entrada mostra perfis em cartões com Abrir, Editar e Excluir rotulados", 
   assert.match(html, /2 meses com atividades/);
   assert.doesNotMatch(html, /<select[^>]*id="entry-profile"/);
 });
+
+// ============================================================
+// E5: visão semanal (faixas de segunda a domingo cortadas pelo mês)
+// ============================================================
+const weeks = load("./src/lib/weeks.ts");
+const bandLabels = (monthKey, activities = [], today = "") =>
+  weeks.getMonthWeekBands(monthKey, activities, today).map((band) => band.label);
+
+// Referência independente: anda dia a dia e fecha a faixa no domingo.
+function referenceBands(monthKey) {
+  const [year, month] = monthKey.split("-").map(Number);
+  const out = [];
+  let start = 1;
+  for (let day = 1; ; day++) {
+    const date = new Date(Date.UTC(year, month - 1, day));
+    if (date.getUTCMonth() !== month - 1) {
+      if (start < day) out.push(start === day - 1 ? `Dia ${start}` : `${start} a ${day - 1}`);
+      return out;
+    }
+    if (date.getUTCDay() === 0) {
+      out.push(start === day ? `Dia ${start}` : `${start} a ${day}`);
+      start = day + 1;
+    }
+  }
+}
+
+test("faixas de semana: mês que começa no domingo (nov/2026, 6 faixas, como o app original)", () => {
+  assert.deepEqual(bandLabels("2026-11"), ["Dia 1", "2 a 8", "9 a 15", "16 a 22", "23 a 29", "Dia 30"]);
+  const bands = weeks.getMonthWeekBands("2026-11");
+  assert.deepEqual(bands.map((b) => b.partial), [true, false, false, false, false, true]);
+  assert.deepEqual(bands.map((b) => b.days), [1, 7, 7, 7, 7, 1]);
+  assert.equal(bands[0].start, "2026-11-01");
+  assert.equal(bands[5].end, "2026-11-30");
+});
+
+test("faixas de semana: mês que começa no sábado e fevereiros", () => {
+  // 01/08/2026 é sábado.
+  assert.equal(new Date(Date.UTC(2026, 7, 1)).getUTCDay(), 6);
+  assert.deepEqual(bandLabels("2026-08"), ["1 a 2", "3 a 9", "10 a 16", "17 a 23", "24 a 30", "Dia 31"]);
+  // Fevereiro de 28 dias começando na segunda: quatro semanas inteiras.
+  assert.equal(new Date(Date.UTC(2027, 1, 1)).getUTCDay(), 1);
+  assert.deepEqual(bandLabels("2027-02"), ["1 a 7", "8 a 14", "15 a 21", "22 a 28"]);
+  assert.ok(weeks.getMonthWeekBands("2027-02").every((band) => !band.partial));
+  // Fevereiro bissexto.
+  assert.deepEqual(bandLabels("2028-02"), referenceBands("2028-02"));
+  assert.equal(weeks.getMonthWeekBands("2028-02").at(-1).end, "2028-02-29");
+  // Toda a vigência confere com a referência dia a dia.
+  for (const month of PROJECT_MONTHS) assert.deepEqual(bandLabels(month), referenceBands(month), month);
+  assert.deepEqual(weeks.getMonthWeekBands("2026-13"), []);
+  assert.deepEqual(weeks.getMonthWeekBands("x"), []);
+});
+
+test("faixas de semana: CH exata nos limites das faixas; outro mês é ignorado", () => {
+  const a = (date, start, end) => ({ date, start, end });
+  const bands = weeks.getMonthWeekBands("2026-11", [
+    a("2026-11-01", "08:00", "09:30"), // Dia 1 (domingo)
+    a("2026-11-08", "16:30", "18:00"), // último dia de "2 a 8"
+    a("2026-11-08", "18:00", "18:05"),
+    a("2026-11-09", "11:00", "13:00"), // primeiro dia de "9 a 15"
+    a("2026-11-30", "09:00", "17:00"), // Dia 30
+    a("2026-10-31", "09:00", "17:00"), // outro mês
+    a("2026-12-01", "09:00", "17:00"), // outro mês
+    a("2026-11-10", "10:00", "09:00"), // fim antes do início vale 0
+  ]);
+  assert.deepEqual(bands.map((b) => b.minutes), [90, 95, 120, 0, 0, 480]);
+  assert.equal(formatDuration(bands[1].minutes), "1h35");
+});
+
+test("semana atual vem da data de Brasília, não do fuso do aparelho", () => {
+  // 02:30 UTC de 19/11 ainda é 23:30 de 18/11 em Brasília.
+  assert.equal(weeks.todayInBrasilia(new Date("2026-11-19T02:30:00Z")), "2026-11-18");
+  assert.equal(weeks.todayInBrasilia(new Date("2026-11-19T03:30:00Z")), "2026-11-19");
+  const bands = weeks.getMonthWeekBands("2026-11", [], "2026-11-18");
+  assert.deepEqual(bands.map((b) => b.isCurrent), [false, false, false, true, false, false]);
+  assert.ok(weeks.getMonthWeekBands("2026-11", [], "2026-12-01").every((b) => !b.isCurrent));
+  assert.equal(weeks.getMonthWeekBands("2026-11", [], "2026-11-30").at(-1).isCurrent, true);
+});
+
+test("resumo mensal é o padrão e a visão semanal mostra as faixas com a meta semanal", () => {
+  const { StatsGrid } = load("./src/components/StatsGrid.tsx");
+  const props = { totalMinutes: 90, activitiesCount: 1, monthLabel: "Novembro/2026", monthKey: "2026-11", activities: [{ date: "2026-11-03", start: "16:30", end: "18:00" }] };
+  const monthly = renderToStaticMarkup(React.createElement(StatsGrid, props));
+  assert.match(monthly, /role="radiogroup"/);
+  assert.match(monthly, /checked="" value="monthly"/);
+  assert.match(monthly, /role="progressbar"/);
+  // Com a preferência salva, abre na visão semanal.
+  const records = isolatedStorage();
+  records.set("pet_folha_summary_view", "weekly");
+  const weekly = renderToStaticMarkup(React.createElement(StatsGrid, props));
+  assert.match(weekly, /checked="" value="weekly"/);
+  assert.equal([...weekly.matchAll(/class="week-band"/g)].length, 6);
+  assert.match(weekly, /2 a 8<\/strong>/);
+  assert.match(weekly, /1h30 de 8 h/);
+  assert.match(weekly, /Semana parcial/);
+  assert.match(weekly, /não é reduzida/);
+  // localStorage inacessível: volta ao padrão sem erro.
+  globalThis.localStorage = { getItem() { throw new Error("bloqueado"); } };
+  assert.match(renderToStaticMarkup(React.createElement(StatsGrid, props)), /checked="" value="monthly"/);
+});

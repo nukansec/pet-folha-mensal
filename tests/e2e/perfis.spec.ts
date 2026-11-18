@@ -415,3 +415,76 @@ test.describe("seletores em grupos de opção", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 });
+
+// ============================================================
+// E5: visão semanal
+// ============================================================
+test.describe("visão semanal", () => {
+  test("alterna Mensal | Semanal por clique e teclado, lembra a escolha e soma a CH exata por faixa", async ({ page }, testInfo) => {
+    await page.addInitScript(() => {
+      if (localStorage.getItem("test-seeded")) return;
+      const act = (id: string, date: string, start: string, end: string) => ({ id, date, start, end, modality: "Assíncrona", description: "Sintética", local: "", descricao: "" });
+      localStorage.setItem("pet_folha_profiles_v3", JSON.stringify([{ id: "p", name: "Pessoa Sintética", role: "Monitor(a)", gatNumber: "01", createdAt: "2026-10-01T00:00:00.000Z" }]));
+      localStorage.setItem("pet_folha_active_profile_id_v3", "p");
+      localStorage.setItem("pet_folha_activities_v3_p_2026-11", JSON.stringify([
+        act("a", "2026-11-01", "08:00", "09:30"),
+        act("b", "2026-11-08", "16:30", "18:00"),
+        act("c", "2026-11-09", "11:00", "13:00"),
+        act("d", "2026-11-18", "14:00", "22:15"),
+      ]));
+      localStorage.setItem("test-seeded", "1");
+    });
+    await page.goto("/");
+    const summary = page.getByRole("region", { name: "Resumo da frequência" });
+    const toggle = summary.getByRole("radiogroup", { name: "Visão do resumo" });
+    await expect(toggle.getByRole("radio", { name: "Mensal" })).toBeChecked();
+    await expect(summary.getByRole("progressbar")).toBeVisible();
+    await toggle.getByRole("radio", { name: "Semanal" }).click();
+    const bands = summary.getByRole("list", { name: /CH por semana/ }).getByRole("listitem");
+    await expect(bands).toHaveCount(6);
+    await expect(bands.locator("strong")).toHaveText(["Semana: Dia 1", "Semana: 2 a 8", "Semana: 9 a 15", "Semana: 16 a 22", "Semana: 23 a 29", "Semana: Dia 30"]);
+    await expect(bands.locator(".week-band-value")).toHaveText(["1h30 de 8 h", "1h30 de 8 h", "2h de 8 h", "8h15 de 8 h", "0h de 8 h", "0h de 8 h"]);
+    // Semana atual (18/11/2026, relógio do teste) destacada também por texto.
+    await expect(bands.nth(3)).toHaveAttribute("aria-current", "date");
+    await expect(bands.nth(3)).toContainText("Semana atual");
+    await expect(bands.nth(0)).toContainText("Semana parcial");
+    await expect(summary).toContainText("não é reduzida");
+    // Lembra a escolha.
+    await page.reload();
+    await expect(toggle.getByRole("radio", { name: "Semanal" })).toBeChecked();
+    expect(await page.evaluate(() => localStorage.getItem("pet_folha_summary_view"))).toBe("weekly");
+    // Teclado.
+    await toggle.getByRole("radio", { name: "Semanal" }).focus();
+    await page.keyboard.press("ArrowLeft");
+    await expect(toggle.getByRole("radio", { name: "Mensal" })).toBeChecked();
+    await expect(summary.getByRole("progressbar")).toBeVisible();
+    await page.keyboard.press("ArrowRight");
+    await expect(bands).toHaveCount(6);
+    // Faixas acompanham a troca de mês e novas atividades.
+    await page.getByLabel("Mês da folha").selectOption("2026-08");
+    await expect(bands.locator("strong").first()).toHaveText("Semana: 1 a 2");
+    if (testInfo.project.name === "mobile") {
+      const lefts = await bands.evaluateAll((items) => items.map((item) => Math.round(item.getBoundingClientRect().left)));
+      expect(new Set(lefts).size).toBe(1);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    } else {
+      const lefts = await bands.evaluateAll((items) => items.map((item) => Math.round(item.getBoundingClientRect().left)));
+      expect(new Set(lefts).size).toBe(2);
+    }
+  });
+
+  test("sem armazenamento, a visão semanal funciona e volta ao padrão Mensal", async ({ page }) => {
+    await createProfile(page);
+    await page.evaluate(() => {
+      const original = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (key: string, value: string) {
+        if (key === "pet_folha_summary_view") throw new DOMException("Quota", "QuotaExceededError");
+        return original.call(this, key, value);
+      };
+    });
+    const toggle = page.getByRole("radiogroup", { name: "Visão do resumo" });
+    await toggle.getByRole("radio", { name: "Semanal" }).click();
+    await expect(page.getByRole("list", { name: /CH por semana/ })).toBeVisible();
+    await expect(page.locator(".operation-notice")).toHaveCount(0);
+  });
+});

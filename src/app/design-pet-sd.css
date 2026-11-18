@@ -1496,3 +1496,109 @@
 .workspace-month select:focus-visible {
   outline: none;
 }
+
+/* ---------- Resumo: alternância Mensal | Semanal e faixas de semana ---------- */
+.summary-progress-head {
+  align-items: center;
+}
+.choice-group--toggle {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: auto;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-raised);
+}
+.choice-group--toggle > label.choice {
+  min-height: 44px;
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+.choice-group--toggle > label.choice[data-checked="true"] {
+  border-color: var(--control-border);
+  background: var(--surface);
+  color: var(--brand-text);
+  font-weight: 700;
+  box-shadow: none;
+}
+.week-bands {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.week-band {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+.week-band[data-current="true"] {
+  border-color: var(--brand-text);
+  background: var(--brand-soft);
+}
+.week-band-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font-size: 15px;
+  color: var(--body);
+}
+.week-band-head strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.week-band-value {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+.week-band-tag {
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--brand-text);
+  color: var(--brand-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+.week-band-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.week-band-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brand-vivid);
+}
+.week-band-note {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+@media (max-width: 767px) {
+  .week-bands {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .choice-group--toggle {
+    margin-left: 0;
+    width: 100%;
+  }
+  .choice-group--toggle > label.choice {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+}
