@@ -2,14 +2,19 @@
 
 import { useState } from "react";
 import { Activity, UserProfile } from "@/types";
-import { cleanActivityDescription, formatDateBR } from "@/lib/pet-calculator";
-import { Pencil, Trash2, ListChecks, ExternalLink } from "lucide-react";
-import { formReportStatus } from "@/lib/form-report";
+import {
+  calcPetMinutes,
+  cleanActivityDescription,
+  formatDateBR,
+  formatDuration,
+  formatTotalHours,
+} from "@/lib/pet-calculator";
+import { Pencil, Trash2, ListChecks } from "lucide-react";
 import { ConfirmModal } from "./ConfirmModal";
 
 interface ActivityTableProps {
   activities: Activity[];
-  totalHours: number;
+  totalMinutes: number;
   editingId: string | null;
   onEdit: (activity: Activity) => void;
   onDelete: (id: string) => void;
@@ -17,12 +22,11 @@ interface ActivityTableProps {
   monthLabel: string;
   onLoadSamples: () => void;
   onClearMonth: () => void;
-  onPrepareForm?: (activity: Activity) => void;
 }
 
 export function ActivityTable({
   activities,
-  totalHours,
+  totalMinutes,
   editingId,
   onEdit,
   onDelete,
@@ -30,24 +34,12 @@ export function ActivityTable({
   monthLabel,
   onLoadSamples,
   onClearMonth,
-  onPrepareForm,
 }: ActivityTableProps) {
   const [confirmClear, setConfirmClear] = useState(false);
-  const [pendingOnly, setPendingOnly] = useState(false);
-  const pendingCount = activities.filter((activity) => formReportStatus(user, activity) !== "Enviado").length;
-  const visibleActivities = pendingOnly
-    ? activities.filter((activity) => formReportStatus(user, activity) !== "Enviado")
-    : activities;
+  const visibleActivities = activities;
   const actions = (activity: Activity) => {
-    const state = formReportStatus(user, activity);
     return (
       <div className="record-actions">
-        <span className="report-state" data-state={state}>{state}</span>
-        <button className="report-launch" type="button"
-          onClick={() => onPrepareForm?.(activity)}
-          aria-label={"Enviar ao Forms: " + cleanActivityDescription(activity.description)}>
-          Forms <ExternalLink size={14} aria-hidden="true" />
-        </button>
         <button
           className="icon-button"
           onClick={() => onEdit(activity)}
@@ -75,12 +67,6 @@ export function ActivityTable({
         </div>
         {activities.length > 0 && (
           <div className="records-tools">
-            <label className="records-filter" title="O envio é confirmado por você depois de concluir no Google.">
-              <input type="checkbox" checked={pendingOnly}
-                onChange={(event) => setPendingOnly(event.target.checked)}
-                aria-label="Mostrar só pendências do Forms" />
-              Pendentes <span>{pendingCount}</span>
-            </label>
             <button className="text-button" onClick={() => setConfirmClear(true)}>
               Limpar mês
             </button>
@@ -110,7 +96,6 @@ export function ActivityTable({
         </div>
       ) : (
         <>
-          {visibleActivities.length === 0 && <p className="records-empty">Nenhuma pendência do Forms neste mês.</p>}
           <div className="record-cards">
             {visibleActivities.map((activity) => (
               <article
@@ -122,12 +107,16 @@ export function ActivityTable({
                   <time dateTime={activity.date}>
                     {formatDateBR(activity.date)}
                   </time>
-                  <strong>{activity.hours}h</strong>
+                  <strong>{formatDuration(calcPetMinutes(activity.start, activity.end))}</strong>
                 </div>
                 <h3>{cleanActivityDescription(activity.description)}</h3>
                 <p>
                   {activity.start} às {activity.end} · {activity.modality}
+                  {activity.local && <> · {activity.local}</>}
                 </p>
+                {activity.descricao && (
+                  <p className="record-detail">{activity.descricao}</p>
+                )}
                 {actions(activity)}
               </article>
             ))}
@@ -138,8 +127,9 @@ export function ActivityTable({
               <thead>
                 <tr>
                   <th>Data e horário</th>
+                  <th>Unidade/Local</th>
                   <th>Atividade</th>
-                  <th>Horas</th>
+                  <th>CH</th>
                   <th>
                     <span className="sr-only">Ações</span>
                   </th>
@@ -159,13 +149,19 @@ export function ActivityTable({
                         {activity.start} às {activity.end}
                       </small>
                     </td>
+                    <td>{activity.local || "-"}</td>
                     <td>
                       <strong>
                         {cleanActivityDescription(activity.description)}
                       </strong>
                       <small>{activity.modality}</small>
+                      {activity.descricao && (
+                        <small className="record-detail">{activity.descricao}</small>
+                      )}
                     </td>
-                    <td className="record-hours">{activity.hours}h</td>
+                    <td className="record-hours">
+                      {formatDuration(calcPetMinutes(activity.start, activity.end))}
+                    </td>
                     <td>{actions(activity)}</td>
                   </tr>
                 ))}
@@ -174,7 +170,7 @@ export function ActivityTable({
           </div>
           <div className="records-total">
             <span>Total do mês</span>
-            <strong>{totalHours}h</strong>
+            <strong>{formatTotalHours(totalMinutes)}</strong>
           </div>
         </>
       )}

@@ -1,36 +1,23 @@
-# Documentação Canônica: PET Folha Mensal
+# Documentação: PET-SD Folha Mensal
 
-Piloto Maestri/Codex/Gemini: [papéis e operação](AGENT-WORKFLOW.md).
-Para planejar CI, logs e de-slop: [frentes e referências do Oracle](oracle-ci-logs-unslop.md).
+| Documento | Conteúdo |
+|---|---|
+| [architecture.md](architecture.md) | arquitetura local-first, modelo de dados, armazenamento, migração e impressão |
+| [regimento-pet.md](regimento-pet.md) | resumo do Regimento Interno do PET-SD/UFG usado nas regras do app |
+| [ui-ux.md](ui-ux.md) | telas, folha oficial, acessibilidade e verificações de interface |
+| [deployment-vercel.md](deployment-vercel.md) | deploy na Vercel e variáveis de ambiente |
+| [adaptacao-pet-sd.md](adaptacao-pet-sd.md) | registro da adaptação: épicos, decisões, dúvidas e divergências entre fontes |
+| [adr/0001-config-central-do-programa.md](adr/0001-config-central-do-programa.md) | por que os dados do programa ficam em `src/config/program.ts` |
+| [validation/pet-sd-20261117](validation/pet-sd-20261117/README.md) | capturas e PDFs da folha com dados fictícios |
+| [THIRD-PARTY-UI.md](THIRD-PARTY-UI.md) | componentes de interface de terceiros e licenças |
+| [wireframe-ui.html](wireframe-ui.html) | wireframe herdado do projeto original |
 
-Este diretório concentra a documentação técnica, arquitetural e normativa da aplicação web **PET Folha Mensal**.
+Na raiz: [README.md](../README.md), [CONTRIBUTING.md](../CONTRIBUTING.md) e
+[AGENTS.md](../AGENTS.md).
 
----
+## Referências oficiais
 
-## Sumário de Documentos
-
-1. **[architecture.md](architecture.md)**: Arquitetura de software, padrão Local-First, modelo de dados, componentes React e estratégias de ergonomia mobile.
-2. **[regimento-pet.md](regimento-pet.md)**: Normas do Edital SGTES/MS nº 23/2026, cálculo matemático de horas PET, composição dos 5 GATs e procedimentos de validação de bolsas.
-3. **[deployment-vercel.md](deployment-vercel.md)**: Manual de deploy contínuo na Vercel, variáveis de ambiente e ativação do Vercel Analytics.
-4. **[CONTRIBUTING.md](../CONTRIBUTING.md)**: Guia de colaboração, convenções Git, Conventional Commits e gates de aceitação.
-5. **[AGENTS.md](../AGENTS.md)**: Contrato de execução para agentes de inteligência artificial.
-
----
-
-## Referências Oficiais e Institucionais
-
-* [Repositório Oficial no GitHub](https://github.com/vvvvvdal/pet-folha-mensal)
-* [Aplicação em Produção (Vercel)](https://pet-folha-mensal.vercel.app)
-* [Formulário de Avaliação e Sugestões](https://docs.google.com/forms/d/e/1FAIpQLSfIxvavW_gq0xCUb6qx7VKK-I9tYino158tsCrNCO6IZ1Wf-A/viewform)
-* **Plano Setorial de Saúde - AdaptaSUS** (Plano Clima Adaptação 2025-2035)
-* **Plano de Ação em Saúde de Belém (BHAP)** (COP30)
-* **Decreto Federal nº 11.908/2024** (Programa Brasil Saudável - Unir para Cuidar)
-* **Mudanças Climáticas para Profissionais da Saúde: Guia de Bolso** (2ª edição revisada, Ministério da Saúde, 2026)
-
-## Interface e usabilidade
-
-- [Interface, componentes e verificação](ui-ux.md): organização das telas, temas, ajuda compartilhada e limites de verificação desta entrega.
-
-O [plano da reestruturação](ui-ux-restructure-plan.md) e suas
-[evidências de UI/UX](validation/ui-ux-20261102/README.md) detalham a retomada sem
-JSON, a escala de leitura, o diagnóstico local e a validação de impressão.
+- Edital Conjunto SEIDIGI/SGTES-MS nº 1/2025 (PET-Saúde: Informação e Saúde
+  Digital), publicado no Diário Oficial da União.
+- Regimento Interno do PET-SD/UFG (04/12/2025) e modelo da ficha “Registro de
+  Frequência e Atividades – PET-SD”, distribuídos pela coordenação do programa.

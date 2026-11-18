@@ -4,9 +4,9 @@ import { readFile } from "node:fs/promises";
 const user = {
   id: "test-resume",
   name: "Pessoa de teste",
-  role: "Estudante",
-  gatNumber: "04",
-  gatName: "Mangaba",
+  role: "Monitor(a)",
+  gatNumber: "01",
+  gatName: "GAT de teste",
   createdAt: "2026-10-01T00:00:00.000Z",
 };
 const activity = {
@@ -15,13 +15,15 @@ const activity = {
   start: "14:00",
   end: "15:30",
   description: "Registro anterior de teste",
-  modality: "Síncrona virtual",
-  hours: 2,
+  modality: "Interação em tempo real (Síncrona)",
+  local: "Sala de teste",
+  descricao: "Descrição de teste",
+  hours: 1.5,
 };
 const keys = {
-  profiles: "pet_folha_profiles_v2",
-  active: "pet_folha_active_profile_id_v2",
-  october: `pet_folha_activities_v2_${user.id}_2026-10`,
+  profiles: "pet_folha_profiles_v3",
+  active: "pet_folha_active_profile_id_v3",
+  october: `pet_folha_activities_v3_${user.id}_2026-10`,
 };
 
 test.beforeEach(async ({ page }) => {
@@ -43,15 +45,20 @@ async function create(page: Page) {
 
 async function add(page: Page) {
   await page.getByLabel("Data", { exact: true }).fill("2026-11-02");
-  await page.getByLabel("Entrada", { exact: true }).fill("13:30");
-  await page.getByLabel("Saída", { exact: true }).fill("17:30");
+  await page.getByLabel("Início", { exact: true }).fill("13:30");
+  await page.getByLabel("Fim", { exact: true }).fill("17:30");
+  await page.getByLabel("Unidade/Local", { exact: true }).fill("Sala sintética");
   await page
-    .getByLabel("Atividade realizada", { exact: true })
+    .getByLabel("Atividade desenvolvida", { exact: true })
     .fill("Atividade sintética");
+  await page
+    .getByLabel("Descrição", { exact: true })
+    .fill("Pauta sintética de teste");
   await page
     .getByRole("button", { name: "Adicionar atividade", exact: true })
     .click();
-  await expect(page.locator(".summary-total strong")).toHaveText("5");
+  // CH exata: 13:30 às 17:30 = 4h (a regra antiga daria 5h).
+  await expect(page.locator(".summary-total strong")).toHaveText("4");
 }
 
 test("perfil repetido retoma sem arquivo e preserva meses anteriores", async ({
@@ -88,7 +95,7 @@ test("perfil repetido retoma sem arquivo e preserva meses anteriores", async ({
   await expect(page.getByLabel("Mês da folha")).toHaveValue("2026-11");
   await expect(page.locator(".summary-total strong")).toHaveText("0");
   await page.getByLabel("Mês da folha").selectOption("2026-10");
-  await expect(page.locator(".summary-total strong")).toHaveText("2");
+  await expect(page.locator(".summary-total strong")).toHaveText("1h30");
   await page.getByRole("button", { name: "Concluir", exact: true }).click();
   await page
     .getByRole("button", { name: "Sair / trocar participante", exact: true })
@@ -119,11 +126,12 @@ test("lançar, editar, exportar, restaurar, imprimir e excluir", async ({
   const edit = page
     .getByRole("dialog", { name: "Editar atividade", exact: true })
     .first();
-  await edit.getByLabel("Saída", { exact: true }).fill("18:30");
+  await expect(edit.getByLabel("Unidade/Local", { exact: true })).toHaveValue("Sala sintética");
+  await edit.getByLabel("Fim", { exact: true }).fill("18:15");
   await edit.getByRole("button", { name: /Salvar/ }).click();
-  await expect(page.locator(".summary-total strong")).toHaveText("6");
+  await expect(page.locator(".summary-total strong")).toHaveText("4h45");
   await page.reload();
-  await expect(page.locator(".summary-total strong")).toHaveText("6");
+  await expect(page.locator(".summary-total strong")).toHaveText("4h45");
   await page.evaluate(() =>
     Object.defineProperty(window, "showSaveFilePicker", {
       configurable: true,
@@ -153,8 +161,12 @@ test("lançar, editar, exportar, restaurar, imprimir e excluir", async ({
   await page
     .getByRole("button", { name: "Folha oficial", exact: true })
     .click();
-  await expect(page.locator(".sheet-stage .official-sheet")).toContainText(
-    "TOTAL: 6 horas",
+  const sheet = page.locator(".sheet-stage .official-sheet");
+  await expect(sheet).toContainText("REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD");
+  await expect(sheet).toContainText("Total de CH no mês: 4h45");
+  await expect(sheet).toContainText("( X ) Monitor(a)");
+  await expect(sheet.locator(".pet-sheet-activities tbody tr").first()).toContainText(
+    "02/11Sala sintéticaAtividade sintética13:3018:154h45Interação em tempo real (Síncrona)Pauta sintética de teste",
   );
   await page.evaluate(() => {
     window.print = () => {
@@ -207,17 +219,17 @@ test("erro de cópia e cancelamento preservam dados; formulário não some ao tr
   await expect(page.locator(".operation-notice pre")).not.toContainText(
     "SEGREDO_TESTE",
   );
-  await expect(page.locator(".summary-total strong")).toHaveText("5");
+  await expect(page.locator(".summary-total strong")).toHaveText("4");
   await page.getByRole("button", { name: "Fechar aviso", exact: true }).click();
   await page
-    .getByLabel("Atividade realizada", { exact: true })
+    .getByLabel("Atividade desenvolvida", { exact: true })
     .fill("Rascunho mantido");
   await page.getByLabel("Mês da folha").selectOption("2026-10");
   await page
     .getByRole("button", { name: "Continuar editando", exact: true })
     .click();
   await expect(
-    page.getByLabel("Atividade realizada", { exact: true }),
+    page.getByLabel("Atividade desenvolvida", { exact: true }),
   ).toHaveValue("Rascunho mantido");
   await expect(page.getByLabel("Mês da folha")).toHaveValue("2026-11");
 });
@@ -298,10 +310,10 @@ test("falha de gravação mantém formulário e permite tentar novamente", async
   page,
 }) => {
   await create(page);
-  await page.getByLabel("Entrada", { exact: true }).fill("13:30");
-  await page.getByLabel("Saída", { exact: true }).fill("17:30");
+  await page.getByLabel("Início", { exact: true }).fill("13:30");
+  await page.getByLabel("Fim", { exact: true }).fill("17:30");
   await page
-    .getByLabel("Atividade realizada", { exact: true })
+    .getByLabel("Atividade desenvolvida", { exact: true })
     .fill("Preenchimento preservado");
   await page.evaluate(() => {
     const original = Storage.prototype.setItem;
@@ -311,7 +323,7 @@ test("falha de gravação mantém formulário e permite tentar novamente", async
       },
     });
     Storage.prototype.setItem = function (key, value) {
-      if (key.startsWith("pet_folha_activities_v2_"))
+      if (key.startsWith("pet_folha_activities_v3_"))
         throw new DOMException("Quota", "QuotaExceededError");
       original.call(this, key, value);
     };
@@ -323,7 +335,7 @@ test("falha de gravação mantém formulário e permite tentar novamente", async
     "Seu preenchimento foi mantido",
   );
   await expect(
-    page.getByLabel("Atividade realizada", { exact: true }),
+    page.getByLabel("Atividade desenvolvida", { exact: true }),
   ).toHaveValue("Preenchimento preservado");
   await expect(page.locator(".summary-total strong")).toHaveText("0");
   await page.evaluate(() => {
@@ -335,29 +347,31 @@ test("falha de gravação mantém formulário e permite tentar novamente", async
   await page
     .getByRole("button", { name: "Adicionar atividade", exact: true })
     .click();
-  await expect(page.locator(".summary-total strong")).toHaveText("5");
+  await expect(page.locator(".summary-total strong")).toHaveText("4");
 });
 
-test("folha extensa pagina e mantém assinaturas somente no final", async ({
+test("folha extensa pagina, repete o cabeçalho da tabela e deixa assinaturas e instruções no final", async ({
   page,
 }) => {
   await create(page);
   await page.evaluate(() => {
-    const id = localStorage.getItem("pet_folha_active_profile_id_v2");
+    const id = localStorage.getItem("pet_folha_active_profile_id_v3");
     const records = Array.from({ length: 40 }, (_, index) => ({
       id: `long-${index}`,
       date: "2026-11-02",
       start: "14:00",
       end: "15:00",
-      modality: "Síncrona virtual",
-      description:
+      modality: "Assíncrona",
+      local: "-",
+      description: `Atividade longa ${index + 1}`,
+      descricao:
         "Descrição sintética extensa para verificar o limite de impressão. ".repeat(
           4,
         ),
       hours: 1,
     }));
     localStorage.setItem(
-      `pet_folha_activities_v2_${id}_2026-11`,
+      `pet_folha_activities_v3_${id}_2026-11`,
       JSON.stringify(records),
     );
   });
@@ -379,28 +393,35 @@ test("folha extensa pagina e mantém assinaturas somente no final", async ({
   const task = getDocument({ data: new Uint8Array(bytes) });
   const pdf = await task.promise;
   try {
-    expect(pdf.numPages).toBeGreaterThan(1);
+    expect(pdf.numPages).toBeGreaterThan(2);
+    const texts: string[] = [];
     for (let number = 1; number <= pdf.numPages; number++) {
       const sheet = await pdf.getPage(number);
+      const { width, height } = sheet.getViewport({ scale: 1 });
+      // Carta paisagem: 792 x 612 pt.
+      expect([Math.round(width), Math.round(height)]).toEqual([792, 612]);
       const content = await sheet.getTextContent();
-      const text = content.items.map((item) => "str" in item ? item.str : "").join(" ");
-      if (number === pdf.numPages) {
-        expect(text).toContain("Assinatura do Participante");
-        expect(text).toContain("Assinatura da Supervisão do GAT");
-        expect(text).toContain("TOTAL: 40 horas");
-      } else {
-        expect(text).not.toContain("Assinatura do Participante");
-        expect(text).not.toContain("Assinatura da Supervisão do GAT");
-      }
+      texts.push(content.items.map((item) => "str" in item ? item.str : "").join(" "));
     }
+    const last = texts.at(-1)!;
+    expect(last).toContain("Instruções de preenchimento");
+    expect(last).not.toContain("Assinatura do Participante");
+    const signaturePages = texts
+      .map((text, index) => (text.includes("Assinatura do Participante") ? index : -1))
+      .filter((index) => index >= 0);
+    expect(signaturePages).toEqual([texts.length - 2]);
+    expect(texts[texts.length - 2]).toContain("Assinatura do Responsável");
+    expect(texts.join(" ")).toContain("Total de CH no mês: 40 horas");
+    for (const text of texts.filter((text) => text.includes("Atividade longa")))
+      expect(text).toContain("Unidade/Local");
   } finally {
     await task.destroy();
   }
   expect(
     await page.evaluate(() => {
-      const id = localStorage.getItem("pet_folha_active_profile_id_v2");
+      const id = localStorage.getItem("pet_folha_active_profile_id_v3");
       return JSON.parse(
-        localStorage.getItem(`pet_folha_activities_v2_${id}_2026-11`)!,
+        localStorage.getItem(`pet_folha_activities_v3_${id}_2026-11`)!,
       ).length;
     }),
   ).toBe(40);
@@ -417,7 +438,7 @@ test("erro em edição mantém o diálogo, o preenchimento e o foco", async ({
     exact: true,
   });
   await edit
-    .getByLabel("Descrição da Atividade", { exact: true })
+    .getByLabel("Atividade desenvolvida", { exact: true })
     .fill("Correção preservada");
   await page.evaluate(() => {
     Storage.prototype.setItem = () => {
@@ -430,12 +451,12 @@ test("erro em edição mantém o diálogo, o preenchimento e o foco", async ({
   ).toBeVisible();
   await page.getByRole("button", { name: "Entendido", exact: true }).click();
   await expect(
-    edit.getByLabel("Descrição da Atividade", { exact: true }),
+    edit.getByLabel("Atividade desenvolvida", { exact: true }),
   ).toHaveValue("Correção preservada");
   await expect(edit.getByRole("button", { name: /Salvar/ })).toBeFocused();
   await edit.getByRole("button", { name: "Cancelar", exact: true }).click();
   await page
-    .getByRole("button", { name: /Participante sintético Estudante/ })
+    .getByRole("button", { name: /Participante sintético Monitor\(a\)/ })
     .click();
   const profile = page.getByRole("dialog", {
     name: "Identificação do participante",
@@ -479,28 +500,57 @@ test("seletor de mês mantém opções contrastantes nos dois temas e funciona p
       await month.press("Alt+ArrowDown");
       await page.screenshot({ path: testInfo.outputPath(`month-${theme}.png`) });
       await page.keyboard.press("Escape");
+    } else {
+      // No celular, o Enter abre a lista nativa do select; feche-a antes da
+      // próxima iteração, senão as teclas seguintes vão para a lista aberta.
+      await page.keyboard.press("Escape");
     }
   }
 });
 
 
-test("entrada oculta só o exemplo antigo sem uso e explica os arquivos sem expansão", async ({ page }) => {
+test("dados do formato antigo migram para o v3; exemplo sem uso não aparece; v2 é preservado", async ({ page }) => {
+  // Perfis sintéticos no formato _v2 da versão original.
   const legacy = { id: "mariana-rios", name: "Mariana Dias Rios", role: "Estudante", gatNumber: "01", gatName: "Araticum", createdAt: "2026-09-01T00:00:00.000Z" };
+  const used = { id: "pessoa-v2", name: "Pessoa Sintética V2", role: "Estudante", gatNumber: "04", gatName: "Antigo", createdAt: "2026-09-01T00:00:00.000Z" };
+  const old = [{ id: "v2-a", date: "2026-10-06", start: "14:00", end: "15:30", modality: "Síncrona presencial", description: "Reunião antiga", hours: 2 }];
   await page.goto("/");
-  await page.evaluate((legacy) => {
-    localStorage.setItem("pet_folha_profiles_v2", JSON.stringify([legacy]));
-  }, legacy);
+  await page.evaluate(({ legacy, used, old }) => {
+    localStorage.clear();
+    localStorage.setItem("pet_folha_profiles_v2", JSON.stringify([legacy, used]));
+    localStorage.setItem("pet_folha_activities_v2_pessoa-v2_2026-10", JSON.stringify(old));
+  }, { legacy, used, old });
   await page.reload();
-  await expect(page.getByLabel("Nome completo", { exact: true })).toBeVisible();
-  await expect(page.getByRole("group", { name: "Como deseja começar" }).getByRole("button", { name: "Continuar", exact: true })).toHaveCount(0);
+  const select = page.getByLabel("Perfil neste navegador", { exact: true });
+  await expect(select.locator("option")).toHaveCount(1);
+  await expect(select).toHaveValue(used.id);
+  await expect(select.locator("option")).toHaveText(/Monitor\(a\)/);
   await expect(page.getByText(/O JSON é um arquivo que guarda sua identificação/)).toBeVisible();
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("pet_folha_profiles_v2")!).length)).toBe(1);
-  await page.evaluate(() => localStorage.setItem("pet_folha_activities_v2_mariana-rios_2026-10", "[]"));
-  await page.reload();
-  await expect(page.getByLabel("Perfil neste navegador", { exact: true })).toHaveValue(legacy.id);
   await expect(page.getByText(/Quem usa este navegador pode abrir/)).toBeVisible();
   await page.getByRole("button", { name: "Continuar com este perfil", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Minha frequência", exact: true })).toBeVisible();
+  await page.getByLabel("Mês da folha").selectOption("2026-10");
+  await expect(page.locator(".summary-total strong")).toHaveText("1h30");
+  await expect(page.locator(".record-hours:visible, .record-meta strong:visible").first()).toHaveText("1h30");
+  const stored = await page.evaluate(() => ({
+    v2: JSON.parse(localStorage.getItem("pet_folha_profiles_v2")!).length,
+    v2Activities: localStorage.getItem("pet_folha_activities_v2_pessoa-v2_2026-10"),
+    v3: JSON.parse(localStorage.getItem("pet_folha_activities_v3_pessoa-v2_2026-10")!),
+  }));
+  expect(stored.v2).toBe(2);
+  expect(JSON.parse(stored.v2Activities!)).toEqual(old);
+  expect(stored.v3[0]).toMatchObject({ modality: "Interação em tempo real (Síncrona)", local: "", descricao: "", hours: 1.5 });
+});
+
+test("sem links configurados, botões de Forms e avaliação não aparecem", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("button", { name: "Avaliar", exact: true })).toHaveCount(0);
+  await expect(page.getByText(/Clima/)).toHaveCount(0);
+  await expect(page.locator("footer")).toContainText("Felipe Gonçalves Vidal");
+  await create(page);
+  await add(page);
+  await expect(page.getByRole("button", { name: /Forms/ })).toHaveCount(0);
+  await page.getByRole("button", { name: /^Concluir/ }).click();
+  await expect(page.getByRole("link", { name: "Abrir formulário de atividades" })).toHaveCount(0);
 });
 
 const png = Buffer.from(
@@ -535,7 +585,7 @@ function makePdf(pageCount: number) {
 }
 
 function proofs(page: Page) {
-  return page.getByRole("region", { name: "Comprovantes (opcional)" });
+  return page.getByRole("region", { name: "Comprovação fotográfica" });
 }
 
 async function openSheet(page: Page) {
@@ -586,7 +636,8 @@ test("comprovantes opcionais persistem por mês e perfil e entram nas duas impre
   await expect(page.locator("html")).toHaveAttribute("data-print-pages", "quadrada,paisagem,retrato");
   if (testInfo.project.name === "desktop") {
     const pdf = await page.pdf({ path: testInfo.outputPath("folha-com-comprovantes.pdf"), preferCSSPageSize: true });
-    expect(pdf.toString("latin1").match(/\/Type \/Page\b/g)).toHaveLength(4);
+    // Folha (2 páginas: registro e instruções) + 3 páginas de comprovantes.
+    expect(pdf.toString("latin1").match(/\/Type \/Page\b/g)).toHaveLength(5);
   }
 
   await page.getByRole("button", { name: "Modelo em branco", exact: true }).click();
@@ -631,7 +682,7 @@ test("cópias com comprovantes levam os originais e a restauração reverte falh
   const file = testInfo.outputPath("copia-com-comprovantes.json");
   await (await downloadPromise).saveAs(file);
   const data = JSON.parse(await readFile(file, "utf8"));
-  expect(data.version).toBe("1.2");
+  expect(data.version).toBe("1.3");
   expect(data.attachments.map(({ name, base64 }: { name: string; base64: string }) =>
     [name, Buffer.from(base64, "base64")])).toEqual([["foto.png", png]]);
 
@@ -641,7 +692,7 @@ test("cópias com comprovantes levam os originais e a restauração reverte falh
     await fresh.goto(page.url());
     await fresh.getByRole("button", { name: "Restaurar cópia", exact: true }).click();
     await restoreCopy(fresh, data, "Cópia de segurança da folha");
-    await expect(fresh.locator(".summary-total strong")).toHaveText("5");
+    await expect(fresh.locator(".summary-total strong")).toHaveText("4");
     await openSheet(fresh);
     await expect(proofs(fresh).getByRole("button", { name: "Abrir foto.png" })).toBeVisible();
   } finally {
@@ -670,7 +721,7 @@ test("cópias com comprovantes levam os originais e a restauração reverte falh
   await expect(page.getByText("Não foi possível restaurar", { exact: true })).toBeVisible();
   await expect(proofs(page).getByRole("button", { name: "Abrir foto.png" })).toBeVisible();
   await page.getByRole("button", { name: "Minha frequência", exact: true }).click();
-  await expect(page.locator(".summary-total strong")).toHaveText("5");
+  await expect(page.locator(".summary-total strong")).toHaveText("4");
 
   await page.reload();
   await openSheet(page);
@@ -680,111 +731,12 @@ test("cópias com comprovantes levam os originais e a restauração reverte falh
   await expect(proofs(page).getByRole("button", { name: "Abrir foto.png" })).toHaveCount(0);
 });
 
-test("preparar Forms, confirmar envio, revisar edição e restaurar relatório", async ({ page }, testInfo) => {
-  await create(page);
-  await add(page);
-  await page.getByRole("button", { name: /^Enviar ao Forms:/ }).click();
-  const panel = page.getByRole("dialog", { name: "Enviar ao Forms", exact: true });
-  await expect(panel.getByLabel("E-mail para o formulário")).toHaveValue("");
-  await panel.getByLabel("E-mail para o formulário").fill("teste@example.com");
-  await panel.getByLabel("Tipo de atividade no Forms").selectOption("Reunião Interna do seu GAT");
-  await page.evaluate(() => {
-    const original = Storage.prototype.setItem;
-    Reflect.set(window, "restoreReportStorage", () => { Storage.prototype.setItem = original; });
-    Storage.prototype.setItem = function (key, value) {
-      if (key.startsWith("pet_folha_activities")) throw new DOMException("Quota", "QuotaExceededError");
-      original.call(this, key, value);
-    };
-  });
-  await panel.getByRole("button", { name: "Abrir Forms preenchido", exact: true }).click();
-  await expect(panel.getByRole("alert")).toContainText("Não foi possível salvar");
-  await expect(panel.getByLabel("Tipo de atividade no Forms")).toHaveValue("Reunião Interna do seu GAT");
-  await expect(panel.getByLabel("E-mail para o formulário")).toHaveValue("teste@example.com");
-  await page.evaluate(() => {
-    const restore = Reflect.get(window, "restoreReportStorage");
-    if (typeof restore === "function") restore();
-    window.open = () => null;
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
-      value: { writeText: async (value: string) => { document.documentElement.dataset.copiedSummary = value; } },
-    });
-  });
-  await panel.getByRole("button", { name: "Abrir Forms preenchido", exact: true }).click();
-  await expect(panel.getByRole("alert")).toContainText("bloqueou a nova aba");
-  const href = await panel.getByRole("link", { name: "Abrir o link preparado", exact: true }).getAttribute("href");
-  const params = new URL(href!).searchParams;
-  expect(params.get("entry.333612427")).toBe("2026-11-02");
-  expect(params.get("emailAddress")).toBe("teste@example.com");
-  expect(params.get("entry.1054891050")).toMatch(/^Síncrono Virtual/);
-  expect(params.get("entry.62230450")).toBe("5");
-  expect(params.get("entry.1807232520_hour")).toBe("13");
-  expect(params.get("entry.1807232520_minute")).toBe("30");
-  expect(params.get("entry.748998103_hour")).toBe("17");
-  expect(params.get("entry.1781993657")).toBe("não");
-  expect(params.get("entry.1074022684")).toBe("não");
-  expect(params.get("emailReceipt")).toBe("true");
-  await panel.getByRole("button", { name: "Copiar resumo", exact: true }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-copied-summary", /Atividade sintética[\s\S]*13:30 às 17:30/);
-  await page.evaluate(() => {
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
-      value: { writeText: async () => { throw new Error("Clipboard unavailable"); } },
-    });
-  });
-  await panel.getByRole("button", { name: "Copiar resumo", exact: true }).click();
-  await expect(panel.getByRole("alert")).toContainText("O resumo foi selecionado");
-  await panel.getByRole("radio", { name: "Sim" }).first().check({ force: true });
-  await panel.getByLabel("Quantas pessoas (só número)").fill("7");
-  await panel.getByLabel("Tipo de atendimento ou procedimento").fill("Aferição de pressão");
-  await panel.getByRole("radio", { name: "Não" }).last().check({ force: true });
-  await panel.getByRole("button", { name: "Abrir Forms preenchido", exact: true }).click();
-  const served = new URL((await panel.getByRole("link", { name: "Abrir o link preparado", exact: true }).getAttribute("href"))!).searchParams;
-  expect(served.get("emailReceipt")).toBeNull();
-  expect(served.get("entry.1781993657")).toBe("sim");
-  expect(served.get("entry.2115801122")).toBe("7");
-  expect(served.get("entry.1412130923")).toBe("Aferição de pressão");
-  await panel.getByLabel("Já enviei").check();
-  await expect(panel.getByRole("status")).toHaveText("Marcado como enviado.");
-  await panel.getByRole("button", { name: "Fechar", exact: true }).click();
-  await page.getByLabel("Mostrar só pendências do Forms").check();
-  await expect(page.getByText("Nenhuma pendência do Forms neste mês.", { exact: true })).toBeVisible();
-  await page.getByLabel("Mostrar só pendências do Forms").uncheck();
-  await page.reload();
-  await expect(page.locator(".report-state:visible")).toHaveText("Enviado");
-  await page.getByRole("button", { name: /^Editar atividade:/ }).click();
-  const edit = page.getByRole("dialog", { name: "Editar atividade", exact: true });
-  await edit.getByLabel("Descrição da Atividade", { exact: true }).fill("Descrição alterada após envio");
-  await edit.getByRole("button", { name: /Salvar/ }).click();
-  await expect(page.locator(".report-state:visible")).toHaveText("Revisar envio");
-
-  await page.evaluate(() => Object.defineProperty(window, "showSaveFilePicker", { configurable: true, value: undefined }));
-  const pendingDownload = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Salvar cópia", exact: true }).click();
-  const backupPath = testInfo.outputPath("relatorio-1.2.json");
-  await (await pendingDownload).saveAs(backupPath);
-  const backup = JSON.parse(await readFile(backupPath, "utf8"));
-  expect(backup.version).toBe("1.2");
-  expect(backup.activities[0].formReport.confirmation.at).toBeTruthy();
-  await restoreCopy(page, { ...backup, version: "1.1" });
-  await expect(page.locator(".report-state:visible")).toHaveText("Pendente");
-  await restoreCopy(page, backup);
-  await expect(page.locator(".report-state:visible")).toHaveText("Revisar envio");
-  await page.getByRole("button", { name: /^Enviar ao Forms:/ }).click();
-  await panel.getByLabel("Revisar envio").uncheck();
-  await expect(panel.getByRole("status")).toHaveText("Marcado como pendente.");
-  await panel.getByRole("button", { name: "Fechar", exact: true }).click();
-  await page.getByLabel("Mês da folha").selectOption("2026-10");
-  await expect(page.getByRole("button", { name: /^Enviar ao Forms:/ })).toHaveCount(0);
-});
-
-test("novidades mostram data de publicação e histórico acessível nos dois temas", async ({ page }, testInfo) => {
+test("novidades mostram data de publicação nos dois temas", async ({ page }, testInfo) => {
   await page.goto("/");
   const section = page.getByRole("region", { name: "Novidades do site" });
-  await expect(section.getByRole("heading", { name: "Formulário completo e tela sem rolagem" })).toBeVisible();
-  await expect(section.getByText("Última atualização", { exact: false })).toContainText("08 de novembro de 2026");
-  await expect(section.getByText("Sua folha continua neste navegador", { exact: true })).not.toBeVisible();
-  await section.getByText("Ver histórico de atualizações", { exact: true }).click();
-  await expect(section.getByText("Sua folha continua neste navegador", { exact: true })).toBeVisible();
+  await expect(section.getByRole("heading", { name: "Folha no modelo do PET-SD" })).toBeVisible();
+  await expect(section.getByText("Última atualização", { exact: false })).toContainText("17 de novembro de 2026");
+  await expect(section.getByText("Ver histórico de atualizações", { exact: true })).toHaveCount(0);
   for (const theme of ["light", "dark"]) {
     await page.evaluate((theme) => { document.documentElement.dataset.theme = theme; }, theme);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);

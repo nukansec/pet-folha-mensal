@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { UserProfile, UserRole, GATInfo } from "@/types";
 import { useTheme } from "@/lib/theme";
+import { PROGRAM } from "@/config/program";
 import { Brand } from "./Brand";
 import { FAQ, HelpModal } from "./Help";
 import { ReleaseNotes } from "./ReleaseNotes";
@@ -46,7 +47,9 @@ export function LandingPage({
   );
   const [name, setName] = useState("");
   const [gat, setGat] = useState(Object.keys(gats)[0] || "");
-  const [role, setRole] = useState(roles[0] || "");
+  const [role, setRole] = useState(
+    roles.includes(PROGRAM.defaultRole) ? PROGRAM.defaultRole : roles[0] || "",
+  );
   const [helpOpen, setHelpOpen] = useState(false);
   const [profileId, setProfileId] = useState(profiles[0]?.id || "");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -93,7 +96,7 @@ export function LandingPage({
       </header>
       <main className="start-main">
         <div className="start-heading">
-          <p className="section-kicker">PET-Saúde Clima · UFG</p>
+          <p className="section-kicker">{PROGRAM.name} · {PROGRAM.campus}</p>
           <h1>Folha de frequência</h1>
           <p>Registre suas atividades e prepare a folha mensal para assinatura.</p>
         </div>
@@ -145,7 +148,7 @@ export function LandingPage({
                     </div>
                     <div className="start-field-row">
                       <div className="field">
-                        <label htmlFor="entry-role">Função no PET</label>
+                        <label htmlFor="entry-role">Perfil</label>
                         <select
                           id="entry-role"
                           value={role}
@@ -158,7 +161,7 @@ export function LandingPage({
                         </select>
                       </div>
                       <div className="field">
-                        <label htmlFor="entry-gat">Grupo tutorial</label>
+                        <label htmlFor="entry-gat">GAT</label>
                         <select
                           id="entry-gat"
                           value={gat}
@@ -227,7 +230,7 @@ export function LandingPage({
               <FileJson size={24} aria-hidden="true" />
               <div>
                 <h3><span className="file-extension">.json</span> Cópia para continuar</h3>
-                <p>O JSON é um arquivo que guarda sua identificação, as atividades, os comprovantes e o controle dos relatórios da folha. Ele permite continuar editando ou levar os registros para outro aparelho.</p>
+                <p>O JSON é um arquivo que guarda sua identificação, as atividades e os comprovantes da folha. Ele permite continuar editando ou levar os registros para outro aparelho.</p>
                 <p>Na sua folha, use <strong>Salvar cópia</strong>. Para abrir o arquivo aqui, escolha <strong>Restaurar cópia</strong>. Não precisa abrir nem editar o JSON por conta própria; guarde-o em local seguro.</p>
               </div>
             </div>

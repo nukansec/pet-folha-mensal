@@ -1,36 +1,37 @@
 "use client";
 
 import { ChevronDown, X } from "lucide-react";
+import { PROGRAM } from "@/config/program";
 import { Modal } from "./Modal";
 
 const questions = [
   [
     "Como começo minha folha?",
-    "No primeiro acesso, informe nome, função e GAT. Nos próximos meses, use “Continuar” neste mesmo navegador e escolha o mês. Você não precisa do arquivo anterior para abrir um novo mês.",
+    "No primeiro acesso, informe nome, perfil e GAT. Nos próximos meses, use “Continuar” neste mesmo navegador e escolha o mês. Você não precisa do arquivo anterior para abrir um novo mês.",
   ],
   [
     "O que é o JSON e como restauro uma folha?",
-    "O JSON é a cópia editável da sua folha: guarda sua identificação, atividades, comprovantes e o controle dos relatórios. Use “Restaurar cópia” e selecione o arquivo .json salvo anteriormente. O PDF não restaura os registros.",
+    "O JSON é a cópia editável da sua folha: guarda sua identificação, atividades e comprovantes. Use “Restaurar cópia” e selecione o arquivo .json salvo anteriormente. O PDF não restaura os registros.",
   ],
   [
     "Onde ficam meus dados?",
-    "Neste navegador. Use “Salvar cópia” para baixar o arquivo .json; limpar os dados do navegador pode apagar seus registros. Guarde a cópia em local seguro.",
+    "Neste navegador. Nada é enviado a um servidor. Use “Salvar cópia” para baixar o arquivo .json; limpar os dados do navegador pode apagar seus registros. Guarde a cópia em local seguro.",
   ],
   [
     "Perdi a cópia. Posso continuar?",
     "Se usou este navegador, abra seu perfil em “Continuar”: os meses anteriores continuam locais. Em outro aparelho ou após limpar os dados, você pode criar uma folha para o novo mês; os registros antigos dependem da cópia ou do navegador original. Não há sincronização automática.",
   ],
   [
-    "Como as horas são calculadas?",
-    "A chegada é arredondada para a hora anterior; a saída, para a seguinte. Exemplo: 13h30 às 17h30 = 5h. A referência é de 8h semanais e aproximadamente 32h mensais.",
+    "Como a carga horária (CH) é calculada?",
+    `A CH é a duração exata entre início e fim, em minutos: 16h30 às 18h00 = 1h30; 11h00 às 13h00 = 2h. O mínimo é de ${PROGRAM.monthlyTargetHours}h no mês e o excedente não passa para o mês seguinte.`,
   ],
   [
-    "Como preparo o formulário de cada atividade?",
-    "Em “Atividades do mês”, escolha “Preparar formulário”, confira sua identificação e selecione o tipo da atividade. Abra o Forms preenchido, complete as próximas etapas e envie pelo Google. Depois volte e marque “Marcar como enviado”. Se editar a atividade depois disso, ela aparecerá como “Revisar envio”.",
+    "Preciso comprovar as atividades?",
+    "Atividades presenciais e in loco precisam de registro fotográfico. Na aba “Folha oficial”, anexe as fotos (JPEG ou PNG) ou um PDF abaixo da prévia; eles saem nas páginas seguintes do PDF. Os produtos das atividades síncronas e assíncronas vão para o Drive oficial do grupo.",
   ],
   [
     "Como imprimo e assino?",
-    "Se o seu GAT pedir comprovantes, abra “Minha folha” na aba “Folha oficial” e anexe PDFs, JPEGs ou PNGs abaixo da prévia. Em “Imprimir / salvar PDF”, use papel A4 em paisagem. Confira a folha e os comprovantes nas páginas seguintes antes de assinar o PDF completo.",
+    `Em “Imprimir / salvar PDF”, use papel Carta na horizontal, como no modelo oficial. Confira a folha e os comprovantes e assine pelo Gov.br. ${PROGRAM.deadline.label}`,
   ],
 ];
 

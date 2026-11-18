@@ -1,18 +1,17 @@
-import Image from "next/image";
+import { PROGRAM } from "@/config/program";
 
+// TODO(pet-sd): selo textual provisório; trocar pelo logo oficial do PET-SD/UFG.
 export function Brand() {
   return (
     <span className="brand">
-      <Image
-        src="/images/avatar-pet-clima.png"
-        alt=""
-        width={38}
-        height={38}
-        style={{ width: "auto" }}
-      />
+      <span className="brand-seal" aria-hidden="true">
+        PET
+        <br />
+        SD
+      </span>
       <span>
         <strong>
-          PET-Saúde <span className="text-info">Clima</span>
+          {PROGRAM.acronym} <span className="text-info">{PROGRAM.campus}</span>
         </strong>
         <small>Folha de frequência mensal</small>
       </span>

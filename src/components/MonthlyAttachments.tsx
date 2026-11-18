@@ -87,11 +87,11 @@ export function MonthlyAttachments({ profileId, monthKey, busy, onBusyChange, on
     <section className="rounded-2xl border border-line bg-surface p-4 sm:p-6 space-y-4" aria-labelledby={headingId}>
       <div>
         <h2 id={headingId} className="text-lg font-semibold text-ink">
-          Comprovantes <span className="text-sm font-normal text-muted">(opcional)</span>
+          Comprovação fotográfica
         </h2>
         <p id={hintId} className="mt-1 text-sm text-muted">
-          Se o seu GAT pedir comprovantes, anexe PDFs ou imagens JPEG e PNG.
-          Eles saem depois da folha, na ordem desta lista.
+          Atividades presenciais e in loco exigem registro fotográfico.
+          Anexe fotos (JPEG ou PNG) ou PDFs; eles saem depois da folha, na ordem desta lista.
           Até {ATTACHMENT_LIMIT_MB} MB por arquivo, {MONTH_LIMIT_MB} MB e {MONTH_PAGE_LIMIT} páginas no total.
         </p>
       </div>

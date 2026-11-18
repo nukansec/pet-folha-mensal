@@ -1,140 +1,83 @@
-# Como Colaborar no PET Folha Mensal
+# Como colaborar
 
-O projeto adota a branch `main` como linha integrada, estável e demonstrável. Branches de trabalho devem representar uma mudança lógica verificável, com foco em uma única entrega por vez.
+Obrigado por contribuir com o PET-SD Folha Mensal. Leia também o
+[AGENTS.md](AGENTS.md), que resume as regras de negócio e de privacidade.
 
----
+## 1. Princípios
 
-## 1. Princípios Fundamentais
+- **Fidelidade à ficha oficial.** A folha impressa segue o modelo “Registro de
+  Frequência e Atividades – PET-SD” em Carta paisagem. Mudanças em
+  `OfficialSheet.tsx` ou no CSS de impressão precisam de comparação visual
+  (`scripts/capture-validation.mjs`).
+- **Regras do programa em um lugar.** Textos e regras do PET-SD vivem em
+  `src/config/program.ts`; não repita esses textos em componentes.
+- **CH exata.** `fim − início` em minutos, somada em inteiros. Nada de
+  arredondar horas.
+- **Local-first e privacidade.** Registros ficam no navegador. O repositório é
+  público: exemplos, testes, capturas e issues usam só dados fictícios. Nunca
+  inclua nomes de integrantes, dados de participantes ou de pacientes.
+- **Celular primeiro.** Alvos de toque de pelo menos 44 px, texto de pelo menos
+  16 px em campos e sem rolagem horizontal da página.
 
-- **Foco e Escopo**: Trabalhe em uma task por vez e consulte `TASKS.md` antes de iniciar. Não expanda escopo sem sinalizar a necessidade.
-- **Local-First e Privacidade**: Todos os dados dos participantes (perfis, frequências e backups) residem no navegador (`localStorage`). Nenhuma chave privada, credencial ou dado pessoal deve ser enviado para servidores externos.
-- **Conformidade Normativa SUS**: O documento emitido em PDF deve seguir rigorosamente o padrão A4 Paisagem oficial do Ministério da Saúde (SGTES/MS) e as diretrizes do Edital SGTES/MS nº 23/2026.
-- **Ergonomia e Mobile-First**: A maioria dos participantes acessa a aplicação pelo smartphone. Todo novo controle ou tela deve respeitar a área de toque mínima de 44x44px (WCAG 2.5.5), fontes de formulário `>= 16px` (prevenindo zoom involuntário no iOS Safari) e contenção total de viewport (zero scroll horizontal indesejado).
-- **Não Versione Segredos ou Arquivos Temporários**: Não versione arquivos `.env.local`, builds `.next/`, certificados ou caches de dependências.
-- **Autonomia de Envio Remoto**: Agentes de inteligência artificial ou ferramentas automatizadas **nunca executam `git push`**; o envio para o repositório remoto é prerrogativa exclusiva do integrador humano.
-
----
-
-## 2. Estado Atual das Frentes
-
-As frentes do sistema coexistem de forma desacoplada e modular:
-
-| Frente | Responsabilidade | Regra de Integração |
-|---|---|---|
-| **UI / Dashboard** | Telas de acesso, formulários, cards móveis e tabela desktop | Mobile-first com touch targets `>= 44px`; nunca forçar tabela de 7 colunas em telas menores que 640px |
-| **Motor de Impressão (PDF)** | Gabarito oficial A4 Paisagem (`OfficialSheet.tsx`) | Preservar proporção exata para impressão em 1 página horizontal; cabeçalho tríplice intacto |
-| **Cálculo de Horas** | Motor matemático (`pet-calculator.ts`) | Regra editalícia `CEILING(Saída) - FLOOR(Chegada)`; 8h semanais obrigatórias |
-| **Persistência Local** | Gerenciador multiusuário e backups (`storage.ts`) | Isolamento de dados por perfil; validação de PIN de admin via hash SHA-256 (`crypto.subtle`) |
-| **Telemetria e Feedback** | `@vercel/analytics` e `FeedbackModal.tsx` | Sem cookies invasivos; compatibilidade estrita com LGPD e formulário de sugestões externo |
-
----
-
-## 3. Fluxo de Git
-
-Atualize a branch `main` antes de iniciar qualquer atividade:
+## 2. Fluxo de Git (GitHub Flow)
 
 ```bash
 git switch main
 git pull --ff-only origin main
-git switch -c feat/nome-da-sua-feature
+git switch -c feat/descricao-curta      # ou fix/, docs/, test/, chore/
 ```
 
-Durante o desenvolvimento:
+Antes de cada commit:
 
 ```bash
 git status --short
-git --no-pager diff
-```
-
-Antes de submeter o commit:
-
-```bash
+git diff --cached                        # procure segredos e dados pessoais
 git diff --check
-git status --short
 ```
 
-### Padrão de Commits
+### Commits
 
-Utilize **Conventional Commits** em mensagens atômicas e descritivas:
+Conventional Commits em português, mensagens curtas e atômicas:
 
 ```text
-feat(ui): adicionar cards móveis para lançamentos de frequência
-fix(calc): corrigir arredondamento de minutos fracionados
-docs(arch): atualizar especificações de persistência local-first
-refactor(navbar): desacoplar controles de navegação para telas compactas
-test(storage): validar integridade de restauração de backup JSON
+feat(folha): repetir faixa de logos em cada página
+fix(ch): somar minutos inteiros no total do mês
+docs(regimento): atualizar prazo de entrega
+test(storage): cobrir migração do formato _v2
 ```
 
----
+Commits saem em nome de quem contribui, sem coautoria automática nem menção a
+ferramentas de IA. Abra PR para a `main`; não faça commit direto nela.
 
-## 4. Gates de Validação (Obrigatórios)
+## 3. Verificações obrigatórias
 
-Antes de concluir qualquer tarefa ou solicitar merge para a `main`, todos os gates abaixo devem ser executados com sucesso:
-
-### 4.1. Verificação Estática de Tipagem (TypeScript)
-
-Garante conformidade com o TypeScript 5 sem emissão de erros:
+As mesmas do CI (`.github/workflows/ci.yml`):
 
 ```bash
-npx tsc --noEmit
-```
-
-*Critério de aceite*: Retorno código 0 (zero erros de tipagem).
-
-### 4.2. Compilação de Produção (Next.js Turbopack)
-
-Valida a geração de páginas estáticas, otimização de bundles e CSS:
-
-```bash
-npm run build
-```
-
-*Critério de aceite*: Compilação Turbopack concluída com sucesso e geração de todas as rotas estáticas.
-
-### 4.3. Linter e Qualidade de Código
-
-```bash
+npm ci
 npm run lint
+npm run typecheck
+npm run test:ui
+npm run build
+npx playwright install chromium   # uma vez
+npm run test:e2e
 ```
 
-*Critério de aceite*: Sem warnings críticos ou erros de sintaxe ESLint.
+## 4. Estrutura
 
----
+- `src/config/program.ts`: dados do programa.
+- `src/app/`: layout, página principal, ícone, CSS global e rota do painel.
+- `src/components/`: telas, formulários, modais e `OfficialSheet.tsx`.
+- `src/lib/`: cálculo de CH, armazenamento e migração, comprovantes, sessão do painel.
+- `scripts/verify-ui.mjs`: testes unitários; `tests/e2e/`: Playwright.
+- `scripts/capture-validation.mjs`: capturas para `docs/validation/`.
+- `scripts/gerar-modelo-em-branco.py`: gera o modelo em branco a partir da ficha
+  oficial (a ficha de origem não entra no repositório).
+- `public/images/pet-sd/` e `public/templates/`: faixa de logos e modelos em branco.
 
-### 4.4. Regressão do percurso e dos arquivos
+## 5. Critérios para merge
 
-Use Node 22 (`nvm use`) e `npm ci`. Execute `npm run test:ui` para cálculo,
-isolamento por perfil/mês, retomada local e restauração com falha de gravação.
-Para mudanças de interface, fluxo ou persistência, execute `npm run test:e2e`
-(após `npx playwright install chromium`). A suíte inicia uma instância isolada
-na porta 5013 e usa somente participantes sintéticos. O CI também executa esses
-checks em PRs e atualizações da main. O primeiro resultado remoto depende do
-push humano; build aprovado não substitui revisão visual e impressão.
-
----
-
-## 5. Estrutura de Arquivos
-
-Pastas do repositório indicam a especialidade do código:
-
-- `src/app/`: Rotas Next.js App Router (`layout.tsx`, `page.tsx`, `globals.css`).
-- `src/components/`: Componentes visuais desacoplados e ergonomicamente responsivos.
-- `src/lib/`: Lógica de cálculo matemático do PET, persistência local e alternador de tema.
-- `src/context/`: Contextos globais leves (ex: `DialogContext` para modais e alertas).
-- `src/types/`: Interfaces e contratos TypeScript consolidados.
-- `public/templates/`: Arquivos oficiais de referência (.pdf, .docx e .xlsx).
-- `scripts/legacy-tools/`: Scripts arquivados de automação e manipulação de planilhas.
-- `docs/`: Documentação canônica, arquitetura de software, regimento do PET e guias de deploy.
-
----
-
-## 6. Critérios para Merge
-
-Para que uma alteração seja incorporada à `main`:
-
-1. `git diff --check` deve estar limpo (sem trailing whitespace ou quebras inadequadas).
-2. `npx tsc --noEmit` deve passar com 0 erros.
-3. `npm run build` deve compilar sem avisos de falha.
-4. Não pode haver inclusão acidental de segredos, dados pessoais ou arquivos de cache.
-5. A documentação (`README.md`, `TASKS.md` ou `docs/`) deve ser atualizada sempre que houver alteração de comportamento ou nova funcionalidade.
-6. A memória compartilhada canônica no Obsidian deve ser sincronizada conforme as diretrizes do projeto.
+1. Todas as verificações da seção 3 passando.
+2. Documentação em `docs/` atualizada quando mudar regra, dado salvo ou folha.
+3. Mudou o formato salvo? Sufixo novo nas chaves e migração não destrutiva, com teste.
+4. Nenhum segredo, `.env` com valores ou dado pessoal no diff.

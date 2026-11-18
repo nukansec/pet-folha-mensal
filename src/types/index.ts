@@ -1,12 +1,9 @@
+import { PROGRAM } from "@/config/program";
+
 export type UserRole = string;
 
-export const DEFAULT_ROLES: string[] = [
-  'Estudante',
-  'Orientador de Serviço',
-  'Preceptor',
-  'Tutor',
-  'Coordenador de GAT'
-];
+/** Perfis da ficha oficial, na ordem das caixas. */
+export const DEFAULT_ROLES: string[] = [...PROGRAM.roles];
 
 export interface GATInfo {
   number: string;
@@ -16,68 +13,24 @@ export interface GATInfo {
   description: string;
 }
 
-export const DEFAULT_GATS: Record<string, GATInfo> = {
-  '01': {
-    number: '01',
-    name: 'Araticum',
-    fullName: 'GAT 01 (Araticum)',
-    axis: 'Eixo I',
-    description: 'Produção do cuidado e Segurança Alimentar e Nutricional (SAN) na APS'
-  },
-  '02': {
-    number: '02',
-    name: 'Buriti',
-    fullName: 'GAT 02 (Buriti)',
-    axis: 'Eixo I',
-    description: 'Vigilância socioambiental territorial e Rede de Atenção Psicossocial (RAPS)'
-  },
-  '03': {
-    number: '03',
-    name: 'Ipê-amarelo',
-    fullName: 'GAT 03 (Ipê-amarelo)',
-    axis: 'Eixo II',
-    description: 'Atenção especializada, cuidado farmacêutico e estoques estratégicos'
-  },
-  '04': {
-    number: '04',
-    name: 'Mangaba',
-    fullName: 'GAT 04 (Mangaba)',
-    axis: 'Eixo III',
-    description: 'Comunicação acessível (LIBRAS, Braille, audiodescrição) e educação popular'
-  },
-  '05': {
-    number: '05',
-    name: 'Pequi',
-    fullName: 'GAT 05 (Pequi)',
-    axis: 'Eixo III',
-    description: 'Vigilância preditiva baseada em IA e modelagem computacional'
-  }
-};
+export const DEFAULT_GATS: Record<string, GATInfo> = Object.fromEntries(
+  Object.values(PROGRAM.gats).map((gat) => [
+    gat.number,
+    { ...gat, fullName: `GAT ${gat.number} (${gat.name})` },
+  ]),
+);
 
 export const GATS = DEFAULT_GATS;
 
+/** Modalidade da atividade; os valores válidos vêm de PROGRAM.modalities. */
+export type ModalityType = string;
+
 export interface ActivityTemplate {
   id: string;
-  name: string; // nome da atividade (ex: "Reunião do GAT", "Oficina formativa...")
-  modality: ModalityType; // Síncrona virtual | Síncrona presencial | Assíncrona virtual
+  name: string; // nome da atividade (ex.: "Reunião semanal do GAT {gatNumber}")
+  modality: ModalityType;
+  local: string; // Unidade/Local sugerido
   isGatSpecific?: boolean;
-}
-
-export type ModalityType =
-  | 'Síncrona virtual'
-  | 'Síncrona presencial'
-  | 'Assíncrona virtual';
-
-export interface FormReport {
-  group: string;
-  role: string;
-  activityType: string;
-  // Respostas das etapas seguintes do Forms (chaves em FORM_EXTRA_KEYS).
-  extra?: Record<string, string>;
-  confirmation?: {
-    at: string;
-    snapshot: string;
-  };
 }
 
 export interface Activity {
@@ -86,9 +39,14 @@ export interface Activity {
   start: string; // HH:MM
   end: string; // HH:MM
   modality: ModalityType;
+  /** Coluna "Atividade Desenvolvida" da ficha. */
   description: string;
+  /** Coluna "Unidade/Local" da ficha ("" quando não se aplica). */
+  local: string;
+  /** Coluna "Descrição" da ficha (detalhes, pautas, produtos). */
+  descricao: string;
+  /** CH em horas decimais (minutos / 60). O total do mês soma minutos. */
   hours: number;
-  formReport?: FormReport;
 }
 
 export interface UserProfile {
@@ -102,7 +60,7 @@ export interface UserProfile {
 }
 
 export interface MonthRecord {
-  monthYear: string; // ex: "Setembro/2026"
-  monthKey: string; // ex: "2026-09"
+  monthYear: string; // ex: "Outubro/2026"
+  monthKey: string; // ex: "2026-10"
   activities: Activity[];
 }

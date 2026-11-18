@@ -7,8 +7,8 @@ import {
   UserRole,
   GATInfo,
   ActivityTemplate,
-  FormReport,
 } from "@/types";
+import { PROGRAM } from "@/config/program";
 import {
   getStoredProfiles,
   getProfilesForAccess,
@@ -37,6 +37,9 @@ import {
 import { restoreWithAttachments } from "@/lib/attachment-backup";
 import {
   calcPetHours,
+  calcPetMinutes,
+  formatDuration,
+  sumActivityMinutes,
   getMonthYearLabel,
   formatDateBR,
   cleanActivityDescription,
@@ -49,8 +52,6 @@ import { ProfileModal } from "@/components/ProfileModal";
 import { AdminModal } from "@/components/AdminModal";
 import { StatsGrid } from "@/components/StatsGrid";
 import { ActivityForm } from "@/components/ActivityForm";
-import { ACTIVITY_FORM_URL } from "@/lib/form-report";
-import { ActivityReportModal } from "@/components/ActivityReportModal";
 import { ActivityTable } from "@/components/ActivityTable";
 import { EditActivityModal } from "@/components/EditActivityModal";
 import { OfficialSheet } from "@/components/OfficialSheet";
@@ -94,9 +95,6 @@ export default function Home() {
     "dashboard",
   );
   const [showBlankTemplate, setShowBlankTemplate] = useState(false);
-  const [reportingActivity, setReportingActivity] = useState<{
-    profileId: string; monthKey: string; id: string;
-  } | null>(null);
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [attachmentsBusy, setAttachmentsBusy] = useState(false);
@@ -196,7 +194,10 @@ export default function Home() {
   };
 
   const changeMonth = async (value: string) => {
-    if (value === monthKey || !(await confirmDraft())) return;
+    if (value === monthKey) return;
+    // Sem rascunho, troca o mês no mesmo evento: o select é controlado e um
+    // await aqui faria o React restaurar o valor antigo até o estado mudar.
+    if (draftDirty && !(await confirmDraft())) return;
     setDraftDirty(false);
     setEditingActivity(null);
     setMonthKey(value);
@@ -290,10 +291,10 @@ export default function Home() {
     if (!activeUser) return false;
     if (
       !data.date.startsWith(monthKey) ||
-      calcPetHours(data.start, data.end) <= 0
+      calcPetMinutes(data.start, data.end) <= 0
     ) {
       setStorageError(
-        "Confira a data e os horários: a atividade deve pertencer ao mês selecionado e a saída deve ser posterior à entrada.",
+        "Confira a data e os horários: a atividade deve pertencer ao mês selecionado e o fim deve ser posterior ao início.",
       );
       return false;
     }
@@ -328,7 +329,7 @@ export default function Home() {
     const confirmed = await confirm({
       title: "Excluir Atividade?",
       message: act
-        ? `Deseja realmente remover o registro "${cleanActivityDescription(act.description)}" de ${formatDateBR(act.date)} (${act.hours}h)?`
+        ? `Deseja realmente remover o registro "${cleanActivityDescription(act.description)}" de ${formatDateBR(act.date)} (${formatDuration(calcPetMinutes(act.start, act.end))})?`
         : "Deseja realmente remover esta atividade da sua folha mensal?",
       confirmText: "Sim, excluir",
       cancelText: "Cancelar",
@@ -684,18 +685,9 @@ export default function Home() {
     );
   }
 
-  const totalHours = activities.reduce((sum, act) => sum + act.hours, 0);
+  // Soma em minutos inteiros: CH exata sem erro de ponto flutuante.
+  const totalMinutes = sumActivityMinutes(activities);
   const monthLabel = getMonthYearLabel(monthKey);
-  const reportActivity = reportingActivity?.profileId === activeUser.id &&
-    reportingActivity.monthKey === monthKey
-    ? activities.find((activity) => activity.id === reportingActivity.id)
-    : undefined;
-  const saveFormReport = (formReport: FormReport) => {
-    if (!reportActivity) return false;
-    return persistActivities(activities.map((activity) =>
-      activity.id === reportActivity.id ? { ...activity, formReport } : activity
-    ), "Dados do formulário salvos.");
-  };
 
   return (
     <>
@@ -737,9 +729,9 @@ export default function Home() {
             </div>
             {activeTab === "dashboard" && (
               <StatsGrid
-                totalHours={totalHours}
+                totalMinutes={totalMinutes}
                 activitiesCount={activities.length}
-                targetHours={32}
+                targetHours={PROGRAM.monthlyTargetHours}
               />
             )}
             <label className="workspace-month">
@@ -779,11 +771,8 @@ export default function Home() {
 
                 <ActivityTable
                   key={JSON.stringify([activeUser.id, monthKey])}
-                  onPrepareForm={(activity) => setReportingActivity({
-                    profileId: activeUser.id, monthKey, id: activity.id,
-                  })}
                   activities={activities}
-                  totalHours={totalHours}
+                  totalMinutes={totalMinutes}
                   editingId={editingActivity ? editingActivity.id : null}
                   onEdit={(act) => setEditingActivity(act)}
                   onDelete={handleDeleteActivity}
@@ -795,11 +784,16 @@ export default function Home() {
               </div>
               <div className="review-next">
                 <p>
-                  Registre também cada atividade no{" "}
-                  <a target="_blank" rel="noopener noreferrer" href={ACTIVITY_FORM_URL}>
-                    formulário do PET-Saúde Clima
-                  </a>
-                  . Terminou? Confira a folha antes de imprimir.
+                  {PROGRAM.links.activityForm && (
+                    <>
+                      Registre também as atividades no{" "}
+                      <a target="_blank" rel="noopener noreferrer" href={PROGRAM.links.activityForm}>
+                        formulário do {PROGRAM.acronym}
+                      </a>
+                      .{" "}
+                    </>
+                  )}
+                  Terminou? Confira a folha antes de imprimir. {PROGRAM.deadline.label}
                 </p>
                 <button
                   className="primary-button"
@@ -816,7 +810,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* ABA 2: FOLHA OFICIAL (PREVIEW A4 PAISAGEM) */}
+          {/* ABA 2: FOLHA OFICIAL (PRÉVIA CARTA PAISAGEM) */}
           {activeTab === "official" && (
             <div className="space-y-4 animate-fade-in">
               <div className="sheet-toolbar flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3.5 rounded-2xl border border-line bg-surface text-xs shadow-[var(--page-shadow)]">
@@ -843,10 +837,21 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   {showBlankTemplate && (
                     <a
-                      href="/templates/PET%20-%20Folha%20de%20Frequ%C3%AAncia%20-%20Modelo%20Vazio.pdf"
-                      download="PET - Folha de Frequência - Modelo Vazio.pdf"
+                      href={PROGRAM.sheet.blankTemplateDocx}
+                      download
                       className="px-3 py-1.5 rounded-xl border border-line hover:bg-raised text-body cursor-pointer flex items-center gap-1.5 text-xs font-medium transition-all"
-                      title="Baixar arquivo PDF original em branco"
+                      title="Baixar o modelo em branco (Word)"
+                    >
+                      <Download className="size-3.5" />
+                      <span>Baixar .docx</span>
+                    </a>
+                  )}
+                  {showBlankTemplate && (
+                    <a
+                      href={PROGRAM.sheet.blankTemplatePdf}
+                      download
+                      className="px-3 py-1.5 rounded-xl border border-line hover:bg-raised text-body cursor-pointer flex items-center gap-1.5 text-xs font-medium transition-all"
+                      title="Baixar o modelo em branco (PDF)"
                     >
                       <Download className="size-3.5" />
                       <span>Baixar PDF</span>
@@ -870,8 +875,8 @@ export default function Home() {
                   </button>
                 </div>
                 <p className="text-sm text-muted w-full">
-                  Na janela de impressão, escolha papel A4 e orientação{" "}
-                  <strong>Horizontal</strong> na janela de impressão do sistema.
+                  Na janela de impressão, escolha papel <strong>Carta</strong> e
+                  orientação <strong>Horizontal</strong>, como no modelo oficial.
                 </p>
               </div>
 
@@ -881,7 +886,7 @@ export default function Home() {
                     user={activeUser}
                     monthLabel={monthLabel}
                     activities={activities}
-                    totalHours={totalHours}
+                    totalMinutes={totalMinutes}
                     isBlankTemplate={showBlankTemplate}
                   />
                 </div>
@@ -897,18 +902,6 @@ export default function Home() {
                 />
               )}
             </div>
-          )}
-
-          {reportActivity && (
-            <ActivityReportModal
-              key={JSON.stringify([activeUser.id, monthKey, reportActivity.id])}
-              activity={reportActivity}
-              user={activeUser}
-              onClose={() => setReportingActivity(null)}
-              onEditProfile={() => setIsProfileModalOpen(true)}
-              onSaveProfile={handleSaveProfile}
-              onSave={saveFormReport}
-            />
           )}
 
           {/* Modal de Identificação do Participante */}
@@ -1015,7 +1008,7 @@ export default function Home() {
           user={activeUser}
           monthLabel={monthLabel}
           activities={activities}
-          totalHours={totalHours}
+          totalMinutes={totalMinutes}
           isBlankTemplate={showBlankTemplate}
         />
       </div>

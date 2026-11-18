@@ -2,168 +2,186 @@
 
 import React from 'react';
 import { Activity, UserProfile } from '@/types';
-import { formatDateBR, formatActivityForSheet, sortActivitiesChronologically } from '@/lib/pet-calculator';
+import { PROGRAM } from '@/config/program';
+import {
+  calcPetMinutes,
+  sumActivityMinutes,
+  formatDayMonth,
+  formatDuration,
+  formatTotalHours,
+  sortActivitiesChronologically,
+} from '@/lib/pet-calculator';
 
 interface OfficialSheetProps {
   user?: UserProfile;
   monthLabel?: string;
   activities?: Activity[];
-  totalHours?: number;
+  totalMinutes?: number;
   isBlankTemplate?: boolean;
 }
 
+// Larguras das 8 colunas do modelo oficial (w:gridCol, em twips; total 13562).
+const COLUMNS: Array<[string, number]> = [
+  ['Data', 761],
+  ['Unidade/Local', 1729],
+  ['Atividade Desenvolvida', 2144],
+  ['Início', 754],
+  ['Fim', 844],
+  ['CH (h)', 993],
+  ['Modalidade', 1701],
+  ['Descrição', 4636],
+];
+const TOTAL_TWIPS = COLUMNS.reduce((sum, [, width]) => sum + width, 0);
+const BLANK_ROWS = 12;
+const MIN_FILLED_ROWS = 8;
+
+function gatLabel(gatNumber?: string) {
+  if (!gatNumber) return '';
+  const numeric = Number(gatNumber);
+  return Number.isInteger(numeric) ? String(numeric) : gatNumber;
+}
+
+/**
+ * Reprodução do "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD" (Carta paisagem).
+ * A tabela externa repete a faixa de logos em cada página impressa, como o
+ * cabeçalho do Word; a tabela de atividades repete a linha de títulos.
+ */
 export function OfficialSheet({
   user,
-  monthLabel = 'Setembro/2026',
+  monthLabel = '',
   activities = [],
-  totalHours = 0,
-  isBlankTemplate = false
+  totalMinutes,
+  isBlankTemplate = false,
 }: OfficialSheetProps) {
   const sortedActivities = React.useMemo(
     () => (isBlankTemplate ? [] : sortActivitiesChronologically(activities)),
-    [activities, isBlankTemplate]
+    [activities, isBlankTemplate],
   );
-  const emptyRowsCount = isBlankTemplate ? 10 : Math.max(0, 10 - sortedActivities.length);
+  const emptyRows = isBlankTemplate
+    ? BLANK_ROWS
+    : Math.max(1, MIN_FILLED_ROWS - sortedActivities.length);
+  const total = totalMinutes ?? sumActivityMinutes(sortedActivities);
+  const role = isBlankTemplate ? '' : user?.role ?? '';
 
   return (
-    <div
-      className="official-sheet bg-white text-black p-4 sm:p-6 md:p-7 w-full max-w-[297mm] mx-auto box-border"
-      style={{ fontFamily: '"Times New Roman", Times, serif' }}
-    >
-      {/* Cabeçalho Tríplice Oficial */}
-      <div
-        className="flex justify-between items-center mb-3"
-        style={{ fontFamily: 'Calibri, "Segoe UI", Arial, sans-serif' }}
-      >
-        <div className="w-[32%] text-center text-[8.5pt] leading-tight text-black font-normal">
-          Ministério da Saúde<br />
-          Secretaria de Gestão do Trabalho e da Educação na Saúde<br />
-          Departamento de Gestão da Educação na Saúde
-        </div>
-        <div className="w-[36%] text-center flex justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/logo-horizontal.png"
-            alt="PET-Saúde Clima"
-            className="h-11 sm:h-12 max-w-full object-contain"
-          />
-        </div>
-        <div className="w-[32%] text-center text-[8.5pt] leading-tight text-black font-normal">
-          Secretaria Municipal de Saúde de Goiânia<br />
-          Secretaria Estadual de Saúde de Goiás<br />
-          Universidade Federal de Goiás
-        </div>
-      </div>
-
-      {/* Título */}
-      <h1 className="text-center text-[15pt] md:text-[16pt] font-bold text-black my-2 tracking-tight">
-        Folha de Frequência Mensal*
-      </h1>
-
-      {/* Metadados */}
-      <div className="text-[10pt] text-black mb-3">
-        {/* Linha 1: Nome */}
-        <div className="mb-2 flex items-baseline">
-          <span className="font-bold mr-1 shrink-0">Nome:</span>
-          <span className="flex-1 border-b border-black font-normal px-2 pb-0.5 min-h-[1.2rem]">
-            {isBlankTemplate ? '' : (user?.name || '')}
-          </span>
-        </div>
-        {/* Linha 2: Perfil**, Nº do GAT, Mês/ano */}
-        <div className="flex items-baseline justify-between gap-6">
-          <div className="flex-[2] flex items-baseline min-w-0">
-            <span className="font-bold mr-1 shrink-0">Perfil**:</span>
-            <span className="flex-1 border-b border-black font-normal px-2 pb-0.5 min-h-[1.2rem] truncate">
-              {isBlankTemplate ? '' : (user?.role || '')}
-            </span>
-          </div>
-          <div className="w-44 flex items-baseline shrink-0">
-            <span className="font-bold mr-1 shrink-0">Nº do GAT:</span>
-            <span className="flex-1 border-b border-black font-normal px-2 pb-0.5 min-h-[1.2rem] text-center">
-              {isBlankTemplate ? '' : (user?.gatNumber || '')}
-            </span>
-          </div>
-          <div className="w-56 flex items-baseline shrink-0">
-            <span className="font-bold mr-1 shrink-0">Mês/ano:</span>
-            <span className="flex-1 border-b border-black font-normal px-2 pb-0.5 min-h-[1.2rem] text-center">
-              {isBlankTemplate ? '' : monthLabel}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabela de Lançamentos */}
-      <table className="official-table w-full border-collapse border-[1.5px] border-black text-[9.5pt] text-black mb-1.5">
+    <div className="official-sheet pet-sheet">
+      <table className="pet-sheet-frame" role="presentation">
         <thead>
-          <tr className="bg-white font-bold">
-            <th className="border border-black px-2 py-1.5 text-center w-[12%] align-middle">Data</th>
-            <th className="border border-black px-2 py-1.5 text-center w-[13%] align-middle leading-tight">
-              Horário de<br />Chegada
-            </th>
-            <th className="border border-black px-2 py-1.5 text-center w-[13%] align-middle leading-tight">
-              Horário de<br />Saída
-            </th>
-            <th className="border border-black px-2 py-1.5 text-center w-[62%] align-middle">Atividade</th>
+          <tr>
+            <td>
+              <div className="pet-sheet-header">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={PROGRAM.sheet.headerImage}
+                  alt={PROGRAM.sheet.headerImageAlt}
+                />
+              </div>
+            </td>
           </tr>
         </thead>
         <tbody>
-          {!isBlankTemplate &&
-            sortedActivities.map((act) => (
-              <tr key={act.id} className="h-7">
-                <td className="border border-black px-2 py-1 text-center align-middle font-normal whitespace-nowrap">
-                  {formatDateBR(act.date)}
-                </td>
-                <td className="border border-black px-2 py-1 text-center align-middle font-normal whitespace-nowrap">
-                  {act.start}
-                </td>
-                <td className="border border-black px-2 py-1 text-center align-middle font-normal whitespace-nowrap">
-                  {act.end}
-                </td>
-                <td className="border border-black px-2 py-1 text-left align-middle font-normal break-words">
-                  {formatActivityForSheet(act.description, act.modality)}
-                </td>
-              </tr>
-            ))}
+          <tr>
+            <td>
+              <h1 className="pet-sheet-title">{PROGRAM.sheet.title}</h1>
 
-          {/* Linhas em branco de preenchimento */}
-          {Array.from({ length: emptyRowsCount }).map((_, i) => (
-            <tr key={`empty-${i}`} className="h-7">
-              <td className="border border-black px-2 py-1 text-center align-middle"></td>
-              <td className="border border-black px-2 py-1 text-center align-middle"></td>
-              <td className="border border-black px-2 py-1 text-center align-middle"></td>
-              <td className="border border-black px-2 py-1 text-left align-middle"></td>
-            </tr>
-          ))}
+              <table className="pet-sheet-identification">
+                <colgroup>
+                  <col style={{ width: '14.7%' }} />
+                  <col />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th scope="row">Nome:</th>
+                    <td>{isBlankTemplate ? '' : user?.name?.toLocaleUpperCase('pt-BR')}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">GAT:</th>
+                    <td>{isBlankTemplate ? '' : gatLabel(user?.gatNumber)}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Perfil:</th>
+                    <td className="pet-sheet-roles">
+                      {PROGRAM.roles.map((item) => (
+                        <span key={item}>
+                          ( {item === role ? 'X' : '  '} ) {item}
+                        </span>
+                      ))}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Mês de Referência:</th>
+                    <td>{isBlankTemplate ? '' : monthLabel}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <table className="official-table pet-sheet-activities">
+                <colgroup>
+                  {COLUMNS.map(([label, width]) => (
+                    <col
+                      key={label}
+                      style={{ width: `${((width / TOTAL_TWIPS) * 100).toFixed(2)}%` }}
+                    />
+                  ))}
+                </colgroup>
+                <thead>
+                  <tr>
+                    {COLUMNS.map(([label]) => (
+                      <th key={label} scope="col">
+                        {label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedActivities.map((act) => (
+                    <tr key={act.id}>
+                      <td>{formatDayMonth(act.date)}</td>
+                      <td>{act.local}</td>
+                      <td>{act.description}</td>
+                      <td>{act.start}</td>
+                      <td>{act.end}</td>
+                      <td>{formatDuration(calcPetMinutes(act.start, act.end))}</td>
+                      <td>{act.modality}</td>
+                      <td className="pet-sheet-description">{act.descricao}</td>
+                    </tr>
+                  ))}
+                  {Array.from({ length: emptyRows }).map((_, i) => (
+                    <tr key={`empty-${i}`} className="pet-sheet-empty-row">
+                      {COLUMNS.map(([label]) => (
+                        <td key={label} />
+                      ))}
+                    </tr>
+                  ))}
+                  <tr className="pet-sheet-total">
+                    <td colSpan={COLUMNS.length}>
+                      Total de CH no mês:{' '}
+                      {isBlankTemplate ? ' '.repeat(8) + ' horas' : formatTotalHours(total)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div className="official-sheet-closing pet-sheet-closing">
+                <p className="pet-sheet-note">{PROGRAM.sheet.deadlineNote}</p>
+                <p className="pet-sheet-signature">{PROGRAM.sheet.participantSignature}</p>
+                <p className="pet-sheet-signature">{PROGRAM.sheet.responsibleSignature}</p>
+              </div>
+
+              <section className="pet-sheet-instructions" aria-label="Instruções de preenchimento">
+                <h2>Instruções de preenchimento</h2>
+                <ol>
+                  {PROGRAM.sheet.instructions.map((item, index) => (
+                    <li key={item}>
+                      {index + 1}) {item}
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            </td>
+          </tr>
         </tbody>
       </table>
-
-      <div className="official-sheet-closing">
-        {/* Total de Horas (exibido apenas quando preenchido para validação das 32h) */}
-        {!isBlankTemplate && (
-          <div className="text-[10pt] font-bold text-black mt-1 mb-2">
-            TOTAL: {totalHours} {totalHours === 1 ? "hora" : "horas"}
-          </div>
-        )}
-
-        {/* Assinaturas Digitais (Espaço dedicado para carimbos e assinaturas do Gov.br) */}
-        <div className="flex justify-between items-end mt-12 mb-4 px-10">
-          <div className="w-[42%] text-center">
-            <div className="text-[10pt] font-normal text-black">
-              Assinatura do Participante
-            </div>
-          </div>
-          <div className="w-[42%] text-center">
-            <div className="text-[10pt] font-normal text-black">
-              Assinatura da Supervisão do GAT
-            </div>
-          </div>
-        </div>
-
-        {/* Nota de Rodapé Oficial */}
-        <div className="text-[7.5pt] text-black leading-tight mt-6">
-          <p>**Estudante, Orientador de Serviço, Preceptor, Tutor, Coordenador de GAT</p>
-        </div>
-      </div>
     </div>
   );
 }

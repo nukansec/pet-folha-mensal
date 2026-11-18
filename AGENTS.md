@@ -1,60 +1,63 @@
-# PET Folha Mensal: Contrato de Execução para Agentes
+# PET-SD Folha Mensal: contrato para agentes
 
-Este repositório armazena a aplicação fullstack de gestão e emissão da **Folha de Frequência Mensal do PET-Saúde Clima UFG** (13ª Edição, Edital SGTES/MS nº 23/2026), preparada para deploy na **Vercel**.
+Aplicação de registro mensal de frequência e atividades do **PET-Saúde:
+Informação e Saúde Digital (PET-SD) UFG 2025–2027** (Edital Conjunto
+SEIDIGI/SGTES-MS nº 1/2025; Ministério da Saúde, UFG e SMS Goiânia). Fork de
+`vvvvvdal/pet-folha-mensal`; créditos no `README.md`. Deploy na Vercel.
 
----
+## 1. Fonte da verdade
 
-## 1. Escopo e Diretrizes Fundamentais
+- Dados do programa (nome, edital, GATs, perfis, modalidades, meta, prazo, links,
+  textos da folha): `src/config/program.ts`. Não espalhe esses textos em
+  componentes; leia da config. Motivo: `docs/adr/0001-config-central-do-programa.md`.
+- Registro da adaptação, decisões, dúvidas e divergências entre fontes:
+  `docs/adaptacao-pet-sd.md`. Resumo das normas: `docs/regimento-pet.md`.
 
-* **Princípios Estruturantes**: SUS, Equidade em Saúde, Justiça Climática, Uma Só Saúde (*One Health*).
-* **Proponentes**: SMS Goiânia (coordenação), SES Goiás e UFG.
-* **Vigência**: 03/08/2026 a 02/08/2028.
-* **Comunicação Oficial**: Toda frequência e comunicação institucional deve ser enviada para `petsaudeufg.smsgoiania@gmail.com`.
+## 2. Regras de negócio
 
----
+1. **Ficha**: "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD", Carta paisagem.
+   Campos Nome, GAT, Perfil (caixas Coordenador(a), Tutor(a), Preceptor(a),
+   Orientador(a) de serviço, Monitor(a); o do participante marcado com X) e Mês de
+   Referência. Colunas: Data | Unidade/Local | Atividade Desenvolvida | Início |
+   Fim | CH (h) | Modalidade | Descrição. Rodapé com "Total de CH no mês", nota de
+   prazo, assinaturas do participante e do responsável e página de instruções.
+2. **CH exata**: `fim − início` em minutos, sem arredondamento
+   (16:30–18:00 = `1h30`; 11:00–13:00 = `2h`). Fim ≤ início vale 0. Some minutos
+   inteiros (`sumActivityMinutes`), nunca horas decimais. **Não** use a regra do
+   projeto original (`CEILING(saída) − FLOOR(chegada)`).
+3. **Meta**: mínimo de 32 h no mês; o excedente não passa para o mês seguinte.
+4. **Modalidades**: as da config (padrão: "Interação em tempo real (Síncrona)" e
+   "Assíncrona"). Atividades presenciais e in loco exigem comprovação fotográfica.
+5. **Prazo**: o rodapé da folha reproduz o texto do modelo (1º dia útil do mês
+   seguinte); o prazo exibido no app vem da config.
 
-## 2. Regras de Negócio e Cálculo de Carga Horária
+## 3. Dados, privacidade e LGPD
 
-1. **Carga Horária Obrigatória**: 8 horas semanais por bolsista (~32 horas mensais). O não cumprimento por dois meses consecutivos acarreta desligamento automático.
-2. **Regra Matemática do PET (Hora Relógio)**:
-   * Cada hora ou fração de hora iniciada conta como 1 hora cheia.
-   * Fórmula canônica: `CEILING(Saída) - FLOOR(Chegada)`.
-   * Exemplos:
-     * 14:00 às 15:30 = 2 horas (14h-15h + 15h-16h iniciada)
-     * 13:30 às 17:30 = 5 horas (13h-14h + 14h-15h + 15h-16h + 16h-17h + 17h-18h iniciada)
-     * 19:00 às 20:40 = 2 horas (19h-20h + 20h-21h iniciada)
-3. **Prazos e Validação**:
-   * Preenchimento do relatório no Google Forms até o final do mês.
-   * Envio da Folha assinada até o **1º dia útil do mês subsequente**.
+- Local-first: `localStorage` (chaves `_v3`) e IndexedDB para comprovantes. Mudou
+  o formato salvo? Suba o sufixo das chaves e escreva migração não destrutiva
+  (ver `migrateFromV2` em `src/lib/storage.ts`) e teste em `scripts/verify-ui.mjs`.
+- Repositório **público**: exemplos, seeds, testes e capturas 100% fictícios.
+  Nunca inclua nomes de integrantes, dados de participantes ou qualquer dado
+  derivado de prontuário.
+- Nunca leia, crie ou edite `.env` com valores; só `.env.example`, sem valores.
+  `ADMIN_PIN_HASH` e `ADMIN_SESSION_SECRET` são citados apenas pelo nome.
 
----
+## 4. Stack e verificações
 
-## 3. Estrutura Operacional (5 GATs)
+- Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4.
+- Antes de concluir: `npm run lint`, `npm run typecheck`, `npm run test:ui`,
+  `npm run build` e `npm run test:e2e` (o CI roda os mesmos comandos).
 
-* **GAT 1 (Araticum) - Eixo I**: Produção do cuidado e Segurança Alimentar e Nutricional (SAN) na APS.
-* **GAT 2 (Buriti) - Eixo I**: Vigilância socioambiental territorial e Rede de Atenção Psicossocial (RAPS).
-* **GAT 3 (Ipê-amarelo) - Eixo II**: Assistência especializada e cuidado farmacêutico em eventos extremos.
-* **GAT 4 (Mangaba) - Eixo III**: Comunicação acessível (LIBRAS, Braille, audiodescrição) e educação popular.
-* **GAT 5 (Pequi) - Eixo III**: Vigilância preditiva baseada em IA e modelagem computacional.
+## 5. Git
 
----
-
-## 4. Stack Tecnológica e Padrões de Código
-
-* **Framework**: Next.js 15 (App Router) + TypeScript + Tailwind CSS.
-* **Design Ergonomico**: Tokens anti-fadiga visual da skill `frontend-design-ultimate` (Gentle Dark, Sépia, Claro).
-* **Deploy**: Vercel (zero-config, build via `npm run build`).
-* **Impressão / PDF**: Módulo A4 Paisagem estritamente compatível com o modelo oficial do Ministério da Saúde.
-
----
-
-## 5. Handoff e Memória Compartilhada
-
-Para planejar CI, logs ou de-slop com o Oracle, consulte `docs/oracle-ci-logs-unslop.md`.
-Para o piloto Maestri/Codex/Gemini, consulte `docs/AGENT-WORKFLOW.md` quando pertinente.
-
-Atualizações de arquitetura ou regras devem sincronizar a documentação canônica em `docs/` e a nota do Obsidian em:
-`04 - Contexto Compartilhado/Projeto - PET Saúde Clima UFG.md`.
+- GitHub Flow: uma branch por tarefa (`feat/`, `fix/`, `docs/`); nada direto na `main`.
+- Conventional Commits em português (`feat:`, `fix:`, `docs:`, `refactor:`,
+  `test:`, `chore:`).
+- Sem coautoria nem menção a ferramentas de IA em commits, PRs, código ou docs.
+- Push, PR e release só com pedido do mantenedor. Nunca envie nada ao remoto
+  `upstream` (projeto original).
+- Antes de commitar: `git status` e `git diff --cached` procurando segredos e
+  dados pessoais.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

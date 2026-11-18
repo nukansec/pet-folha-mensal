@@ -39,6 +39,10 @@ const React = load("react");
 const { renderToStaticMarkup } = load("react-dom/server");
 const {
   calcPetHours,
+  calcPetMinutes,
+  sumActivityMinutes,
+  formatDuration,
+  formatTotalHours,
   getCurrentMonth,
   getDefaultActivityDate,
   PROJECT_MONTHS,
@@ -61,9 +65,9 @@ const render = (element) =>
 const sampleUser = {
   id: "test-ui",
   name: "Participante de teste",
-  role: "Estudante",
-  gatNumber: "04",
-  gatName: "Mangaba",
+  role: "Monitor(a)",
+  gatNumber: "01",
+  gatName: "GAT de teste",
   createdAt: "2026-10-01T00:00:00.000Z",
 };
 const sampleActivity = {
@@ -71,9 +75,11 @@ const sampleActivity = {
   date: "2026-10-06",
   start: "14:00",
   end: "15:30",
-  modality: "Síncrona virtual",
+  modality: "Interação em tempo real (Síncrona)",
   description: "Atividade de teste",
-  hours: 2,
+  local: "Sala fictícia",
+  descricao: "Pauta fictícia de teste",
+  hours: 1.5,
 };
 function isolatedStorage() {
   const records = new Map();
@@ -89,13 +95,46 @@ function isolatedStorage() {
   return records;
 }
 
-test("cálculo oficial: frações, horários iguais e intervalos inválidos", () => {
-  assert.equal(calcPetHours("14:00", "15:30"), 2);
-  assert.equal(calcPetHours("13:30", "17:30"), 5);
-  assert.equal(calcPetHours("19:00", "20:40"), 2);
-  assert.equal(calcPetHours("14:00", "14:00"), 0);
-  assert.equal(calcPetHours("15:00", "14:00"), 0);
-  assert.equal(calcPetHours("", ""), 0);
+test("CH do PET-SD é a duração exata em minutos, sem arredondar", () => {
+  assert.equal(calcPetMinutes("16:30", "18:00"), 90);
+  assert.equal(formatDuration(calcPetMinutes("16:30", "18:00")), "1h30");
+  assert.equal(calcPetMinutes("11:00", "13:00"), 120);
+  assert.equal(formatDuration(calcPetMinutes("11:00", "13:00")), "2h");
+  assert.equal(calcPetMinutes("18:00", "19:00"), 60);
+  assert.equal(formatDuration(calcPetMinutes("18:00", "19:00")), "1h");
+  assert.equal(calcPetHours("16:30", "18:00"), 1.5);
+  // Regra antiga (CEILING - FLOOR) daria 2h e 5h: aqui vale a duração real.
+  assert.equal(calcPetMinutes("14:00", "15:30"), 90);
+  assert.equal(calcPetMinutes("13:30", "17:30"), 240);
+  assert.equal(formatDuration(5), "0h05");
+});
+
+test("fim igual ou anterior ao início e horários inválidos valem zero", () => {
+  assert.equal(calcPetMinutes("14:00", "14:00"), 0);
+  assert.equal(calcPetMinutes("15:00", "14:00"), 0);
+  assert.equal(calcPetMinutes("", ""), 0);
+  assert.equal(calcPetMinutes("25:00", "26:00"), 0);
+  assert.equal(calcPetMinutes("aa:bb", "10:00"), 0);
+  assert.equal(calcPetHours("18:00", "17:00"), 0);
+  assert.equal(calcPetMinutes("9:00", "10:00"), 0);
+});
+
+test("soma do mês em minutos e total no formato da ficha", () => {
+  const month = [
+    { start: "16:30", end: "18:00" },
+    { start: "11:00", end: "13:00" },
+    { start: "18:00", end: "19:00" },
+    { start: "10:00", end: "12:30" },
+    { start: "09:00", end: "09:00" },
+  ];
+  assert.equal(sumActivityMinutes(month), 90 + 120 + 60 + 150);
+  assert.equal(formatTotalHours(sumActivityMinutes(month)), "7 horas");
+  assert.equal(formatTotalHours(60), "1 hora");
+  assert.equal(formatTotalHours(0), "0 horas");
+  assert.equal(formatTotalHours(33 * 60 + 30), "33h30");
+  // Três atividades de 20 min não acumulam erro de ponto flutuante.
+  const thirds = Array.from({ length: 3 }, () => ({ start: "10:00", end: "10:20" }));
+  assert.equal(sumActivityMinutes(thirds), 60);
 });
 
 test("perfil novo, inclusão, edição, exclusão e isolamento por mês e participante", () => {
@@ -109,11 +148,11 @@ test("perfil novo, inclusão, edição, exclusão e isolamento por mês e partic
   const user = result.user;
   assert.deepEqual(storage.getActivitiesForMonth(user.id, "2026-10"), []);
   storage.saveActivitiesForMonth(user.id, "2026-10", [sampleActivity]);
-  assert.equal(storage.getActivitiesForMonth(user.id, "2026-10")[0].hours, 2);
+  assert.equal(storage.getActivitiesForMonth(user.id, "2026-10")[0].hours, 1.5);
   storage.saveActivitiesForMonth(user.id, "2026-10", [
     { ...sampleActivity, end: "17:30", hours: calcPetHours("14:00", "17:30") },
   ]);
-  assert.equal(storage.getActivitiesForMonth(user.id, "2026-10")[0].hours, 4);
+  assert.equal(storage.getActivitiesForMonth(user.id, "2026-10")[0].hours, 3.5);
   assert.deepEqual(storage.getActivitiesForMonth(user.id, "2026-11"), []);
   assert.deepEqual(
     storage.getActivitiesForMonth("outro-perfil", "2026-10"),
@@ -128,7 +167,8 @@ test("cópia de segurança mantém o formato e restaura o perfil e suas atividad
   storage.saveProfiles([sampleUser]);
   storage.saveActivitiesForMonth(sampleUser.id, "2026-10", [sampleActivity]);
   const backup = storage.exportUserData(sampleUser, "2026-10");
-  assert.equal(JSON.parse(backup).version, "1.0");
+  assert.equal(JSON.parse(backup).version, "1.3");
+  assert.equal(JSON.parse(backup).activities[0].local, "Sala fictícia");
   localStorage.clear();
   const result = storage.importUserData(backup);
   assert.equal(result.success, true);
@@ -157,8 +197,8 @@ test("cadastro repetido oferece o perfil local e preserva o mês anterior sem JS
   storage.setActiveProfileId(null);
   const result = storage.registerProfile({
     name: "  PARTICIPANTE DE TESTE ",
-    role: "Tutor",
-    gatNumber: "01",
+    role: "Tutor(a)",
+    gatNumber: "02",
   });
   assert.equal(result.success, false);
   assert.equal(result.existingUser?.id, sampleUser.id);
@@ -179,26 +219,85 @@ test("navegador novo e lista vazia não recebem participantes de exemplo", () =>
   assert.deepEqual(storage.getStoredProfiles(), []);
 });
 
-test("exemplo legado só sai da entrada se intacto, sem atividades e inativo; armazenamento é preservado", () => {
+test("migração v2 para v3 copia perfis e atividades, completa campos e preserva o v2", () => {
   const records = isolatedStorage();
-  // Perfil fictício distribuído pela versão antiga, usado como fixture de migração.
-  const legacy = { id: "mariana-rios", name: "Mariana Dias Rios", role: "Estudante", gatNumber: "01", gatName: "Araticum", createdAt: "2026-09-01T00:00:00.000Z" };
-  storage.saveProfiles([legacy, sampleUser]);
-  const before = JSON.stringify([...records]);
-  assert.deepEqual(storage.getProfilesForAccess([legacy, sampleUser]), [sampleUser]);
-  assert.equal(JSON.stringify([...records]), before);
-  for (const value of ["[]", "invalid-json", JSON.stringify([sampleActivity])]) {
-    records.set("pet_folha_activities_v2_mariana-rios_2026-10", value);
-    assert.deepEqual(storage.getProfilesForAccess([legacy]), [legacy]);
+  // Perfis e atividades sintéticos no formato antigo (_v2).
+  const legacyUser = { id: "pessoa-a", name: "Pessoa Sintética A", role: "Estudante", gatNumber: "04", gatName: "Antigo", createdAt: "2026-09-01T00:00:00.000Z" };
+  const tutor = { id: "pessoa-b", name: "Pessoa Sintética B", role: "Tutor", gatNumber: "02", createdAt: "2026-09-01T00:00:00.000Z", pin: "1234" };
+  // Exemplo distribuído pela versão original, sem uso: não é copiado.
+  const example = { id: "mariana-rios", name: "Mariana Dias Rios", role: "Estudante", gatNumber: "01", gatName: "Araticum", createdAt: "2026-09-01T00:00:00.000Z" };
+  const oldActivities = [
+    { id: "a1", date: "2026-10-06", start: "14:00", end: "15:30", modality: "Síncrona virtual", description: "Reunião (Síncrona virtual)", hours: 2 },
+    { id: "a2", date: "2026-10-07", start: "13:30", end: "17:30", modality: "Assíncrona virtual", description: "Estudo", hours: 5 },
+  ];
+  records.set("pet_folha_profiles_v2", JSON.stringify([legacyUser, tutor, example]));
+  records.set("pet_folha_active_profile_id_v2", "pessoa-a");
+  records.set("pet_folha_activities_v2_pessoa-a_2026-10", JSON.stringify(oldActivities));
+  records.set("pet_folha_config_gats_v2", JSON.stringify({ "04": { number: "04", name: "Antigo" } }));
+  const v2Snapshot = [...records].filter(([key]) => key.includes("_v2") && !key.includes("migrated")).map(([key, value]) => key + value).join();
+
+  const profiles = storage.getStoredProfiles();
+  assert.deepEqual(profiles.map((p) => [p.id, p.role]), [["pessoa-a", "Monitor(a)"], ["pessoa-b", "Tutor(a)"]]);
+  assert.equal("pin" in profiles[1], false);
+  assert.equal(storage.getActiveProfile().id, "pessoa-a");
+  const migrated = storage.getActivitiesForMonth("pessoa-a", "2026-10");
+  assert.deepEqual(migrated.map((a) => [a.modality, a.local, a.descricao, a.hours, a.description]), [
+    ["Interação em tempo real (Síncrona)", "", "", 1.5, "Reunião"],
+    ["Assíncrona", "", "", 4, "Estudo"],
+  ]);
+  // GATs do programa anterior não passam para o v3.
+  assert.equal(storage.getStoredGats()["04"].name, "Cuidado à pessoa com câncer");
+  // As chaves v2 continuam intactas e a migração não roda de novo.
+  assert.equal([...records].filter(([key]) => key.includes("_v2") && !key.includes("migrated")).map(([key, value]) => key + value).join(), v2Snapshot);
+  storage.saveActivitiesForMonth("pessoa-a", "2026-10", []);
+  assert.equal(storage.migrateFromV2(), false);
+  assert.deepEqual(storage.getActivitiesForMonth("pessoa-a", "2026-10"), []);
+});
+
+test("perfis v3 malformados não impedem a migração e o GAT antigo ganha o nome do PET-SD", () => {
+  const records = isolatedStorage();
+  records.set("pet_folha_profiles_v3", JSON.stringify([{}, null]));
+  records.set("pet_folha_profiles_v2", JSON.stringify([{ id: "p", name: "Pessoa Sintética", role: "Estudante", gatNumber: "01", gatName: "Antigo", createdAt: "2026-09-01T00:00:00.000Z" }]));
+  records.set("pet_folha_activities_v2_p_2026-10", JSON.stringify([{ id: "a", date: "2026-10-01", start: "10:00", end: "11:00", modality: "Assíncrona virtual", description: "Estudo" }]));
+  assert.deepEqual(storage.getStoredProfiles().map((p) => [p.id, p.gatName]), [["p", "Alerta de violências com IA"]]);
+  assert.equal(storage.getActivitiesForMonth("p", "2026-10").length, 1);
+});
+
+test("exemplo antigo com atividades ou ativo é migrado; navegador sem v2 não ganha marcador", () => {
+  const records = isolatedStorage();
+  storage.getStoredProfiles();
+  assert.equal(records.has("pet_folha_migrated_from_v2"), false);
+  const example = { id: "mariana-rios", name: "Mariana Dias Rios", role: "Estudante", gatNumber: "01", gatName: "Araticum", createdAt: "2026-09-01T00:00:00.000Z" };
+  records.set("pet_folha_profiles_v2", JSON.stringify([example]));
+  records.set("pet_folha_activities_v2_mariana-rios_2026-10", "[]");
+  assert.deepEqual(storage.getStoredProfiles().map((p) => p.id), ["mariana-rios"]);
+  assert.ok(records.has("pet_folha_migrated_from_v2"));
+});
+
+test("cópias 1.0 a 1.2 restauram com campos novos vazios e ignoram o Forms antigo", () => {
+  isolatedStorage();
+  const old = {
+    version: "1.2",
+    attachments: [],
+    user: { ...sampleUser, role: "Estudante" },
+    monthKey: "2026-10",
+    activities: [{ id: "x", date: "2026-10-06", start: "16:30", end: "18:00", modality: "Assíncrona virtual", description: "Estudo", hours: 2, formReport: { group: "GT 4" } }],
+  };
+  const result = storage.inspectUserData(JSON.stringify(old));
+  assert.equal(result.success, true);
+  assert.equal(result.user.role, "Monitor(a)");
+  assert.deepEqual(result.activities[0], {
+    id: "x", date: "2026-10-06", start: "16:30", end: "18:00",
+    modality: "Assíncrona", description: "Estudo", local: "", descricao: "", hours: 1.5,
+  });
+  assert.deepEqual(result.attachmentData, []);
+  const v10 = storage.inspectUserData(JSON.stringify({ ...old, version: "1.0", attachments: undefined }));
+  assert.equal(v10.success, true);
+  assert.equal(v10.attachmentData, undefined);
+  for (const bad of [{ local: 7 }, { descricao: "x".repeat(4001) }]) {
+    const broken = { ...old, version: "1.3", activities: [{ ...old.activities[0], ...bad }] };
+    assert.equal(storage.inspectUserData(JSON.stringify(broken)).success, false);
   }
-  records.delete("pet_folha_activities_v2_mariana-rios_2026-10");
-  storage.setActiveProfileId(legacy.id);
-  assert.deepEqual(storage.getProfilesForAccess([legacy]), [legacy]);
-  storage.setActiveProfileId(null);
-  for (const edited of [{ ...legacy, name: "Pessoa sintética" }, { ...legacy, email: "test@example.org" }, { ...legacy, extra: true }]) {
-    assert.deepEqual(storage.getProfilesForAccess([edited]), [edited]);
-  }
-  assert.deepEqual(storage.getStoredProfiles(), [legacy, sampleUser]);
 });
 
 function verifyLabelTargets(html) {
@@ -230,8 +329,10 @@ test("entrada apresenta acesso e explicação visível do JSON e PDF antes do FA
   assert.match(html, /Quem usa este navegador pode abrir/);
   assert.doesNotMatch(html, /Veja como sua folha|preview-disclosure|Sua frequência,|Vamos começar/);
   verifyLabelTargets(html);
-  assert.match(html, /Felipe Vidal/);
-  assert.match(html, /Robert Taveira/);
+  assert.match(html, /Felipe Gonçalves Vidal/);
+  assert.match(html, /Robert Francisco Taveira/);
+  assert.match(html, /projeto original/);
+  assert.doesNotMatch(html, /Clima/);
   assert.doesNotMatch(html, /hubfrequencia@gmail.com|Ver preços/);
 });
 
@@ -276,7 +377,7 @@ test("formulários e modais renderizam com campos rotulados e diálogos nativos"
     }),
   );
   verifyLabelTargets(form);
-  for (const field of ["Data", "Entrada", "Saída"])
+  for (const field of ["Data", "Início", "Fim", "Unidade/Local", "Atividade desenvolvida", "Descrição"])
     assert.match(form, new RegExp('<label[^>]*for="[^"]+"[^>]*>' + field));
   const components = [
     [
@@ -313,31 +414,52 @@ test("formulários e modais renderizam com campos rotulados e diálogos nativos"
   }
 });
 
-test("folha oficial mantém estrutura, horas e áreas de assinatura", () => {
+test("folha oficial reproduz o modelo do PET-SD: campos, perfis, 8 colunas, total e instruções", () => {
   const html = renderToStaticMarkup(
     React.createElement(OfficialSheet, {
       user: sampleUser,
       monthLabel: "Outubro/2026",
       activities: [sampleActivity],
-      totalHours: 2,
+      totalMinutes: 90,
     }),
   );
-  assert.match(html, /TOTAL: 2 horas/);
-  assert.match(html, /Assinatura do Participante/);
-  assert.match(html, /Assinatura da Supervisão do GAT/);
-  assert.equal(
-    (html.match(/<tbody>[\s\S]*?<\/tbody>/)?.[0].match(/<tr/g) || []).length,
-    10,
+  assert.match(html, /REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD/);
+  assert.match(html, /images\/pet-sd\/cabecalho-ficha\.png/);
+  for (const field of ["Nome:", "GAT:", "Perfil:", "Mês de Referência:"])
+    assert.ok(html.includes(field), "Campo ausente: " + field);
+  assert.match(html, /PARTICIPANTE DE TESTE/);
+  assert.match(html, /<td>1<\/td>/);
+  assert.match(html, /\( X \) Monitor\(a\)/);
+  assert.equal((html.match(/\( X \)/g) || []).length, 1);
+  for (const role of ["Coordenador(a)", "Tutor(a)", "Preceptor(a)", "Orientador(a) de serviço"])
+    assert.ok(html.includes(role), "Perfil ausente: " + role);
+  const head = html.match(/pet-sheet-activities[\s\S]*?<thead>([\s\S]*?)<\/thead>/)[1];
+  assert.deepEqual(
+    [...head.matchAll(/<th[^>]*>([^<]*)<\/th>/g)].map((m) => m[1]),
+    ["Data", "Unidade/Local", "Atividade Desenvolvida", "Início", "Fim", "CH (h)", "Modalidade", "Descrição"],
   );
-  assert.doesNotMatch(
-    html,
-    /Perguntas frequentes|site-footer|Exemplo · dados fictícios/,
+  assert.match(html, /<td>06\/10<\/td><td>Sala fictícia<\/td><td>Atividade de teste<\/td><td>14:00<\/td><td>15:30<\/td><td>1h30<\/td><td>Interação em tempo real \(Síncrona\)<\/td>/);
+  assert.match(html, /Total de CH no mês: 1h30/);
+  assert.match(html, /primeiro dia útil do mês posterior/);
+  assert.match(html, /Assinatura do Participante:/);
+  assert.match(html, /Assinatura do Responsável:/);
+  assert.match(html, /Instruções de preenchimento/);
+  assert.equal((html.match(/<li>/g) || []).length, 5);
+  assert.doesNotMatch(html, /Perguntas frequentes|site-footer|Clima/);
+
+  const blank = renderToStaticMarkup(
+    React.createElement(OfficialSheet, { user: sampleUser, monthLabel: "Outubro/2026", activities: [sampleActivity], isBlankTemplate: true }),
   );
+  assert.doesNotMatch(blank, /PARTICIPANTE DE TESTE|Atividade de teste|\( X \)/);
+  assert.equal((blank.match(/pet-sheet-empty-row/g) || []).length, 12);
 });
 
-test("CSS mantém impressão A4 paisagem isolada, temas e redução de movimento", () => {
+test("CSS mantém impressão Carta paisagem isolada, temas e redução de movimento", () => {
   const css = readFileSync(path.join(root, "src/app/globals.css"), "utf8");
-  assert.match(css, /size: A4 landscape/);
+  assert.match(css, /size: letter landscape/);
+  assert.doesNotMatch(css, /size: A4/);
+  assert.match(css, /\.pet-sheet-instructions \{\s*break-before: page/);
+  assert.match(css, /\.pet-sheet-frame > thead \{\s*display: table-header-group/);
   assert.match(css, /\.screen-only\s*\{\s*display: none !important/);
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
   assert.match(css, /html\[data-theme="light"\]/);
@@ -347,7 +469,7 @@ test("CSS mantém impressão A4 paisagem isolada, temas e redução de movimento
 test("lista oferece primeiro registro e exemplos opcionais; tabela e cartões mantêm edição e exclusão", () => {
   const props = {
     activities: [],
-    totalHours: 0,
+    totalMinutes: 0,
     editingId: null,
     onEdit: noop,
     onDelete: noop,
@@ -363,10 +485,12 @@ test("lista oferece primeiro registro e exemplos opcionais; tabela e cartões ma
     React.createElement(ActivityTable, {
       ...props,
       activities: [sampleActivity],
-      totalHours: 2,
+      totalMinutes: 90,
     }),
   );
   assert.match(filled, /<table/);
+  assert.match(filled, /Sala fictícia/);
+  assert.match(filled, /1h30/);
   assert.match(filled, /aria-label="Editar atividade:/);
   assert.match(filled, /aria-label="Excluir atividade:/);
   assert.match(filled, /Atividade de teste/);
@@ -374,8 +498,10 @@ test("lista oferece primeiro registro e exemplos opcionais; tabela e cartões ma
 
 test("datas acompanham o mês escolhido e cobrem toda a vigência", () => {
   assert.equal(getCurrentMonth(new Date(2026, 10, 2)), "2026-11");
-  assert.equal(getCurrentMonth(new Date(2025, 0, 1)), "2026-08");
-  assert.equal(getCurrentMonth(new Date(2029, 0, 1)), "2028-08");
+  assert.equal(getCurrentMonth(new Date(2025, 0, 1)), "2025-08");
+  assert.equal(getCurrentMonth(new Date(2029, 0, 1)), "2027-08");
+  assert.equal(PROJECT_MONTHS[0], "2025-08");
+  assert.equal(PROJECT_MONTHS.at(-1), "2027-08");
   assert.equal(PROJECT_MONTHS.length, 25);
   assert.equal(
     getDefaultActivityDate("2026-11", new Date(2026, 10, 2)),
@@ -445,7 +571,7 @@ test("falha da recuperação é explícita e detalhes de suporte não levam dado
   };
   // Existing activity value forces rollback through setItem rather than removeItem.
   original(
-    "pet_folha_activities_v2_test-ui_2026-10",
+    "pet_folha_activities_v3_test-ui_2026-10",
     JSON.stringify([sampleActivity]),
   );
   const result = storage.importUserData(
@@ -503,68 +629,8 @@ test("entrada oferece os perfis locais sem exigir cópia e resumo não promete a
   assert.match(html, /Participante de teste/);
   const { StatsGrid } = load("./src/components/StatsGrid.tsx");
   const summary = renderToStaticMarkup(
-    React.createElement(StatsGrid, { totalHours: 32, activitiesCount: 8 }),
+    React.createElement(StatsGrid, { totalMinutes: 32 * 60, activitiesCount: 8 }),
   );
   assert.doesNotMatch(summary, /Apta|Média semanal/);
   assert.match(summary, /distribuição semanal/);
-});
-
-test("tipo do Forms é sugerido pelo nome da atividade", () => {
-  const { suggestActivityType } = load("./src/lib/form-report.ts");
-  assert.equal(suggestActivityType("Reunião do GAT 04 (Mangaba)"), "Reunião Interna do seu GAT");
-  assert.equal(suggestActivityType("Reuniao de GAT"), "Reunião Interna do seu GAT");
-  assert.equal(suggestActivityType("Reunião geral do PET"), "Encontro Geral de todos os participantes do projeto");
-  assert.equal(suggestActivityType("Atualização do site"), "");
-});
-
-test("preparo do Forms codifica as opções oficiais e a confirmação acompanha os dados", () => {
-  const forms = load("./src/lib/form-report.ts");
-  const user = { ...sampleUser, email: "teste@example.com", name: "Nome com acentuação" };
-  const report = {
-    ...forms.defaultFormReport(user),
-    activityType: "Reunião Interna do seu GAT",
-  };
-  const url = new URL(forms.buildFormUrl(user, sampleActivity, report));
-  assert.equal(url.searchParams.get("entry.1358311658"), user.name);
-  assert.equal(url.searchParams.get("entry.333612427"), sampleActivity.date);
-  assert.equal(url.searchParams.get("entry.1810741336"), "OUTUBRO/2026");
-  assert.equal(url.searchParams.get("entry.1919744864"), "GT 4");
-  assert.equal(url.searchParams.get("emailAddress"), user.email);
-  assert.equal(forms.formReportStatus(user, { ...sampleActivity, formReport: report }), "Pendente");
-  report.confirmation = {
-    at: "2026-11-07T15:00:00.000Z",
-    snapshot: forms.formSnapshot(user, sampleActivity, report),
-  };
-  const activity = { ...sampleActivity, formReport: report };
-  assert.equal(forms.formReportStatus(user, activity), "Enviado");
-  assert.equal(forms.formReportStatus(user, { ...activity, description: "Descrição editada" }), "Revisar envio");
-  assert.equal(forms.formReportStatus({ ...user, email: "outro@example.com" }, activity), "Revisar envio");
-  assert.throws(() => forms.buildFormUrl(user, activity, { ...report, activityType: "Opção inexistente" }));
-  assert.throws(() => forms.buildFormUrl({ ...user, email: "" }, activity, report));
-});
-
-test("cópias 1.2 preservam relatórios e cópias antigas começam pendentes", () => {
-  isolatedStorage();
-  const forms = load("./src/lib/form-report.ts");
-  const report = {
-    ...forms.defaultFormReport(sampleUser),
-    activityType: "Reunião Interna do seu GAT",
-  };
-  report.confirmation = {
-    at: "2026-11-07T15:00:00.000Z",
-    snapshot: forms.formSnapshot(sampleUser, sampleActivity, report),
-  };
-  storage.saveActivitiesForMonth(sampleUser.id, "2026-10", [{ ...sampleActivity, formReport: report }]);
-  const exported = JSON.parse(storage.exportUserData(sampleUser, "2026-10", []));
-  assert.equal(exported.version, "1.2");
-  const result = storage.inspectUserData(JSON.stringify(exported));
-  assert.equal(result.success, true);
-  assert.deepEqual(result.activities[0].formReport, report);
-  for (const version of ["1.0", "1.1"]) {
-    const restored = storage.inspectUserData(JSON.stringify({ ...exported, version }));
-    assert.equal(restored.success, true);
-    assert.equal(restored.activities[0].formReport, undefined);
-  }
-  exported.activities[0].formReport.confirmation.at = "data inválida";
-  assert.equal(storage.inspectUserData(JSON.stringify(exported)).success, false);
 });

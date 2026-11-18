@@ -122,7 +122,7 @@ export function ProfileModal({
           </div>
 
           <div className="field">
-            <label htmlFor="profile-email">E-mail para o formulário (opcional)</label>
+            <label htmlFor="profile-email">E-mail (opcional)</label>
             <input id="profile-email" type="email" value={email} autoComplete="email"
               onChange={(event) => setEmail(event.target.value)} />
           </div>
@@ -144,7 +144,7 @@ export function ProfileModal({
             </div>
 
             <div className="field">
-              <label htmlFor="profilemodal-field-3">Função no PET</label>
+              <label htmlFor="profilemodal-field-3">Perfil</label>
               <select
                 id="profilemodal-field-3"
                 value={role}
