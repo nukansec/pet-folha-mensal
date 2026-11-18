@@ -8,6 +8,8 @@ progresso por épico e do relatório final.
 | Épico | Status | Commits | Como verificar | Pendências |
 | --- | --- | --- | --- | --- |
 | E0 Reconhecimento | feito | `docs: diagnóstico de perfis e visão semanal` | este arquivo; `docs/validation/perfis-20261118/antes/` | — |
+| E1 Créditos | feito | `docs: autoria da versão PET-SD nos créditos` | rodapé (entrada e painel); README › Créditos; `test:ui` "botão Avaliar o site…" | — |
+| E2 Menu do participante | feito | `feat(ui): menu do participante no topo` | clique no cartão do topo; `tests/e2e/perfis.spec.ts` › "menu do participante" | — |
 
 ## E0 — Diagnóstico
 
@@ -82,4 +84,20 @@ Outros achados:
 
 ## Decisões
 
-(preenchido por épico)
+- **E1** — Autor em `PROGRAM.author` (nome e GitHub), ao lado de
+  `PROGRAM.credits`; o rodapé não tem nome fixo. LICENSE intocada.
+- **E2** — Menu no padrão WAI-ARIA "menu button" (`role="menu"`,
+  `menuitem`, foco móvel por setas/Home/End, Esc devolve o foco ao botão, Tab
+  e clique fora fecham). O nome acessível do botão é o texto visível + "menu do
+  participante" (rótulo visível contido no nome, WCAG 2.5.3).
+- **E2** — Trocar e Sair reaproveitam as proteções do Concluir em vez de
+  duplicá-las: `confirmDraft` (rascunho) e, se houver alterações na sessão, o
+  próprio `ExitModal`, com o botão principal renomeado ("Trocar participante"
+  / "Sair") e o mesmo aviso "sair sem salvar cópia". Sem alterações, sai
+  direto. Motivo: uma só regra de saída para manter e testar.
+- **E2** — Trocar participante volta à entrada na aba Continuar com foco no
+  título "Vamos começar"; Sair volta à entrada padrão com o aviso "Sessão
+  encerrada". As duas zeram o perfil ativo, como o Concluir.
+- **E2** — GAT no modal: `FullSelect` ganhou `singleLine` (uma linha, reticências,
+  texto inteiro no `title`); o resto do app continua quebrando a linha.
+  "Salvar alterações" e títulos em caixa de frase também no modal de edição.

@@ -79,7 +79,7 @@ export function EditActivityModal({
 
     if (previewMinutes <= 0) {
       await alert({
-        title: "Horário Inválido",
+        title: "Horário inválido",
         message: "O fim deve ser posterior ao início.",
         variant: "warning",
       });
@@ -134,7 +134,7 @@ export function EditActivityModal({
               <Edit3 className="size-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-ink">Editar Atividade</h3>
+              <h3 className="text-base font-bold text-ink">Editar atividade</h3>
               <p className="text-xs text-muted">
                 Atualize horários, local, modalidade ou descrição do registro
               </p>
@@ -374,7 +374,7 @@ export function EditActivityModal({
               className="min-h-[44px] px-5 py-2.5 rounded-xl bg-brand hover:bg-brand-strong text-on-brand text-sm font-bold transition-all shadow-[var(--page-shadow)] flex items-center gap-2 cursor-pointer"
             >
               <Check className="size-4" />
-              <span>Salvar Alterações</span>
+              <span>Salvar alterações</span>
             </button>
           </div>
         </form>

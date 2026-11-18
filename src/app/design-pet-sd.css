@@ -102,14 +102,20 @@
   gap: 4px;
   margin-left: 8px;
 }
-.profile-button {
+/* Menu do participante: o wrapper ocupa o lugar que era do cartão. */
+.participant-menu {
+  position: relative;
   margin-left: auto;
   flex: 0 1 auto;
+  min-width: 0;
+  max-width: min(460px, 50vw);
+}
+.profile-button {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
   min-width: 0;
-  max-width: min(460px, 50vw);
   min-height: 48px;
   padding: 6px 12px 6px 6px;
   border: 1px solid var(--border);
@@ -118,9 +124,61 @@
   text-align: left;
   overflow: hidden;
 }
-.profile-button:hover {
+.profile-button:hover,
+.profile-button[aria-expanded="true"] {
   border-color: var(--control-border);
   background: var(--surface-raised);
+}
+.profile-button > span:nth-child(2) {
+  flex: 1 1 auto;
+}
+.profile-chevron {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+.profile-button[aria-expanded="true"] .profile-chevron {
+  transform: rotate(180deg);
+}
+.participant-menu-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  gap: 2px;
+  min-width: 260px;
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--page-shadow);
+}
+.participant-menu-list [role="menuitem"] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--foreground);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+}
+.participant-menu-list [role="menuitem"] svg {
+  flex-shrink: 0;
+  color: var(--brand-text);
+}
+.participant-menu-list [role="menuitem"]:hover,
+.participant-menu-list [role="menuitem"]:focus-visible {
+  background: var(--brand-soft);
+  color: var(--brand-text);
+}
+.participant-menu-list [role="menuitem"]:focus-visible {
+  outline-offset: -3px;
 }
 .profile-button > span:first-child {
   display: grid;
@@ -135,7 +193,7 @@
   font-size: 14px;
   font-weight: 700;
 }
-.profile-button > span:last-child {
+.profile-button > span:nth-child(2) {
   display: grid;
   min-width: 0;
 }
@@ -912,11 +970,17 @@
     gap: 0;
   }
   /* Perfil numa linha própria, com quebra no nome em vez de corte. */
-  .profile-button {
+  .participant-menu {
     order: 3;
     flex: 1 1 100%;
     max-width: none;
     margin-left: 0;
+  }
+  /* Menu na largura útil, abaixo do cartão. */
+  .participant-menu-list {
+    left: 0;
+    right: 0;
+    min-width: 0;
   }
   .profile-button strong {
     white-space: normal;
@@ -1036,6 +1100,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .profile-chevron,
   .progress-track > span,
   .primary-button,
   .secondary-button {
@@ -1065,6 +1130,16 @@
   line-height: 1.35;
   text-align: left;
   overflow-wrap: anywhere;
+}
+/* Variante de uma linha: reticências e texto inteiro no title. */
+.full-select--single .full-select-display {
+  overflow-wrap: normal;
+}
+.full-select--single .full-select-display > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .full-select-display > svg {
   flex-shrink: 0;

@@ -456,8 +456,9 @@ test("erro em edição mantém o diálogo, o preenchimento e o foco", async ({
   await expect(edit.getByRole("button", { name: /Salvar/ })).toBeFocused();
   await edit.getByRole("button", { name: "Cancelar", exact: true }).click();
   await page
-    .getByRole("button", { name: /Participante sintético Monitor\(a\)/ })
+    .getByRole("button", { name: /Participante sintético Monitor\(a\).*menu do participante/ })
     .click();
+  await page.getByRole("menuitem", { name: "Editar identificação" }).click();
   const profile = page.getByRole("dialog", {
     name: "Identificação do participante",
     exact: true,

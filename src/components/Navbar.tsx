@@ -15,6 +15,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Brand } from "./Brand";
+import { ParticipantMenu } from "./ParticipantMenu";
 
 interface NavbarProps {
   user: UserProfile;
@@ -28,6 +29,8 @@ interface NavbarProps {
   onOpenExitModal: () => void;
   onOpenFeedback: () => void;
   onOpenHelp: () => void;
+  onSwitchParticipant: () => void;
+  onSignOut: () => void;
 }
 
 export function Navbar({
@@ -41,6 +44,8 @@ export function Navbar({
   onOpenAdmin,
   onOpenExitModal,
   onOpenHelp,
+  onSwitchParticipant,
+  onSignOut,
 }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -52,19 +57,14 @@ export function Navbar({
       </a>
       <div className="workspace-nav-top">
         <Brand />
-        <button
-          className="profile-button"
-          onClick={onOpenProfileModal}
-          title={`${user.name} · ${user.role} · GAT ${user.gatNumber} ${gatName}. Clique para editar a identificação.`}
-        >
-          <span aria-hidden="true">{user.gatNumber}</span>
-          <span>
-            <strong>{user.name}</strong>
-            <small>
-              {user.role} · GAT {user.gatNumber} · {gatName}
-            </small>
-          </span>
-        </button>
+        <ParticipantMenu
+          user={user}
+          gatName={gatName}
+          onEditProfile={onOpenProfileModal}
+          onSwitchParticipant={onSwitchParticipant}
+          onSaveCopy={onExportBackup}
+          onSignOut={onSignOut}
+        />
         <div className="workspace-tools">
           <button
             className="icon-button"

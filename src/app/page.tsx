@@ -80,6 +80,14 @@ export default function Home() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  // Como a sessão termina: Concluir, Trocar participante ou Sair (menu).
+  const [exitMode, setExitMode] = useState<"conclude" | "switch" | "exit">(
+    "conclude",
+  );
+  // "switch" abre a entrada na aba Continuar, com foco na lista de perfis.
+  const [entryIntent, setEntryIntent] = useState<"default" | "switch">(
+    "default",
+  );
   const [monthKey, setMonthKey] = useState(getCurrentMonth);
   const [ready, setReady] = useState(false);
   const [draftDirty, setDraftDirty] = useState(false);
@@ -207,8 +215,39 @@ export default function Home() {
   const openConclusion = async () => {
     if (await confirmDraft()) {
       setDraftDirty(false);
+      setExitMode("conclude");
       setIsExitModalOpen(true);
     }
+  };
+
+  const endSession = (mode: "conclude" | "switch" | "exit") => {
+    setDraftDirty(false);
+    setActiveTab("dashboard");
+    setIsExitModalOpen(false);
+    setActiveProfileId(null);
+    setActiveUser(null);
+    setActivities([]);
+    setEditingActivity(null);
+    setHasChanges(false);
+    setEntryIntent(mode === "switch" ? "switch" : "default");
+    if (mode !== "switch") showToast("Sessão encerrada com sucesso.");
+  };
+
+  /**
+   * Trocar participante e Sair (menu do topo) seguem as proteções do
+   * Concluir: rascunho no formulário pede confirmação (confirmDraft); com
+   * alterações sem cópia, abre a mesma janela do Concluir, que lembra de
+   * salvar a cópia sem impedir a saída.
+   */
+  const leaveSession = async (mode: "switch" | "exit") => {
+    if (!(await confirmDraft())) return;
+    setDraftDirty(false);
+    if (hasChanges) {
+      setExitMode(mode);
+      setIsExitModalOpen(true);
+      return;
+    }
+    endSession(mode);
   };
 
   const persistActivities = (next: Activity[], message: string): boolean => {
@@ -642,6 +681,8 @@ export default function Home() {
         <LandingPage
           profiles={getProfilesForAccess(profiles)}
           onSelectProfile={handleSelectProfile}
+          initialTab={entryIntent === "switch" ? "local" : undefined}
+          focusAccess={entryIntent === "switch"}
           onLoginWithJson={handleImportBackup}
           onCreateProfile={handleCreateNewProfile}
           gats={gats}
@@ -711,6 +752,8 @@ export default function Home() {
           onOpenExitModal={openConclusion}
           onOpenFeedback={() => setIsFeedbackModalOpen(true)}
           onOpenHelp={() => setIsHelpOpen(true)}
+          onSwitchParticipant={() => void leaveSession("switch")}
+          onSignOut={() => void leaveSession("exit")}
         />
 
         <main id="conteudo" className="workspace-main" data-tab={activeTab}>
@@ -952,16 +995,14 @@ export default function Home() {
           <ExitModal
             isOpen={isExitModalOpen}
             onClose={() => setIsExitModalOpen(false)}
-            onConfirmExit={() => {
-              setDraftDirty(false);
-              setActiveTab("dashboard");
-              setIsExitModalOpen(false);
-              setActiveProfileId(null);
-              setActiveUser(null);
-              setActivities([]);
-              setHasChanges(false);
-              showToast("Sessão encerrada com sucesso.");
-            }}
+            onConfirmExit={() => endSession(exitMode)}
+            leaveLabel={
+              exitMode === "switch"
+                ? "Trocar participante"
+                : exitMode === "exit"
+                  ? "Sair"
+                  : undefined
+            }
             onDownloadJson={handleExportBackup}
             onDownloadPdf={printParticipantSheet}
             userName={activeUser.name}

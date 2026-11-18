@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ArrowDown,
   ArrowRight,
@@ -45,6 +45,10 @@ interface LandingPageProps {
   roles: string[];
   onOpenAdmin: () => void;
   onOpenFeedback: () => void;
+  /** Aba inicial; "Trocar participante" abre em "Continuar". */
+  initialTab?: "local" | "create" | "upload";
+  /** Leva o foco ao cartão de acesso (depois de "Trocar participante"). */
+  focusAccess?: boolean;
 }
 
 export function LandingPage({
@@ -56,11 +60,19 @@ export function LandingPage({
   roles,
   onOpenAdmin,
   onOpenFeedback,
+  initialTab,
+  focusAccess = false,
 }: LandingPageProps) {
   const { theme, toggleTheme } = useTheme();
   const [tab, setTab] = useState<"local" | "create" | "upload">(
-    profiles.length ? "local" : "create",
+    initialTab ?? (profiles.length ? "local" : "create"),
   );
+  useEffect(() => {
+    if (!focusAccess) return;
+    const heading = document.getElementById("access-title");
+    heading?.scrollIntoView({ block: "start" });
+    heading?.focus({ preventScroll: true });
+  }, [focusAccess]);
   const [name, setName] = useState("");
   const gatList = sortedGats(gats);
   const [gat, setGat] = useState(
@@ -194,7 +206,7 @@ export function LandingPage({
         <div className="start-layout">
           <section id="acesso" aria-labelledby="access-title">
             <Frame>
-              <FrameHeader><h2 id="access-title">Vamos começar</h2></FrameHeader>
+              <FrameHeader><h2 id="access-title" tabIndex={-1}>Vamos começar</h2></FrameHeader>
               <FramePanel>
                 <SegmentedControl aria-label="Como deseja começar">
                   {profiles.length > 0 && (
