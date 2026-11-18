@@ -3,7 +3,7 @@
 import { Modal } from "./Modal";
 import { PROGRAM } from "@/config/program";
 import React, { useEffect, useState } from "react";
-import { UserProfile, GATInfo, ActivityTemplate, ModalityType } from "@/types";
+import { UserProfile, GATInfo, ActivityTemplate, ModalityType, sortedGats } from "@/types";
 import {
   saveGats,
   saveRoles,
@@ -993,7 +993,8 @@ export function AdminModal({
 
                   {/* Cards de GATs Atuais com Edição */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
-                    {Object.entries(gats).map(([num, info]) => {
+                    {sortedGats(gats).map((info) => {
+                      const num = info.number;
                       return (
                         <div
                           key={num}

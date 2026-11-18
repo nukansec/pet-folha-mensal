@@ -16,7 +16,7 @@ import {
   Settings2,
   Sun,
 } from "lucide-react";
-import { UserProfile, UserRole, GATInfo } from "@/types";
+import { UserProfile, UserRole, GATInfo, sortedGats } from "@/types";
 import { useTheme } from "@/lib/theme";
 import { PROGRAM } from "@/config/program";
 import { Brand, BrandMark } from "./Brand";
@@ -51,7 +51,10 @@ export function LandingPage({
     profiles.length ? "local" : "create",
   );
   const [name, setName] = useState("");
-  const [gat, setGat] = useState(Object.keys(gats)[0] || "");
+  const gatList = sortedGats(gats);
+  const [gat, setGat] = useState(
+    gats[PROGRAM.defaultGat] ? PROGRAM.defaultGat : gatList[0]?.number || "",
+  );
   const [role, setRole] = useState(
     roles.includes(PROGRAM.defaultRole) ? PROGRAM.defaultRole : roles[0] || "",
   );
@@ -255,7 +258,7 @@ export function LandingPage({
                           onChange={(event) => setGat(event.target.value)}
                           required
                         >
-                          {Object.values(gats).map((item) => (
+                          {gatList.map((item) => (
                             <option key={item.number} value={item.number}>
                               GAT {item.number} · {item.name}
                             </option>

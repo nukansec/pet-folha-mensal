@@ -98,11 +98,13 @@
 }
 .workspace-tools {
   display: flex;
+  flex-shrink: 0;
   gap: 4px;
   margin-left: 8px;
 }
 .profile-button {
   margin-left: auto;
+  flex: 0 1 auto;
   display: flex;
   align-items: center;
   gap: 10px;

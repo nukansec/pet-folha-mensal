@@ -2,7 +2,7 @@
 
 import { Modal } from "./Modal";
 import React, { useState, useEffect } from "react";
-import { UserProfile, UserRole, GATInfo } from "@/types";
+import { UserProfile, UserRole, GATInfo, sortedGats } from "@/types";
 import { normalizeName } from "@/lib/storage";
 import { X, Check, User } from "lucide-react";
 import { useDialog } from "@/context/DialogContext";
@@ -135,9 +135,9 @@ export function ProfileModal({
                 value={gatNumber}
                 onChange={(e) => setGatNumber(e.target.value)}
               >
-                {Object.entries(gats).map(([num, info]) => (
-                  <option key={num} value={num}>
-                    GAT {num} ({info.name})
+                {sortedGats(gats).map((info) => (
+                  <option key={info.number} value={info.number}>
+                    GAT {info.number} ({info.name})
                   </option>
                 ))}
               </select>
