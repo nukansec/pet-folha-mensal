@@ -12,6 +12,12 @@ prazo, assinaturas e página de instruções, em papel Carta na horizontal.
 > Este repositório é um fork adaptado do projeto original feito para o
 > PET-Saúde Clima. Veja [Créditos](#créditos).
 
+![Painel “Minha frequência” com dados fictícios: faixa de horas, lista de atividades e formulário em uma coluna](docs/validation/design-20261118/depois/pet-sd/painel-claro-1440.jpg)
+
+Interface em branco e laranja, com o logo do PET-SD, seguindo a estrutura de
+telas do app original. Antes, depois e a referência lado a lado:
+[docs/validation/design-20261118](docs/validation/design-20261118/README.md).
+
 ## O que o app faz
 
 - Cadastro local do participante (nome, perfil e GAT) e retomada sem arquivo no
@@ -79,8 +85,9 @@ modalidades, meta, prazo, links e textos da folha) fica em
 [`src/config/program.ts`](src/config/program.ts). O motivo e o custo dessa
 escolha estão em [docs/adr/0001-config-central-do-programa.md](docs/adr/0001-config-central-do-programa.md).
 
-Pendências marcadas no código com `TODO(pet-sd)`: logo oficial do PET-SD para o
-ícone do app, links de formulários (vazios = botões ocultos) e prazo exibido.
+Pendências marcadas no código com `TODO(pet-sd)`: links de formulários (vazios =
+botões ocultos) e prazo exibido. Logo e ícones são gerados do PNG oficial por
+`scripts/brand/gerar-marca.py` (o original não entra no repositório).
 
 ## Deploy na Vercel
 
@@ -104,7 +111,8 @@ Não use o prefixo `NEXT_PUBLIC_` (exporia o valor no navegador). Detalhes em
 
 - [docs/architecture.md](docs/architecture.md): arquitetura, modelo de dados e armazenamento.
 - [docs/regimento-pet.md](docs/regimento-pet.md): resumo do Regimento Interno do PET-SD/UFG.
-- [docs/ui-ux.md](docs/ui-ux.md): telas, folha oficial e verificações de interface.
+- [docs/ui-ux.md](docs/ui-ux.md): telas, paleta, botões, logo, folha oficial e verificações de interface.
+- [docs/design-pet-sd.md](docs/design-pet-sd.md): registro do novo design (decisões e antes × depois).
 - [docs/deployment-vercel.md](docs/deployment-vercel.md): deploy e variáveis de ambiente.
 - [docs/adaptacao-pet-sd.md](docs/adaptacao-pet-sd.md): registro da adaptação, decisões e pendências.
 - [CONTRIBUTING.md](CONTRIBUTING.md): fluxo de Git, commits e verificações.
@@ -117,8 +125,9 @@ criado para o PET-Saúde Clima UFG por
 [Felipe Gonçalves Vidal](https://www.linkedin.com/in/vvvvvdal/) e
 [Robert Francisco Taveira](https://www.linkedin.com/in/robert-taveira/).
 A arquitetura local-first, a cópia de segurança, os comprovantes e a base da
-interface vêm do trabalho deles. Esta versão adapta regras, cadastro e folha ao
-PET-SD UFG.
+interface vêm do trabalho deles, e a estrutura de telas segue a versão
+publicada do app deles. Esta versão adapta regras, cadastro, folha, paleta e
+marca ao PET-SD UFG.
 
 ## Licença
 

@@ -2,11 +2,61 @@
 
 O percurso prioriza preencher a frequência em poucos passos, inclusive no
 celular: abrir perfil → escolher mês → lançar e revisar → conferir a folha →
-guardar a cópia (.json) e o PDF. A base da interface vem do projeto original;
-esta página descreve o estado do fork PET-SD.
+guardar a cópia (.json) e o PDF. A estrutura de telas segue o app original
+(PET-Saúde Clima); esta página descreve o estado do fork PET-SD. Decisões e
+capturas do design atual: [design-pet-sd.md](design-pet-sd.md).
+
+## Paleta e tokens
+
+Branco e laranja, derivados do logo. Os componentes usam só tokens semânticos
+de `src/app/globals.css`; nenhum tom bruto nem nome de cor herdado.
+
+| Token | Claro | Escuro | Uso |
+| --- | --- | --- | --- |
+| `--background` / `--surface` | `#fafaf9` / `#ffffff` | `#1a1716` / `#221f1d` | página / cartões |
+| `--foreground` / `--body` / `--muted` | grafite `#1c1917` / `#44403c` / `#57534e` | `#f5f5f4` / `#d6d3d1` / `#a8a29e` | texto |
+| `--brand` / `--brand-strong` | `#c2410c` / `#9a3412` | `#fb923c` / `#fdba74` | botão primário / hover |
+| `--on-brand` | branco | grafite | texto sobre `--brand` |
+| `--brand-text` | `#b43c0a` | `#fb923c` | links, abas ativas, ícones de destaque |
+| `--brand-soft` | `#fff4ed` | laranja 10 % | fundos suaves, hover de secundário |
+| `--brand-vivid` | `#f26a35` | `#f26a35` | só decorativo: barra de progresso, prévia |
+| `--focus-ring` | `#c2410c` | `#fb923c` | anel de foco |
+| `--info` | `#1a5a8e` (azul do logo) | `#8cc4ec` | “UFG”, informação |
+| `--danger`, `--danger-fill`, `--warning` | vermelho e âmbar | — | erro, ação destrutiva, alerta; nunca laranja da marca |
+
+- Contraste AA conferido por `npm run test:contrast`
+  (`scripts/checar-contraste.mjs`, lê os tokens do CSS): 4,5:1 para texto, 3:1
+  para bordas de controle, foco e gráficos. O laranja vivo do logo dá 3,05:1 no
+  branco, por isso nunca vira texto.
+- Tema claro é o padrão; a escolha salva (`pet_theme`) é preservada.
+- A folha oficial e a impressão não usam tokens: preto e branco, como o modelo.
+
+## Botões
+
+- **Uma ação primária por tela**, laranja cheio: “Abrir minha folha”,
+  “Adicionar atividade”, “Conferir folha”, “Imprimir / salvar PDF”.
+- **Secundárias** em contorno (`.secondary-button`): Salvar cópia, Restaurar
+  cópia, Concluir, Começar agora.
+- **Terciárias** como texto sublinhado (`.text-button`) ou ícone: Limpar mês,
+  ver mais, editar, excluir, ajuda, tema, configurações.
+- Botão só de ícone tem `aria-label` e `title`. Alvo mínimo de 44 px.
+- Destrutivas confirmam com contagem (“A atividade de … será removida.”).
+
+## Logo
+
+- Arquivos derivados do PNG oficial por `scripts/brand/gerar-marca.py`
+  (recorte, redimensionamento e compressão; sem redesenho nem troca de cor):
+  `public/images/pet-sd/simbolo.png` (cabeçalho), `marca-completa.png`
+  (entrada), `compartilhamento.png` (Open Graph 1200×630) e, em `src/app/`,
+  `favicon.ico`, `icon.png` (512) e `apple-icon.png` (180, fundo branco).
+- `Brand` = símbolo + “PET-SD UFG” + “Folha de frequência mensal”;
+  `BrandMark` = marca completa. No tema escuro a marca completa fica sobre uma
+  placa branca, porque o subtítulo azul-escuro some no fundo escuro.
 
 ## Entrada e retomada
 
+- Sequência da página: marca e prévia fictícia (hero), cartão “Vamos começar”
+  com as abas, “Três passos por mês”, “Dois arquivos”, novidades e dúvidas.
 - “Continuar” lista os perfis guardados neste navegador; dá para abrir outro mês
   sem restaurar arquivo. “Primeiro acesso” pede nome, **Perfil** (padrão
   Monitor(a)) e **GAT** (padrão GAT 01). Navegador novo começa sem perfis.
@@ -24,13 +74,19 @@ esta página descreve o estado do fork PET-SD.
   selecionável.
 - O resumo mostra a **CH do mês** (`21 horas`, `33h30`), o número de atividades e
   quanto falta para o mínimo de 32 h. Não declara aptidão para envio.
-- O formulário tem Data, Modalidade, Início, Fim, CH calculada na hora,
-  Unidade/Local, Atividade desenvolvida (obrigatória) e Descrição. Modelos rápidos
-  preenchem atividade, modalidade e local.
-- A lista mostra data, horário, modalidade, local, CH e o início da descrição
-  (duas linhas). Editar e excluir têm nomes acessíveis; “Limpar mês” pede
+- Cabeçalho em duas linhas: marca, perfil (nome completo; `title` com função e
+  GAT) e ícones; depois as abas e as ações de cópia e Concluir.
+- O formulário fica numa coluna, à direita no desktop: Preenchimento rápido ·
+  opcional, Data, Início/Fim com a CH ao lado, a regra (“Conta o tempo exato.
+  Ex.: 16h30 às 18h = 1h30.”), Modalidade, Unidade/Local, Atividade
+  desenvolvida (obrigatória), Descrição e o botão primário.
+- Selects mostram a opção escolhida inteira (`FullSelect`), mesmo com nomes
+  longos de GAT ou modelo em 390 px.
+- A lista mostra data, horário, modalidade, local, CH e a descrição em até duas
+  linhas, com “ver mais”. Editar e excluir têm nomes acessíveis; “Limpar mês” pede
   confirmação; exemplos são opcionais e identificados como fictícios.
-- Formulário e lista ficam lado a lado quando há espaço e em uma coluna no celular.
+- Lista e formulário ficam lado a lado a partir de 1024 px; abaixo disso, o
+  formulário vem primeiro.
 
 ## Tipografia e conforto
 
@@ -73,7 +129,11 @@ pontos do modelo (Times New Roman 10 pt).
 
 - `npm run test:ui`: renderização dos componentes, rótulos de campos, folha
   oficial (campos, perfis, 8 colunas, total, instruções), CSS de impressão.
+- `npm run test:contrast`: contraste dos pares de cor nos dois temas.
 - `npm run test:e2e`: percurso completo em desktop e celular, temas, larguras de
-  360 a 1440 px, falhas de gravação, cópia e restauração, comprovantes, migração
+  360 a 1440 px, sem texto cortado nem estouro horizontal, foco visível, folha em
+  preto e branco, falhas de gravação, cópia e restauração, comprovantes, migração
   do formato antigo e PDF de folha extensa em Carta paisagem.
-- Capturas e comparação com o modelo: [validation/pet-sd-20261117](validation/pet-sd-20261117/README.md).
+- Capturas do design atual, com o Clima e o antes lado a lado:
+  [validation/design-20261118](validation/design-20261118/README.md). PDFs da
+  folha comparados com o modelo: [validation/pet-sd-20261117](validation/pet-sd-20261117/README.md).

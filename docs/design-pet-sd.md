@@ -16,7 +16,7 @@ exata, modalidades, GATs, folha oficial).
 | E3 Layout e botões | concluído | `feat(ui): layout e hierarquia de botões no padrão do Clima` | `npm run test:e2e`; capturas em `depois/` (E5) | lateral × duas linhas (dúvida 2) |
 | E4 Ferramentas | concluído | `fix(ui): GAT 01 como padrão e GATs em ordem numérica`; `fix(ui): textos no singular e botões de confirmação acessíveis` | e2e “primeiro acesso começa no GAT 01…” | — |
 | E5 Testes e “depois” | concluído | `test: validação visual do novo design` | e2e “sem texto cortado, foco visível e folha oficial em preto e branco”; `docs/validation/design-20261118/` | — |
-| E6 Documentação | pendente | | | |
+| E6 Documentação | concluído | `docs: documentação do novo design` | CI completo do zero (seção c) | — |
 
 ## Linha de base (E0)
 
@@ -202,3 +202,115 @@ O que ficou **diferente do Clima de propósito**: cabeçalho em duas linhas em v
 de barra lateral (dúvida 2); sem onboarding em carrossel; sem botão flutuante e
 abas inferiores no celular; colunas Unidade/Local e Descrição, CH exata e
 modalidades do PET-SD; laranja no lugar do verde.
+
+
+## Relatório final
+
+### a) O que mudou por épico
+
+| Épico | Commits | Resumo |
+| --- | --- | --- |
+| E0 | `docs: diagnóstico de design e capturas de referência` | linha de base verde; `scripts/capturar-telas.mjs`; capturas do Clima e da produção; tabela de diferenças |
+| E1 | `feat(ui): paleta branca e laranja do PET-SD` | tokens semânticos claro/escuro; sem verde; tema claro padrão; `test:contrast` no CI |
+| E2 | `feat(ui): logo do PET-SD na interface e nos ícones` | `scripts/brand/gerar-marca.py`; símbolo, marca completa, favicon, icon, apple-icon, Open Graph; `Brand`/`BrandMark` |
+| E3 | `feat(ui): layout e hierarquia de botões no padrão do Clima` | cabeçalho em duas linhas, faixa de horas, formulário em uma coluna, lista com “ver mais”, rodapé, entrada completa |
+| E4 | `fix(ui): GAT 01 como padrão e GATs em ordem numérica`; `fix(ui): textos no singular e botões de confirmação acessíveis` | bug do GAT 10, plural, botões de 44 px, toast 14 px |
+| E5 | `fix(ui): selects mostram a opção escolhida inteira`; `test: validação visual do novo design` | `FullSelect`; e2e de texto cortado, foco e folha P&B; capturas depois e comparações |
+| E6 | `docs: documentação do novo design` | `ui-ux.md`, README, notas de versão, registro de adaptação |
+
+### b) Por que cada decisão
+
+- **Tokens semânticos em vez de cores com nome** (`--brand` em vez de
+  `--pet-green`): o componente diz *para que* serve a cor, não *qual* cor é.
+  Trocar a paleta vira mudar um bloco de CSS, e o tema escuro é só outro
+  valor para o mesmo nome. Foi o que permitiu trocar verde por laranja sem
+  tocar na lógica dos componentes.
+- **Dois laranjas:** o do logo (`#f26a35`) tem 3,05:1 no branco, o que serve
+  para um gráfico (mínimo 3:1) mas não para texto (4,5:1). Botões e links usam
+  um laranja mais escuro, da mesma família. No escuro inverte: laranja claro
+  com texto grafite, porque branco sobre laranja claro não passa.
+- **Contraste por script, lendo o próprio CSS:** sem segunda tabela de cores
+  para desatualizar. O script pegou um caso que eu não teria visto a olho (badge
+  laranja a 10 %, 4,48:1).
+- **Logo só recortado:** a regra de identidade visual proíbe redesenhar ou
+  mudar cores. O PNG já era transparente e sem halo, então não houve remoção de
+  fundo; a versão “ladrilho” não foi necessária. O script é versionado e lê o
+  original por argumento, para o arquivo de 1,4 MB não entrar no repositório
+  público.
+- **CSS novo em arquivo separado:** o `globals.css` herdado tinha o mesmo
+  seletor definido em até quatro lugares. Um arquivo carregado depois tem a
+  palavra final de forma previsível, e o diff mostra o design novo inteiro num
+  lugar só. O custo é a dívida que fica no `globals.css` (ver e).
+- **Duas linhas em vez da lateral do Clima:** foi o pedido, e é a mudança menor
+  e reversível. A lateral fica como dúvida 2.
+- **Formulário primeiro no DOM, à direita na tela:** no celular e para quem
+  usa teclado, lançar é a tarefa principal; no desktop, o grid reproduz o Clima.
+- **`FullSelect`:** um `<select>` nativo não quebra linha, e baixar a fonte de
+  16 px faz o iOS aproximar a tela. Deixar o select nativo transparente por
+  cima de uma caixa com o texto mantém teclado, leitor de tela e o seletor
+  nativo do celular, sem reimplementar um combobox.
+
+### c) Como verificar
+
+```bash
+rm -rf .next && npm ci
+npm run lint && npm run test:ui && npm run test:contrast
+npm run typecheck && npm run build && npm run test:e2e
+```
+
+- Capturas: `docs/validation/design-20261118/{antes/clima,antes/pet-sd,depois/pet-sd}`;
+  lado a lado em `docs/validation/design-20261118/comparacao/`.
+- Regenerar: ver `docs/validation/design-20261118/README.md`.
+- Marca: `python scripts/brand/gerar-marca.py "<pasta do PET>/Marca_do_PETSaude.png"`.
+
+### d) Descrição pronta de PR
+
+> **feat: novo design do PET-SD (branco e laranja, logo oficial, layout do Clima)**
+>
+> **O quê.** Troca a paleta verde herdada por branco e laranja derivados do
+> logo, coloca o logo do PET-SD na interface, nos ícones e no Open Graph, e
+> reorganiza as telas na estrutura do PET-Saúde Clima: cabeçalho em duas
+> linhas, faixa de horas, formulário em uma coluna, lista com “ver mais” e
+> entrada com prévia, três passos e dois arquivos. Corrige o GAT padrão (abria
+> no 10), textos no plural com 1 item, selects cortados e estouros
+> horizontais em 390 e 768 px.
+>
+> **Por quê.** Identidade visual do programa e a clareza de uso do app de
+> referência, sem perder nada do PET-SD (8 colunas, Unidade/Local, Descrição,
+> CH exata, modalidades, folha oficial).
+>
+> **Como testar.** `npm ci`, `lint`, `test:ui`, `test:contrast`, `typecheck`,
+> `build`, `test:e2e`. Abrir o preview da Vercel no celular: primeiro acesso,
+> lançar uma atividade, escolher um modelo rápido longo, conferir a folha,
+> alternar o tema.
+>
+> **Onde revisar com atenção.** `src/app/design-pet-sd.css` (layout novo);
+> remoção do bloco “tela única” em `globals.css`; `src/components/ui/full-select.tsx`;
+> `sortedGats` em `src/types/index.ts`; a folha oficial não deve ter mudado
+> (`OfficialSheet.tsx` intacto; teste de P&B); imagens em `public/images/pet-sd/`
+> (aprovação do logo pela coordenação).
+
+### e) Dúvidas, TODO(design) e o que ficou diferente do Clima
+
+- Dúvidas abertas: 1 (vetorial), 2 (lateral × duas linhas), 3 (links de
+  avaliação e de formulário), 4 (aprovação do logo). A 5 foi respondida pelo
+  próprio repositório.
+- `TODO(design)`: nenhum no código. A dívida que fica é o `globals.css` com
+  regras repetidas em camadas (as que o `design-pet-sd.css` sobrescreve
+  continuam lá); limpar exige revisar tela por tela e fica para outra branch.
+- Diferente do Clima de propósito: duas linhas em vez de lateral; sem carrossel
+  de onboarding; sem abas inferiores nem botão flutuante no celular; sem filtro
+  “Pendentes”/“Forms” por atividade (o PET-SD não tem o formulário por
+  atividade); CH exata em vez de “hora iniciada conta inteira”; colunas e
+  modalidades do PET-SD.
+
+### f) O que o Brunno faz antes de publicar
+
+1. Responder as dúvidas 1–4 (principalmente a 4: aprovar o logo com a
+   coordenação, regra de identidade visual do regimento).
+2. `git push -u origin feat/design-pet-sd` (só `origin`; nada no `upstream`).
+3. Abrir o PR no fork com a descrição da seção d.
+4. Esperar o CI (agora com `test:contrast`) e revisar o preview da Vercel.
+5. Merge na `main` → deploy automático na Vercel.
+6. Conferir a produção no celular (entrada, primeiro acesso, lançamento,
+   folha, impressão) e nos dois temas.
