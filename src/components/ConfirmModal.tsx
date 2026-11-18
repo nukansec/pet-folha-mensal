@@ -64,7 +64,7 @@ export function ConfirmModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl border border-line hover:bg-raised text-body text-xs font-semibold cursor-pointer transition-colors"
+            className="min-h-[44px] px-4 py-2 rounded-xl border border-[var(--control-border)] hover:bg-raised text-body text-sm font-semibold cursor-pointer transition-colors"
           >
             {cancelLabel}
           </button>
@@ -74,7 +74,7 @@ export function ConfirmModal({
               onConfirm();
               onClose();
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all shadow-[var(--page-shadow)] ${
+            className={`min-h-[44px] px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition-all shadow-[var(--page-shadow)] ${
               isDestructive
                 ? "bg-danger-fill hover:bg-danger-fill-strong text-on-danger"
                 : "bg-brand hover:bg-brand-strong text-on-brand"

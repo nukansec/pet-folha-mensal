@@ -641,3 +641,14 @@ test("entrada oferece os perfis locais sem exigir cópia e resumo não promete a
   assert.doesNotMatch(summary, /Apta|Média semanal/);
   assert.match(summary, /distribuição semanal/);
 });
+
+test("GATs em ordem numérica e contagens no singular", () => {
+  const { sortedGats, DEFAULT_GATS } = load("./src/types/index.ts");
+  const numbers = sortedGats(DEFAULT_GATS).map((gat) => gat.number);
+  assert.equal(numbers[0], "01");
+  assert.deepEqual(numbers, [...numbers].sort());
+  const { pluralize } = load("./src/lib/pet-calculator.ts");
+  assert.equal(pluralize(1, "atividade", "atividades"), "1 atividade");
+  assert.equal(pluralize(0, "atividade", "atividades"), "0 atividades");
+  assert.equal(pluralize(3, "atividade", "atividades"), "3 atividades");
+});

@@ -8,6 +8,7 @@ import {
   formatDateBR,
   formatDuration,
   formatTotalHours,
+  pluralize,
 } from "@/lib/pet-calculator";
 import { Pencil, Trash2, ListChecks } from "lucide-react";
 import { ConfirmModal } from "./ConfirmModal";
@@ -106,7 +107,7 @@ export function ActivityTable({
             <button
               className="text-button"
               onClick={() => setConfirmClear(true)}
-              title={`Remover as ${activities.length} atividades de ${monthLabel}`}
+              title={`Remover ${pluralize(activities.length, "atividade", "atividades")} de ${monthLabel}`}
             >
               Limpar mês
             </button>
@@ -218,7 +219,11 @@ export function ActivityTable({
           setConfirmClear(false);
         }}
         title="Limpar atividades deste mês?"
-        message={`As ${activities.length} atividades de ${monthLabel} serão removidas. Os outros meses serão preservados. Salve uma cópia antes de continuar.`}
+        message={`${
+          activities.length === 1
+            ? `A atividade de ${monthLabel} será removida.`
+            : `As ${activities.length} atividades de ${monthLabel} serão removidas.`
+        } Os outros meses serão preservados. Salve uma cópia antes de continuar.`}
         confirmLabel="Limpar mês"
         isDestructive
       />

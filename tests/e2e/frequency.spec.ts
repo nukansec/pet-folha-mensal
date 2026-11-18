@@ -743,3 +743,19 @@ test("novidades mostram data de publicação nos dois temas", async ({ page }, t
     await section.screenshot({ path: testInfo.outputPath("novidades-" + theme + ".png") });
   }
 });
+
+test("primeiro acesso começa no GAT 01, lista os GATs em ordem e conta no singular", async ({ page }) => {
+  await page.goto("/");
+  // Chaves "10".."13" vêm antes de "01" em Object.keys; o padrão deve ser o 01.
+  await expect(page.getByLabel("GAT", { exact: true })).toHaveValue("01");
+  const numbers = await page
+    .getByLabel("GAT", { exact: true })
+    .locator("option")
+    .evaluateAll((options) => options.map((option) => (option as HTMLOptionElement).value));
+  expect(numbers).toEqual([...numbers].sort((a, b) => Number(a) - Number(b)));
+  await create(page);
+  await expect(page.getByRole("button", { name: /Participante sintético Monitor\(a\) · GAT 01/ })).toBeVisible();
+  await add(page);
+  await page.getByRole("button", { name: "Limpar mês", exact: true }).click();
+  await expect(page.getByText(/^A atividade de .+ será removida\./)).toBeVisible();
+});
