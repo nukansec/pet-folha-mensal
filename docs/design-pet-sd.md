@@ -314,3 +314,133 @@ npm run typecheck && npm run build && npm run test:e2e
 5. Merge na `main` → deploy automático na Vercel.
 6. Conferir a produção no celular (entrada, primeiro acesso, lançamento,
    folha, impressão) e nos dois temas.
+
+## Ajustes de 18/11
+
+Branch `fix/ajustes-ui-readme`, criada da `main` depois do merge do PR #2.
+Itens A1–A10 do pedido de ajustes. Dados de teste e capturas 100% fictícios.
+
+### O que foi feito, por item
+
+| Item | O que mudou | Commit |
+|---|---|---|
+| A1 Ícone “?” duplicado | Saiu o botão “?” do cabeçalho da entrada (`LandingPage.tsx`); a entrada já tem o link “Dúvidas” e o “Ajuda” do rodapé. No painel (`Navbar.tsx`) o “?” fica. | `aae8fc5` |
+| A2 Modalidade In Loco | `PROGRAM.modalities` = In Loco, Síncrona, Assíncrona; `PROGRAM.defaultModality` = Síncrona. `LEGACY_MODALITIES` mapeia por nome (“Síncrona presencial” → In Loco). Formulário, edição, painel admin e `normalizeModality` usam o nome, não a posição. | `907148c` |
+| A3 Preenchimento rápido | Quatro modelos (Reunião Geral, Capacitação, Visita Técnica, Pesquisa Bibliográfica e Estudos Autônomos); “Em branco” continua como primeira opção. Lista padrão antiga salva sem edição é lida como a nova; lista editada fica. Modelo com local vazio limpa o campo. | `a9a45cf` |
+| A4 Frase da CH | Saiu “Conta o tempo exato…” do formulário. Sem início ou fim, a CH mostra “—” em `--muted`; laranja só com CH calculada. | `e1bac31` |
+| A5 Modal de rascunho | Linha de botões dos modais com `.dialog-actions` (quebra; primário por último). Ver “Bug do A5”. | `ecc6a1e`, `3653fb5` |
+| A6 Cartões .pdf/.json | Cartões esticam até a altura da linha do grid (`align-self: stretch`, conteúdo no topo); no celular, altura própria. | `4256f89` |
+| A7 Cartão de exemplo | Linhas em ordem (ter 06, qua 07); dia da semana vem da data via `Intl.DateTimeFormat` (`weekdayShort`). | `ebceac1` |
+| A8 Endereço | `PROGRAM.links.site` = `https://pet-sd-folha-mensal.vercel.app`; registros antigos ganharam “(endereço antigo)”. | `1814276` |
+| A9 README e docs | Link “Acessar o app” e “Avaliar o site” no topo; três modalidades; modelos novos; prazo dia 19; `test:contrast` na tabela e no CONTRIBUTING; árvore da arquitetura; seção de endereço no deploy; pendências e TASKS. | `1c7318d` e o commit das capturas |
+| A10 Avaliação | `feedbackForm` = `https://forms.gle/tjpuiFpgJ2Njnx7F7`; rodapé “Avaliar o site” → modal → link em nova aba, `rel="noopener noreferrer"`, sem parâmetros. `activityForm` vazio de propósito. | `464a131` |
+| Novidades | Entrada nova em `src/lib/releases.ts`. | `575c09f` |
+
+### Bug do A5
+
+Reproduzido com Playwright em 1440 e 390 px: com o formulário preenchido,
+trocar de mês, de aba ou clicar em Concluir abre “Atividade ainda não
+adicionada”. A linha de ações era `flex justify-end` **sem quebra**; “Continuar
+editando” + “Descartar preenchimento” somam ~432 px, mais que os ~400 px úteis
+da caixa (`max-w-md` menos padding). Como os itens não encolhem, o excesso vazou
+pelo lado do início da linha: em 390 px “Continuar editando” começava em
+x = −91 (caixa de 24 a 366); em 1440 px, 9 px para fora. O mesmo padrão estava
+em `ConfirmModal`, `EditActivityModal`, `ProfileModal` e na edição de GAT do
+`AdminModal`.
+
+Correção: `.dialog-actions` em `design-pet-sd.css` (`flex-wrap: wrap`, itens
+`flex: 1 1 auto`, `min-width: 0`, texto pode quebrar). Em uma linha os botões
+dividem a largura; sem espaço, cada um ocupa a linha toda, na ordem do código
+(cancelar, depois primário). Botão único não estica. Depois: 49–341 px dentro
+da caixa de 24–366 px.
+
+Também conferido e **sem defeito**: o aviso não aparece logo após adicionar com
+sucesso (o formulário avisa `dirty = false`); “Adicionar atividade” com campos
+vazios usa a validação nativa (`required`), que rola até o primeiro campo
+inválido sem esconder sob o cabeçalho fixo; o foco fica no botão depois de
+adicionar. O botão muda de posição só quando a mensagem de erro aparece acima
+dele (esperado).
+
+Teste e2e novo: “modais: botões ficam dentro da caixa…” mede
+`getBoundingClientRect` de cada botão contra a caixa no aviso de rascunho
+(mês, aba, Concluir), no modal de conclusão e na confirmação de exclusão.
+
+### Decisões
+
+- **A1:** o painel tem outro acesso à ajuda, o “Ajuda” do rodapé, mas ele fica
+  no fim de uma página longa. Mantive o “?” do cabeçalho: é o acesso visível.
+- **A2:** padrão do formulário = Síncrona, em `PROGRAM.defaultModality` (nome,
+  não índice). Registro sem modalidade também vira Síncrona.
+- **A3:** a troca da lista antiga acontece na leitura (`getStoredTemplates`); a
+  chave salva não é reescrita (não destrutivo). “Sem edição” = mesmos ids,
+  nomes, modalidades, locais e `isGatSpecific`, na mesma ordem; qualquer
+  diferença mantém a lista da pessoa. A lista antiga ficou em
+  `PROGRAM.legacyTemplates` só para essa comparação. Ids novos
+  (`tpl-reuniao-geral` etc.) para não confundir com os antigos.
+- **A4:** com início e fim preenchidos, a CH aparece mesmo se for `0h` (fim
+  antes do início), porque aí é um valor calculado; o erro explica ao salvar.
+  Leitores de tela ouvem “a calcular” no lugar do traço.
+- **A5:** primário por último também no celular (mesma regra do desktop), em
+  vez de `column-reverse`; mantém a ordem do código igual à visual e à do Tab.
+- **A7:** `timeZone: "UTC"` e meio-dia na data: servidor e navegador dão o mesmo
+  dia, sem erro de hidratação.
+- **A8:** `scripts/capturar-telas.mjs` cita `pet-folha-mensal.vercel.app` (app
+  do Felipe) como referência de layout; é registro de referência, ficou. O
+  `resumo.txt` de `antes/pet-sd/` é saída gerada e ficou intacto; a nota
+  “(endereço antigo)” está nos README/markdown que o citam.
+- **A10:** o link aparece só no rodapé (entrada e painel) → modal. Não está no
+  modal de Concluir nem na Ajuda; não acrescentei para não mudar mais nada.
+  Rótulos: “Avaliar o site” (rodapé e título do modal) e “Abrir formulário de
+  avaliação” (link). Caso vazio testado em `test:ui` (o e2e roda com a config real).
+
+### Como verificar
+
+```bash
+npm ci
+npm run lint && npm run test:ui && npm run test:contrast && npm run build && npm run typecheck && npm run test:e2e
+```
+
+Resultado em 18/11/2026 (Windows, Node 22, `CI=1`): lint sem avisos, test:ui
+31/31, test:contrast ok, build ok, typecheck ok, test:e2e 38/38 (19 testes ×
+desktop 1440 e celular iPhone 13 / 390 px). O `test:ui` pegou o domínio escrito
+no texto das novidades e foi corrigido (`817e276`). Uma rodada anterior da e2e,
+com o dev server recompilando por edições minhas no meio da suíte, falhou em
+“comprovantes…” (mobile); repetida 2× isolada e na rodada final, passou.
+
+Manual: `npm run dev`, abrir http://localhost:5000 em 390 e 1440 px, nos dois
+temas: (1) entrada sem “?” e cartões .pdf/.json alinhados; (2) primeiro acesso,
+Preenchimento rápido → Reunião Geral, depois Visita Técnica (local vazio,
+In Loco); (3) CH “—” até preencher início e fim; (4) digitar algo e trocar de
+mês: modal com os dois botões dentro; (5) rodapé “Avaliar o site” abre o
+formulário em nova aba. Capturas: `docs/validation/design-20261118/ajustes/`.
+
+### Descrição do PR
+
+**O quê.** Ajustes de interface e documentação depois do novo design:
+modalidade “Interação em tempo real (In Loco)”; quatro modelos de
+preenchimento rápido; CH “—” sem horários; botões de modal que não saem da
+caixa; cartões .pdf/.json alinhados; cartão de exemplo com datas coerentes;
+sem “?” duplicado na entrada; novo endereço `pet-sd-folha-mensal.vercel.app`;
+botão “Avaliar o site” ligado ao formulário do PET-SD; README e docs revisados.
+
+**Por quê.** Pedido de ajustes de 18/11/2026: o modal de rascunho cortava
+“Continuar editando” no celular (x = −91 px), o programa usa a modalidade
+In Loco, os modelos antigos não batiam com as atividades reais, o domínio mudou
+e o formulário de avaliação passou a existir.
+
+**Como testar.** CI completo (acima) e o roteiro manual da seção anterior.
+Testes novos: mapeamento de modalidades por nome e cópia 1.2 com “Síncrona
+presencial” → In Loco; migração da lista de modelos (antiga sem edição → nova;
+editada fica); entrada sem “?” e dias da semana do cartão; endereço só na
+config; “Avaliar o site” com e sem link; e2e de modelos, local vazio, cartões,
+avaliação e botões de modal dentro da caixa.
+
+**Onde revisar com atenção.**
+- `src/lib/storage.ts`: `LEGACY_MODALITIES` por nome e `getStoredTemplates`
+  (comparação com `PROGRAM.legacyTemplates`; a troca é na leitura, sem
+  reescrever a chave).
+- `src/app/design-pet-sd.css`: `.dialog-actions` vale para todos os modais
+  (DialogContext, ConfirmModal, EditActivityModal, ProfileModal, AdminModal).
+- `src/config/program.ts`: modalidades, `defaultModality`, modelos e links.
+- Registros antigos com “Síncrona presencial” passam a aparecer como In Loco
+  (antes viravam Síncrona): é mudança de dado exibido, intencional.

@@ -1,5 +1,8 @@
 # PET-SD UFG: Folha de Frequência Mensal
 
+**[Acessar o app](https://pet-sd-folha-mensal.vercel.app)** ·
+[Avaliar o site](https://forms.gle/tjpuiFpgJ2Njnx7F7)
+
 Aplicação web para registrar as atividades do mês e gerar o **Registro de
 Frequência e Atividades – PET-SD** do PET-Saúde: Informação e Saúde Digital
 (PET-SD) da UFG, edição 2025–2027 (Edital Conjunto SEIDIGI/SGTES-MS nº 1/2025).
@@ -12,18 +15,22 @@ prazo, assinaturas e página de instruções, em papel Carta na horizontal.
 > Este repositório é um fork adaptado do projeto original feito para o
 > PET-Saúde Clima. Veja [Créditos](#créditos).
 
-![Painel “Minha frequência” com dados fictícios: faixa de horas, lista de atividades e formulário em uma coluna](docs/validation/design-20261118/depois/pet-sd/painel-claro-1440.jpg)
+![Painel “Minha frequência” com dados fictícios: faixa de horas, lista de atividades e formulário de atividade com preenchimento rápido](docs/validation/design-20261118/ajustes/painel-claro-1440.jpg)
 
 Interface em branco e laranja, com o logo do PET-SD, seguindo a estrutura de
-telas do app original. Antes, depois e a referência lado a lado:
-[docs/validation/design-20261118](docs/validation/design-20261118/README.md).
+telas do app original. Antes, depois, a referência lado a lado e os ajustes de
+18/11/2026: [docs/validation/design-20261118](docs/validation/design-20261118/README.md).
 
 ## O que o app faz
 
 - Cadastro local do participante (nome, perfil e GAT) e retomada sem arquivo no
   mesmo navegador.
 - Lançamento de atividades com data, horários, Unidade/Local, modalidade,
-  atividade desenvolvida e descrição; modelos rápidos para atividades recorrentes.
+  atividade desenvolvida e descrição.
+- Preenchimento rápido com quatro modelos: **Reunião Geral** (In Loco, UFG),
+  **Capacitação** (Síncrona, Online), **Visita Técnica** (In Loco; o local fica
+  para a pessoa preencher) e **Pesquisa Bibliográfica e Estudos Autônomos**
+  (Assíncrona, Online). O painel de configurações permite editar a lista.
 - Cálculo da carga horária (CH) exata e acompanhamento da meta de 32 h no mês.
 - Prévia e impressão da folha oficial (Imprimir / salvar PDF) e modelo em branco
   em `.docx` e PDF.
@@ -40,10 +47,13 @@ Fonte: Regimento Interno do PET-SD/UFG e o modelo oficial da ficha. Resumo em
 - Fim igual ou anterior ao início não é aceito (CH = 0).
 - O total do mês soma minutos e aparece como `34 horas` ou `33h30`.
 - Mínimo de **32 h no mês**; o excedente **não** passa para o mês seguinte.
+- Modalidades: **Interação em tempo real (In Loco)**, **Interação em tempo real
+  (Síncrona)** e **Assíncrona**. O formulário começa em Síncrona.
 - Atividades presenciais e in loco exigem registro fotográfico.
-- O rodapé da folha reproduz o prazo do modelo (1º dia útil do mês seguinte). O
-  prazo exibido no app é configurável (padrão: dia 19) e ainda precisa ser
-  confirmado com a coordenação; ver [docs/adaptacao-pet-sd.md](docs/adaptacao-pet-sd.md).
+- Prazo: entregar a folha assinada ao coordenador do GAT **até o dia 19**
+  (informado em 16/11/2026); é o prazo que o app exibe. A nota no rodapé da
+  folha reproduz o texto do modelo oficial (1º dia útil do mês seguinte). Ver
+  [docs/adaptacao-pet-sd.md](docs/adaptacao-pet-sd.md), decisão D6.
 
 ## Como rodar
 
@@ -61,6 +71,7 @@ npm run dev        # http://localhost:5000
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run test:ui` | testes unitários (Node test runner, sem navegador) |
+| `npm run test:contrast` | contraste WCAG AA dos pares de cor dos temas claro e escuro |
 | `npm run test:e2e` | testes de navegador (Playwright, desktop e celular) |
 
 Antes do primeiro `test:e2e`: `npx playwright install chromium`.
@@ -85,8 +96,10 @@ modalidades, meta, prazo, links e textos da folha) fica em
 [`src/config/program.ts`](src/config/program.ts). O motivo e o custo dessa
 escolha estão em [docs/adr/0001-config-central-do-programa.md](docs/adr/0001-config-central-do-programa.md).
 
-Pendências marcadas no código com `TODO(pet-sd)`: links de formulários (vazios =
-botões ocultos) e prazo exibido. Logo e ícones são gerados do PNG oficial por
+Links: `feedbackForm` aponta para o formulário de avaliação do PET-SD (botão
+“Avaliar o site” no rodapé); `activityForm` fica vazio de propósito, porque o
+programa não tem formulário de registro de atividades (link vazio = botão
+oculto). Logo e ícones são gerados do PNG oficial por
 `scripts/brand/gerar-marca.py` (o original não entra no repositório).
 
 ## Deploy na Vercel
