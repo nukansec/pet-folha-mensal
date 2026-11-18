@@ -13,7 +13,7 @@ progresso por épico e do relatório final.
 | E3 Gerenciar perfis | feito | `feat: editar e excluir perfis na entrada` | entrada › Continuar; `test:ui` (resumo, exclusão, edição, cópia 1.4); `perfis.spec.ts` › "gerenciar perfis na entrada" | — |
 | E4 Seletores | feito | `feat(ui): seletores em grupos de opção` | formulário, modal de edição, primeiro acesso, modal de identificação; `perfis.spec.ts` › "seletores em grupos de opção"; `frequency.spec.ts` › "modelos rápidos…" | — |
 | E5 Visão semanal | feito | `feat: visão semanal da carga horária` | resumo › Semanal; `test:ui` "faixas de semana…", "semana atual…"; `perfis.spec.ts` › "visão semanal" | — |
-| E6 Fechamento | feito | `docs: ajuda, novidades, compatibilidade e capturas de perfis e visão semanal` | Ajuda/Dúvidas, README, `docs/ui-ux.md`, `src/lib/releases.ts`; `tests/e2e/compat.spec.ts`; `docs/validation/perfis-20261118/depois/` | pergunta 2 (meta das semanas parciais) |
+| E6 Fechamento | feito | `docs: ajuda, novidades, compatibilidade e capturas de perfis e visão semanal` | Ajuda/Dúvidas, README, `docs/ui-ux.md`, `src/lib/releases.ts`; `tests/e2e/compat.spec.ts`; `docs/validation/perfis-20261118/depois/` | — |
 
 ## E0 — Diagnóstico
 
@@ -78,8 +78,8 @@ Outros achados:
 
 **Respostas do mantenedor (18/11/2026):** 1 — não: "Salvar cópia" guarda só o
 mês em preenchimento (1.3); a 1.4 fica restrita à cópia antes de excluir.
-2 — explicada de novo na conversa; mantida a meta de 8 h nas faixas parciais
-até nova decisão. 3 — segue a recomendação (lista no modal de edição).
+2 — mantida a mesma meta de 8 h nas faixas parciais
+(opção A), com o rótulo "Semana parcial". 3 — segue a recomendação (lista no modal de edição).
 4 — segue a recomendação (janela do Concluir). 5 — segunda a domingo.
 Nenhuma mudança de código decorrente.
 
