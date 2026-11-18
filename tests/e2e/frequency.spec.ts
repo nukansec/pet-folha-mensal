@@ -905,3 +905,26 @@ test("lista antiga de modelos salva sem edição abre com os modelos novos", asy
   await page.reload();
   await expect(page.getByLabel(/Preenchimento rápido/).locator("option")).toHaveText(["Em branco", "Ata da reunião (editada)"]);
 });
+
+test("cartões .pdf e .json: mesma altura lado a lado, altura própria empilhados", async ({ page }, testInfo) => {
+  await page.goto("/");
+  const cards = await page.locator(".file-guide-item").evaluateAll((elements) =>
+    elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      const icon = element.querySelector("svg")!.getBoundingClientRect();
+      const title = element.querySelector("h3")!.getBoundingClientRect();
+      return { top: box.top, height: box.height, icon: icon.top - box.top, title: title.top - box.top };
+    }),
+  );
+  expect(cards).toHaveLength(2);
+  expect(cards[0].icon).toBeCloseTo(cards[1].icon, 0);
+  expect(cards[0].title).toBeCloseTo(cards[1].title, 0);
+  if (testInfo.project.name === "desktop") {
+    expect(cards[0].top).toBeCloseTo(cards[1].top, 0);
+    expect(cards[0].height).toBeCloseTo(cards[1].height, 0);
+  } else {
+    // Empilhados: o .pdf tem menos texto e fica mais baixo que o .json.
+    expect(cards[1].top).toBeGreaterThan(cards[0].top);
+    expect(cards[0].height).toBeLessThan(cards[1].height);
+  }
+});

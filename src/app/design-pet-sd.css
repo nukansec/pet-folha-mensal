@@ -831,8 +831,15 @@
   border: 0;
   padding: 0;
 }
+/* Os dois cartões (.pdf e .json) esticam até a altura da linha do grid; o
+   conteúdo fica no topo, então ícone, título e texto alinham entre eles. No
+   celular (uma coluna) cada um volta à altura do próprio conteúdo. */
 .file-guide-item {
   display: grid;
+  align-self: stretch;
+  align-content: start;
+  grid-template-rows: auto 1fr;
+  height: 100%;
   gap: 12px;
   padding: 22px;
   border: 1px solid var(--border);
