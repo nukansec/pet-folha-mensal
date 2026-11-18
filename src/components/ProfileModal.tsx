@@ -7,6 +7,7 @@ import { normalizeName } from "@/lib/storage";
 import { X, Check, User } from "lucide-react";
 import { useDialog } from "@/context/DialogContext";
 import { FullSelect } from "@/components/ui/full-select";
+import { RoleChoice } from "./RoleChoice";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -145,20 +146,12 @@ export function ProfileModal({
               </FullSelect>
             </div>
 
-            <div className="field">
-              <label htmlFor="profilemodal-field-3">Perfil</label>
-              <FullSelect
-                id="profilemodal-field-3"
-                value={role}
-                onChange={(e) => setRole(e.target.value as UserRole)}
-              >
-                {roles.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </FullSelect>
-            </div>
+            <RoleChoice
+              id="profilemodal-role"
+              roles={roles}
+              value={role}
+              onChange={(value) => setRole(value as UserRole)}
+            />
           </div>
 
           <p className="text-xs text-muted leading-relaxed">

@@ -107,8 +107,8 @@ for (const theme of ["light", "dark"]) {
     // CH sem horários = "—" neutro (A4).
     await shot(form, `formulario-vazio-${tag}`);
     // Modelo novo sem local: o campo fica vazio (A3).
-    await page.getByLabel(/Preenchimento rápido/).selectOption({ label: "Reunião Geral" });
-    await page.getByLabel(/Preenchimento rápido/).selectOption({ label: "Visita Técnica" });
+    await page.getByRole("radio", { name: "Reunião Geral", exact: true }).check();
+    await page.getByRole("radio", { name: "Visita Técnica", exact: true }).check();
     await page.getByLabel("Início", { exact: true }).fill("08:00");
     await page.getByLabel("Fim", { exact: true }).fill("12:00");
     await shot(form, `formulario-visita-tecnica-${tag}`);

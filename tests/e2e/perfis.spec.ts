@@ -303,3 +303,115 @@ test.describe("gerenciar perfis na entrada", () => {
     expect(await page.evaluate(() => Object.keys(localStorage).filter((k) => k.includes("activities_v3")))).toEqual([]);
   });
 });
+
+// ============================================================
+// E4: seletores em grupos de opção
+// ============================================================
+test.describe("seletores em grupos de opção", () => {
+  test("perfil no primeiro acesso: cartões de rádio por clique e teclado; valor gravado é o nome de PROGRAM", async ({ page }) => {
+    await page.goto("/");
+    const roles = page.getByRole("radiogroup", { name: "Perfil", exact: true });
+    await expect(roles.getByRole("radio")).toHaveCount(5);
+    await expect(roles.getByRole("radio", { name: "Monitor(a)" })).toBeChecked();
+    await roles.getByRole("radio", { name: "Tutor(a)" }).click();
+    await expect(roles.getByRole("radio", { name: "Tutor(a)" })).toBeChecked();
+    // Teclado: foco na opção marcada; seta para a direita escolhe a próxima.
+    await roles.getByRole("radio", { name: "Tutor(a)" }).focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(roles.getByRole("radio", { name: "Preceptor(a)" })).toBeChecked();
+    await expect(roles.getByRole("radio", { name: "Preceptor(a)" })).toBeFocused();
+    const ring = await roles.locator(".choice", { has: page.getByRole("radio", { name: "Preceptor(a)" }) })
+      .evaluate((el) => getComputedStyle(el).outlineStyle);
+    expect(ring).toBe("solid");
+    await page.getByLabel("Nome completo", { exact: true }).fill("Pessoa Sintética Teclado");
+    await page.getByRole("button", { name: "Abrir minha folha", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Minha frequência", exact: true })).toBeVisible();
+    const stored = await page.evaluate(() => JSON.parse(localStorage.getItem("pet_folha_profiles_v3")!)[0]);
+    expect(stored).toMatchObject({ role: "Preceptor(a)", gatNumber: "01" });
+    // No modal de identificação, o mesmo grupo.
+    await menuButton(page).click();
+    await page.getByRole("menuitem", { name: "Editar identificação" }).click();
+    const dialog = page.getByRole("dialog", { name: "Identificação do participante" });
+    const modalRoles = dialog.getByRole("radiogroup", { name: "Perfil", exact: true });
+    await expect(modalRoles.getByRole("radio", { name: "Preceptor(a)" })).toBeChecked();
+    await modalRoles.getByRole("radio", { name: "Orientador(a) de serviço" }).click();
+    await dialog.getByRole("button", { name: "Salvar alterações" }).click();
+    const updated = await page.evaluate(() => JSON.parse(localStorage.getItem("pet_folha_profiles_v3")!)[0]);
+    expect(updated.role).toBe("Orientador(a) de serviço");
+    await page.getByRole("button", { name: "Folha oficial", exact: true }).click();
+    await expect(page.locator(".sheet-stage .official-sheet")).toContainText("( X ) Orientador(a) de serviço");
+  });
+
+  test("modalidade e preenchimento rápido: teclado escolhe; o registro grava os nomes completos", async ({ page }) => {
+    await createProfile(page);
+    const modality = page.getByRole("radiogroup", { name: "Modalidade", exact: true });
+    // Rótulo curto na tela, nome completo como nome acessível.
+    await expect(modality.locator(".choice-text")).toHaveText(["In Loco", "Síncrona", "Assíncrona"]);
+    await expect(modality.getByRole("radio", { name: "Interação em tempo real (Síncrona)", exact: true })).toBeChecked();
+    await modality.getByRole("radio", { name: "Interação em tempo real (Síncrona)", exact: true }).focus();
+    await page.keyboard.press("ArrowLeft");
+    await expect(modality.getByRole("radio", { name: "Interação em tempo real (In Loco)", exact: true })).toBeChecked();
+    // Chips: Tab entra no grupo pela opção marcada; seta escolhe o modelo.
+    const chips = page.getByRole("radiogroup", { name: /Preenchimento rápido/ });
+    await chips.getByRole("radio", { name: "Em branco" }).focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(chips.getByRole("radio", { name: "Reunião Geral" })).toBeChecked();
+    await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Reunião Geral");
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await expect(chips.getByRole("radio", { name: "Pesquisa Bibliográfica e Estudos Autônomos" })).toBeChecked();
+    await expect(modality.getByRole("radio", { name: "Assíncrona", exact: true })).toBeChecked();
+    await page.getByLabel("Data", { exact: true }).fill("2026-11-02");
+    await page.getByLabel("Início", { exact: true }).fill("09:00");
+    await page.getByLabel("Fim", { exact: true }).fill("10:00");
+    await modality.getByRole("radio", { name: "Interação em tempo real (In Loco)", exact: true }).click();
+    await page.getByRole("button", { name: "Adicionar atividade", exact: true }).click();
+    const saved = await page.evaluate(() => {
+      const key = Object.keys(localStorage).find((k) => k.startsWith("pet_folha_activities_v3_"))!;
+      return JSON.parse(localStorage.getItem(key)!)[0];
+    });
+    expect(saved).toMatchObject({
+      modality: "Interação em tempo real (In Loco)",
+      description: "Pesquisa Bibliográfica e Estudos Autônomos",
+      local: "Online",
+    });
+    // Modal de edição usa o mesmo grupo e grava o nome completo.
+    await page.getByRole("button", { name: /^Editar atividade:/ }).click();
+    const edit = page.getByRole("dialog", { name: "Editar atividade", exact: true }).first();
+    await edit.getByRole("radio", { name: "Assíncrona", exact: true }).check();
+    await edit.getByRole("button", { name: /Salvar/ }).click();
+    const edited = await page.evaluate(() => {
+      const key = Object.keys(localStorage).find((k) => k.startsWith("pet_folha_activities_v3_"))!;
+      return JSON.parse(localStorage.getItem(key)!)[0];
+    });
+    expect(edited.modality).toBe("Assíncrona");
+  });
+
+  test("modalidade fora da lista (dado antigo) continua visível e marcada", async ({ page }) => {
+    await page.addInitScript(() => {
+      if (localStorage.getItem("test-seeded")) return;
+      localStorage.setItem("pet_folha_profiles_v3", JSON.stringify([{ id: "p", name: "Pessoa Sintética", role: "Monitor(a)", gatNumber: "01", createdAt: "2026-10-01T00:00:00.000Z" }]));
+      localStorage.setItem("pet_folha_active_profile_id_v3", "p");
+      localStorage.setItem("pet_folha_activities_v3_p_2026-11", JSON.stringify([{ id: "x", date: "2026-11-03", start: "09:00", end: "10:00", modality: "Modalidade personalizada", description: "Registro antigo", local: "", descricao: "" }]));
+      localStorage.setItem("test-seeded", "1");
+    });
+    await page.goto("/");
+    await page.getByRole("button", { name: /^Editar atividade:/ }).click();
+    const edit = page.getByRole("dialog", { name: "Editar atividade", exact: true }).first();
+    await expect(edit.getByRole("radio", { name: "Modalidade personalizada", exact: true })).toBeChecked();
+  });
+
+  test("no celular, modalidade em coluna e chips com rolagem horizontal sem rolar a página", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile", "só no celular");
+    await createProfile(page);
+    const boxes = await page.getByRole("radiogroup", { name: "Modalidade", exact: true }).locator(".choice")
+      .evaluateAll((items) => items.map((item) => item.getBoundingClientRect()));
+    expect(new Set(boxes.map((box) => Math.round(box.left))).size).toBe(1);
+    expect(boxes.every((box) => box.height >= 44)).toBe(true);
+    const chips = page.getByRole("radiogroup", { name: /Preenchimento rápido/ });
+    const scroll = await chips.evaluate((el) => ({ overflow: getComputedStyle(el).overflowX, wide: el.scrollWidth > el.clientWidth }));
+    expect(scroll).toEqual({ overflow: "auto", wide: true });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+});

@@ -13,6 +13,7 @@ import { fillTemplateName } from "./ActivityForm";
 import { X, Calendar, Clock, Check, Edit3 } from "lucide-react";
 import { useDialog } from "@/context/DialogContext";
 import { FullSelect } from "@/components/ui/full-select";
+import { ModalityChoice } from "./ModalityChoice";
 
 interface EditActivityModalProps {
   isOpen: boolean;
@@ -278,32 +279,12 @@ export function EditActivityModal({
             </div>
           </div>
 
-          {/* Row 2: Modalidade */}
-          <fieldset>
-            <legend className="block text-xs font-semibold text-body mb-1.5">
-              Modalidade
-            </legend>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {Array.from(new Set([...PROGRAM.modalities, modality])).map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  aria-pressed={modality === item}
-                  onClick={() => setModality(item)}
-                  className={`min-h-[42px] px-3 py-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                    modality === item
-                      ? "bg-info/10 border-info/50 text-info font-semibold"
-                      : "bg-canvas border-line text-muted hover:text-body"
-                  }`}
-                >
-                  <span
-                    className={`size-2 rounded-full ${modality === item ? "bg-info" : "bg-line"}`}
-                  />
-                  <span>{item}</span>
-                </button>
-              ))}
-            </div>
-          </fieldset>
+          {/* Row 2: Modalidade (mesmo grupo de opções do formulário) */}
+          <ModalityChoice
+            id="editactivitymodal-modality"
+            value={modality}
+            onChange={setModality}
+          />
 
           {/* Row 3: Local + Atividade desenvolvida */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

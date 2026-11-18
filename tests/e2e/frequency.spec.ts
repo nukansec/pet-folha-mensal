@@ -821,7 +821,7 @@ test("sem texto cortado, foco visível e folha oficial em preto e branco", async
   await create(page);
   await add(page);
   // Modalidade padrão do formulário: Síncrona (PROGRAM.defaultModality).
-  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue(/Síncrona/);
+  await expect(page.getByRole("radio", { name: "Interação em tempo real (Síncrona)", exact: true })).toBeChecked();
   for (const theme of ["light", "dark"]) {
     await page.evaluate((theme) => {
       document.documentElement.dataset.theme = theme;
@@ -871,30 +871,36 @@ test("sem texto cortado, foco visível e folha oficial em preto e branco", async
   }
   // Modelo rápido de nome longo, no celular.
   await page.setViewportSize({ width: 390, height: 1000 });
-  await page.getByLabel(/Preenchimento rápido/).selectOption({ label: "Pesquisa Bibliográfica e Estudos Autônomos" });
+  await page.getByRole("radio", { name: "Pesquisa Bibliográfica e Estudos Autônomos", exact: true }).check();
   expect(await cutTexts(page), "modelo longo 390px").toEqual([]);
 });
 
 test("modelos rápidos novos; modelo sem local deixa o campo vazio", async ({ page }) => {
   await create(page);
-  const template = page.getByLabel(/Preenchimento rápido/);
-  await expect(template.locator("option")).toHaveText([
+  const template = page.getByRole("radiogroup", { name: /Preenchimento rápido/ });
+  await expect(template.getByRole("radio")).toHaveCount(5);
+  await expect(template.locator(".choice-text")).toHaveText([
     "Em branco",
     "Reunião Geral",
     "Capacitação",
     "Visita Técnica",
     "Pesquisa Bibliográfica e Estudos Autônomos",
   ]);
-  await template.selectOption({ label: "Reunião Geral" });
+  await expect(template.getByRole("radio", { name: "Em branco" })).toBeChecked();
+  const modality = (name: string) => page.getByRole("radio", { name, exact: true });
+  await template.getByRole("radio", { name: "Reunião Geral" }).check();
   await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("UFG");
-  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Interação em tempo real (In Loco)");
+  await expect(modality("Interação em tempo real (In Loco)")).toBeChecked();
   await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Reunião Geral");
-  await template.selectOption({ label: "Visita Técnica" });
+  await template.getByRole("radio", { name: "Visita Técnica" }).check();
   await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("");
-  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Interação em tempo real (In Loco)");
-  await template.selectOption({ label: "Pesquisa Bibliográfica e Estudos Autônomos" });
+  await expect(modality("Interação em tempo real (In Loco)")).toBeChecked();
+  await template.getByRole("radio", { name: "Pesquisa Bibliográfica e Estudos Autônomos" }).check();
   await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("Online");
-  await expect(page.getByLabel("Modalidade", { exact: true })).toHaveValue("Assíncrona");
+  await expect(modality("Assíncrona")).toBeChecked();
+  // Digitar outra atividade volta a marcar "Em branco".
+  await page.getByLabel("Atividade desenvolvida", { exact: true }).fill("Outra atividade");
+  await expect(template.getByRole("radio", { name: "Em branco" })).toBeChecked();
 });
 
 test("lista antiga de modelos salva sem edição abre com os modelos novos", async ({ page }) => {
@@ -913,7 +919,7 @@ test("lista antiga de modelos salva sem edição abre com os modelos novos", asy
     localStorage.setItem("test-seeded", "1");
   }, legacy);
   await create(page);
-  const options = page.getByLabel(/Preenchimento rápido/).locator("option");
+  const options = page.getByRole("radiogroup", { name: /Preenchimento rápido/ }).locator(".choice-text");
   await expect(options).toHaveCount(5);
   await expect(options.nth(1)).toHaveText("Reunião Geral");
   // Lista editada pela pessoa: fica a dela.
@@ -921,7 +927,7 @@ test("lista antiga de modelos salva sem edição abre com os modelos novos", asy
     localStorage.setItem("pet_folha_config_templates_v3", JSON.stringify([{ ...legacy[2], name: "Ata da reunião (editada)" }]));
   }, legacy);
   await page.reload();
-  await expect(page.getByLabel(/Preenchimento rápido/).locator("option")).toHaveText(["Em branco", "Ata da reunião (editada)"]);
+  await expect(page.getByRole("radiogroup", { name: /Preenchimento rápido/ }).locator(".choice-text")).toHaveText(["Em branco", "Ata da reunião (editada)"]);
 });
 
 test("cartões .pdf e .json: mesma altura lado a lado, altura própria empilhados", async ({ page }, testInfo) => {

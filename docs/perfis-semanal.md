@@ -11,6 +11,7 @@ progresso por épico e do relatório final.
 | E1 Créditos | feito | `docs: autoria da versão PET-SD nos créditos` | rodapé (entrada e painel); README › Créditos; `test:ui` "botão Avaliar o site…" | — |
 | E2 Menu do participante | feito | `feat(ui): menu do participante no topo` | clique no cartão do topo; `tests/e2e/perfis.spec.ts` › "menu do participante" | — |
 | E3 Gerenciar perfis | feito | `feat: editar e excluir perfis na entrada` | entrada › Continuar; `test:ui` (resumo, exclusão, edição, cópia 1.4); `perfis.spec.ts` › "gerenciar perfis na entrada" | — |
+| E4 Seletores | feito | `feat(ui): seletores em grupos de opção` | formulário, modal de edição, primeiro acesso, modal de identificação; `perfis.spec.ts` › "seletores em grupos de opção"; `frequency.spec.ts` › "modelos rápidos…" | — |
 
 ## E0 — Diagnóstico
 
@@ -122,3 +123,24 @@ Outros achados:
   Sem caixa "digite o nome": a cópia antes já é oferecida e o custo de digitar
   no celular não compensa para dados locais.
 - **E3** — Sem perfis (o último excluído), a entrada cai em "Primeiro acesso".
+- **E4** — Grupos de opção com **rádios nativos** transparentes sobre cada
+  cartão, dentro de `role="radiogroup"` + `aria-labelledby`, em vez de botões
+  com `aria-checked` e teclado escrito à mão. O navegador já entrega setas,
+  Tab pela opção marcada, "x de n" no leitor de tela e foco; menos código para
+  errar. O rádio cobre o cartão inteiro (inclusive a borda) e mede ≥ 44 px.
+- **E4** — Modalidade: rótulo curto e ícone na tela (`PROGRAM.modalityShortLabels`),
+  nome completo como nome acessível, `title` e valor gravado; a folha não
+  muda. Modalidade fora da lista (dado antigo ou personalizado) vira uma opção
+  extra, como fazia o select. Em ≤ 480 px vira coluna. O modal de edição usa o
+  mesmo componente.
+- **E4** — Preenchimento rápido: pílulas (quebram linha no desktop, rolagem
+  horizontal no celular). As setas aplicam o modelo ao navegar, como o select
+  nativo fazia ao trocar de opção. No **modal de edição** o "Selecionar modelo…"
+  continua lista: lá é uma ação pontual sem estado "Em branco", não um valor
+  (pergunta 3 do E0).
+- **E4** — Perfil: cartões (grade; 2 colunas em ≤ 480 px) na entrada e no modal.
+  GAT (13) e Mês ficam em select: GAT no `FullSelect` (mesma altura, borda,
+  seta e foco dos campos); o Mês ganhou o mesmo anel de foco na caixa.
+- **E4** — Bug encontrado nos testes: `.activity-fields .field label
+  { position: static }` vencia a regra do cartão e o rádio escapava; os
+  seletores dos grupos usam `> label.choice` para ganhar especificidade.

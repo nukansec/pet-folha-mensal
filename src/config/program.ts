@@ -90,6 +90,15 @@ export const PROGRAM = {
     "Interação em tempo real (Síncrona)",
     "Assíncrona",
   ] as string[],
+  /**
+   * Rótulo curto de cada modalidade nos botões de escolha. O nome completo
+   * continua sendo o valor gravado, o nome acessível e o texto da folha.
+   */
+  modalityShortLabels: {
+    "Interação em tempo real (In Loco)": "In Loco",
+    "Interação em tempo real (Síncrona)": "Síncrona",
+    "Assíncrona": "Assíncrona",
+  } as Record<string, string>,
   /** Modalidade inicial do formulário e de registros sem modalidade. */
   defaultModality: "Interação em tempo real (Síncrona)",
 

@@ -26,6 +26,7 @@ import { ReleaseNotes } from "./ReleaseNotes";
 import { SiteFooter } from "./SiteFooter";
 import { Frame, FrameHeader, FramePanel, SegmentedControl, SegmentedControlItem } from "./ui/access-controls";
 import { FullSelect } from "@/components/ui/full-select";
+import { RoleChoice } from "./RoleChoice";
 import type { ProfileActivitySummary } from "@/lib/storage";
 
 /** Iniciais do cartão: primeira letra do primeiro e do último nome. */
@@ -321,35 +322,26 @@ export function LandingPage({
                         maxLength={150}
                       />
                     </div>
-                    <div className="start-field-row">
-                      <div className="field">
-                        <label htmlFor="entry-role">Perfil</label>
-                        <FullSelect
-                          id="entry-role"
-                          value={role}
-                          onChange={(event) => setRole(event.target.value)}
-                          required
-                        >
-                          {roles.map((item) => (
-                            <option key={item}>{item}</option>
-                          ))}
-                        </FullSelect>
-                      </div>
-                      <div className="field">
-                        <label htmlFor="entry-gat">GAT</label>
-                        <FullSelect
-                          id="entry-gat"
-                          value={gat}
-                          onChange={(event) => setGat(event.target.value)}
-                          required
-                        >
-                          {gatList.map((item) => (
-                            <option key={item.number} value={item.number}>
-                              GAT {item.number} · {item.name}
-                            </option>
-                          ))}
-                        </FullSelect>
-                      </div>
+                    <RoleChoice
+                      id="entry-role"
+                      roles={roles}
+                      value={role}
+                      onChange={setRole}
+                    />
+                    <div className="field">
+                      <label htmlFor="entry-gat">GAT</label>
+                      <FullSelect
+                        id="entry-gat"
+                        value={gat}
+                        onChange={(event) => setGat(event.target.value)}
+                        required
+                      >
+                        {gatList.map((item) => (
+                          <option key={item.number} value={item.number}>
+                            GAT {item.number} · {item.name}
+                          </option>
+                        ))}
+                      </FullSelect>
                     </div>
                     <button
                       className="primary-button w-full"
