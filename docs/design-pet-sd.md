@@ -26,7 +26,7 @@ exata, modalidades, GATs, folha oficial).
 - Capturas geradas por `scripts/capturar-telas.mjs` (Playwright, dados
   fictícios, JPEG 70 %) em 1440 e 390 px, claro e escuro:
   - `antes/clima/`: https://pet-folha-mensal.vercel.app
-  - `antes/pet-sd/`: https://pet-folha-mensal-three.vercel.app
+  - `antes/pet-sd/`: https://pet-folha-mensal-three.vercel.app (endereço antigo; hoje redireciona para https://pet-sd-folha-mensal.vercel.app)
   - Cada pasta tem `resumo.txt` com as telas que não existem num dos sites
     (o Clima não tem modal “Concluir” nem “Configurações” acessível direto).
 

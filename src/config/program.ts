@@ -151,7 +151,7 @@ export const PROGRAM = {
     /** Repositório deste fork. */
     repository: "https://github.com/nukansec/pet-folha-mensal",
     /** Endereço público do app (base das URLs absolutas do Open Graph). */
-    site: "https://pet-folha-mensal-three.vercel.app",
+    site: "https://pet-sd-folha-mensal.vercel.app",
   },
 
   /** Créditos do projeto original (este app é um fork). */

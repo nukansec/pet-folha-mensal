@@ -8,7 +8,7 @@ JPEG com qualidade 70 para não pesar no repositório.
 | Pasta | Origem |
 | --- | --- |
 | `antes/clima/` | referência de layout: https://pet-folha-mensal.vercel.app (PET-Saúde Clima) |
-| `antes/pet-sd/` | produção do PET-SD antes desta branch: https://pet-folha-mensal-three.vercel.app |
+| `antes/pet-sd/` | produção do PET-SD antes desta branch: https://pet-folha-mensal-three.vercel.app (endereço antigo) |
 | `depois/pet-sd/` | esta branch, `npm run build` e `next start` locais |
 | `comparacao/` | as três lado a lado (Clima, antes, depois), por tela, tema e largura |
 

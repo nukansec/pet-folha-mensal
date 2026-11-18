@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import Module, { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -345,6 +345,17 @@ test("cartão de exemplo da entrada: dia da semana vem da data e linhas em ordem
   // Sem o ícone "?" duplicado: a entrada já tem o link "Dúvidas".
   assert.doesNotMatch(html, /aria-label="Abrir ajuda"/);
   assert.match(html, /href="#perguntas">Dúvidas</);
+});
+
+test("endereço do site só na config; metadados usam PROGRAM.links.site", () => {
+  const { PROGRAM } = load("./src/config/program.ts");
+  assert.equal(PROGRAM.links.site, "https://pet-sd-folha-mensal.vercel.app");
+  const files = readdirSync(path.join(root, "src"), { recursive: true })
+    .filter((file) => /\.(ts|tsx|css)$/.test(file))
+    .filter((file) => readFileSync(path.join(root, "src", file), "utf8").includes("vercel.app"))
+    .map((file) => file.replaceAll("\\", "/"));
+  assert.deepEqual(files, ["config/program.ts"]);
+  assert.match(readFileSync(path.join(root, "src/app/layout.tsx"), "utf8"), /metadataBase: new URL\(PROGRAM\.links\.site\)/);
 });
 
 test("cópias 1.0 a 1.2 restauram com campos novos vazios e ignoram o Forms antigo", () => {
