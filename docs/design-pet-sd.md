@@ -14,8 +14,8 @@ exata, modalidades, GATs, folha oficial).
 | E1 Paleta e tokens | concluído | `feat(ui): paleta branca e laranja do PET-SD` | `npm run test:contrast` | — |
 | E2 Marca | concluído | `feat(ui): logo do PET-SD na interface e nos ícones` | `python scripts/brand/gerar-marca.py "<PNG oficial>"`; `npm run build` e conferir `<head>` | vetorial oficial e aprovação da coordenação (dúvidas 1 e 4) |
 | E3 Layout e botões | concluído | `feat(ui): layout e hierarquia de botões no padrão do Clima` | `npm run test:e2e`; capturas em `depois/` (E5) | lateral × duas linhas (dúvida 2) |
-| E4 Ferramentas | pendente | | | |
-| E5 Testes e “depois” | pendente | | | |
+| E4 Ferramentas | concluído | `fix(ui): GAT 01 como padrão e GATs em ordem numérica`; `fix(ui): textos no singular e botões de confirmação acessíveis` | e2e “primeiro acesso começa no GAT 01…” | — |
+| E5 Testes e “depois” | concluído | `test: validação visual do novo design` | e2e “sem texto cortado, foco visível e folha oficial em preto e branco”; `docs/validation/design-20261118/` | — |
 | E6 Documentação | pendente | | | |
 
 ## Linha de base (E0)
@@ -117,9 +117,88 @@ de layout é o site.
    **formulário de atividades** do programa? Sem eles, os botões ficam ocultos.
 4. A coordenação já aprovou o uso do logo no app? (Regra de identidade visual
    do regimento: materiais precisam de aprovação do GAT/coordenação.)
-5. A folha imprime “GAT: 1”, e o app usa “01”. O modelo oficial prevê zero à
-   esquerda? (Não mexi: a folha está fora do escopo de design.)
+5. ~~A folha imprime “GAT: 1”…~~ Respondida pelo próprio repositório:
+   `docs/validation/pet-sd-20261117/README.md` registra “GAT sem zero à
+   esquerda, como no modelo”. Nada a mudar.
+
+## Ferramentas revisadas (E4)
+
+| Ferramenta | Situação | O que mudou |
+| --- | --- | --- |
+| Salvar cópia | toast de sucesso, aviso de erro, `title` explicando o .json | contorno no cabeçalho (secundária) |
+| Restaurar cópia | diálogo mostra participante, mês e contagem antes de gravar | “1 atividades” → “1 atividade” |
+| Concluir | modal separa cópia e PDF e avisa ao sair sem cópia | sem mudança de fluxo |
+| Limpar mês | confirmação com a contagem | singular (“A atividade de … será removida.”); botões de 44 px |
+| Excluir atividade | confirmação com data e CH | título “Excluir atividade?”; botões de 44 px e 14 px |
+| Configurações (PIN) | inalterado | GATs listados em ordem numérica |
+| Ajuda | modal com dúvidas frequentes | `title` no ícone |
+| Troca de mês | confirma rascunho não salvo | sem mudança |
+| Troca de perfil / identificação | modal de perfil | GATs em ordem; select com opção inteira |
+| Comprovantes do mês | estado vazio “Nenhum comprovante neste mês.” | sem mudança |
+| Modelo em branco | rodapé (PDF) e aba da folha (.docx e PDF) | link no rodapé de todas as telas |
+| Imprimir / salvar PDF | primário na aba Folha oficial | sem mudança |
+| Primeiro acesso | — | **bug:** abria no GAT 10 (ordem de chaves em JS); agora GAT 01 |
+| Toast | `role="status"` | 12 px → 14 px |
+
+## Testes novos (E5)
+
+- `sem texto cortado, foco visível e folha oficial em preto e branco` (e2e,
+  desktop e celular): mede `scrollWidth > clientWidth` em rótulos, botões,
+  links, títulos e células, e a largura da opção escolhida nos selects, em 390
+  e 1440 px, nos dois temas, na entrada (com o GAT de nome mais longo), no
+  painel e com o modelo rápido mais longo; confere o anel de foco no botão
+  primário; confere que toda cor da folha oficial é cinza (r = g = b) nos dois
+  temas. Contraprova: a mesma medição reprova a produção atual
+  (“GAT 11 · Segunda opinião em oftalmologia” ocupa 315 px num espaço de 264 px).
+- `primeiro acesso começa no GAT 01, lista os GATs em ordem e conta no
+  singular` (e2e) e `GATs em ordem numérica e contagens no singular`
+  (`test:ui`).
+- `verify-ui.mjs`: a entrada precisa ter a marca, “Vamos começar”, os três
+  passos e os dois arquivos, nessa ordem.
+
+### Defeitos que os testes pegaram durante o trabalho
+
+1. **Estouro horizontal de 158 px em 390 px na entrada:** `.entry-header nav`
+   (globals.css) vencia `.entry-anchors { display: none }` por especificidade.
+   Achado por bisseção automática do CSS (o teste de comprovantes no celular
+   travava porque o diálogo ficava fora da tela rolada).
+2. **Estouro em 768 px no painel:** o botão de perfil não encolhia; apareceu
+   quando o GAT padrão foi corrigido para o 01, de nome mais longo.
+3. **Select cortado na entrada e no modelo rápido em 390 px.** Select nativo
+   não quebra linha e a fonte não pode baixar de 16 px (zoom do iOS). Criado
+   `FullSelect` (`src/components/ui/full-select.tsx`): o select nativo fica
+   transparente por cima de uma caixa que mostra a opção inteira com quebra;
+   foco, teclado e leitor de tela continuam nativos.
+4. **Texto auxiliar de 13 px** (perfil, cabeçalho da tabela) abaixo do mínimo
+   de 14 px do `docs/ui-ux.md`.
 
 ## Antes × depois
 
-Preenchido no E5.
+Imagens lado a lado (Clima | PET-SD antes | PET-SD depois) em
+`docs/validation/design-20261118/comparacao/`. Principais:
+
+| Tela | Arquivo |
+| --- | --- |
+| Entrada, desktop | `comparacao/entrada-claro-1440.jpg` |
+| Entrada, celular escuro | `comparacao/entrada-escuro-390.jpg` |
+| Painel, desktop | `comparacao/painel-claro-1440.jpg`, `painel-escuro-1440.jpg` |
+| Painel, celular | `comparacao/painel-claro-390.jpg` |
+| Folha oficial | `comparacao/folha-claro-1440.jpg` |
+
+O que mudou, olhando as imagens:
+
+- **Entrada:** de “título + cartão + bloco JSON/PDF” para a sequência do Clima:
+  hero com marca e prévia fictícia (CH exata), cartão “Vamos começar”, três
+  passos, dois arquivos, novidades, dúvidas.
+- **Painel:** cabeçalho em duas linhas com o nome inteiro (antes “Pessoa
+  Fictí…”); faixa de horas em cartão; lista à esquerda e formulário em uma
+  coluna à direita (antes duas colunas espremidas, com “Modelo rápid”,
+  “Interação em te” e placeholders cortados).
+- **Celular:** perfil com quebra de linha; botões de cópia com o mesmo peso;
+  formulário em uma coluna com CH ao lado dos horários.
+- **Folha oficial:** igual (preto e branco), só a moldura da interface mudou.
+
+O que ficou **diferente do Clima de propósito**: cabeçalho em duas linhas em vez
+de barra lateral (dúvida 2); sem onboarding em carrossel; sem botão flutuante e
+abas inferiores no celular; colunas Unidade/Local e Descrição, CH exata e
+modalidades do PET-SD; laranja no lugar do verde.

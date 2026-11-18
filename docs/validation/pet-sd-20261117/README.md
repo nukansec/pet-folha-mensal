@@ -14,9 +14,11 @@ exportado para PDF pelo Word) e com o modelo em branco gerado em
 | `folha-25-linhas.pdf` | 25 atividades, quebra de tabela com cabeçalho repetido (4 páginas) |
 | `folha-vazia.pdf` | mês sem atividades (2 páginas) |
 | `folha-modelo-em-branco.pdf` | aba "Modelo em branco" (2 páginas, como o .docx) |
-| `folha-comum-{claro,escuro}-{desktop,390px}.png` | prévia na aba "Folha oficial" nos dois temas e larguras |
-| `folha-25-linhas-claro-desktop.png`, `folha-vazia-claro-desktop.png`, `folha-modelo-em-branco-claro-desktop.png` | prévias |
-| `painel-claro-{desktop,390px}.png` | tela de lançamento com os campos novos |
+
+As capturas de tela desta data (interface verde) foram removidas em
+2026-11-18, quando a interface mudou de paleta e de layout; as atuais estão em
+[`design-20261118/`](../design-20261118/README.md). Os PDFs continuam válidos: a
+folha oficial não mudou.
 
 Para regenerar: `npm run dev` e, em outro terminal,
 `node scripts/capture-validation.mjs . http://127.0.0.1:5000 docs/validation/pet-sd-AAAAMMDD`.
