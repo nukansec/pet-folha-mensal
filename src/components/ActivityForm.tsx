@@ -101,80 +101,61 @@ export function ActivityForm({
       <form onSubmit={submit} className="activity-fields">
         <div className="form-panel-heading">
           <h2 id="activity-form-title">Adicionar atividade</h2>
-          {templates.length > 0 && (
-            <div className="field template-field">
-              <label htmlFor="activity-template" className="sr-only">
-                Preenchimento rápido
-              </label>
-              <select
-                id="activity-template"
-                value={templateId}
-                onChange={(event) => {
-                  setTemplateId(event.target.value);
-                  const template = templates.find(
-                    (item) => item.id === event.target.value,
-                  );
-                  if (template) {
-                    setDescription(
-                      fillTemplateName(
-                        template.name,
-                        defaultGatNumber,
-                        defaultGatName,
-                      ),
-                    );
-                    setModality(template.modality);
-                    if (template.local) setLocal(template.local);
-                    dirty();
-                  }
-                }}
-              >
-                <option value="">Modelo rápido</option>
-                {templates.map((template) => (
-                  <option key={template.id} value={template.id}>
-                    {fillTemplateName(
+        </div>
+        {templates.length > 0 && (
+          <div className="field template-field">
+            <label htmlFor="activity-template">
+              Preenchimento rápido <span className="field-optional">· opcional</span>
+            </label>
+            <select
+              id="activity-template"
+              value={templateId}
+              onChange={(event) => {
+                setTemplateId(event.target.value);
+                const template = templates.find(
+                  (item) => item.id === event.target.value,
+                );
+                if (template) {
+                  setDescription(
+                    fillTemplateName(
                       template.name,
                       defaultGatNumber,
                       defaultGatName,
-                    )}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-        </div>
-        <div className="pair-fields">
-          <div className="field">
-            <label htmlFor="activity-date">Data</label>
-            <input
-              id="activity-date"
-              type="date"
-              required
-              min={`${monthKey}-01`}
-              max={lastDate}
-              value={date}
-              onChange={(event) => {
-                setDate(event.target.value);
-                dirty();
-              }}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="activity-modality">Modalidade</label>
-            <select
-              id="activity-modality"
-              value={modality}
-              onChange={(event) => {
-                setModality(event.target.value);
-                dirty();
+                    ),
+                  );
+                  setModality(template.modality);
+                  if (template.local) setLocal(template.local);
+                  dirty();
+                }
               }}
             >
-              {Array.from(new Set([...PROGRAM.modalities, modality])).map(
-                (item) => (
-                  <option key={item}>{item}</option>
-                ),
-              )}
+              <option value="">Em branco</option>
+              {templates.map((template) => (
+                <option key={template.id} value={template.id}>
+                  {fillTemplateName(
+                    template.name,
+                    defaultGatNumber,
+                    defaultGatName,
+                  )}
+                </option>
+              ))}
             </select>
           </div>
+        )}
+        <div className="field">
+          <label htmlFor="activity-date">Data</label>
+          <input
+            id="activity-date"
+            type="date"
+            required
+            min={`${monthKey}-01`}
+            max={lastDate}
+            value={date}
+            onChange={(event) => {
+              setDate(event.target.value);
+              dirty();
+            }}
+          />
         </div>
         <div className="time-fields">
           <div className="field">
@@ -188,7 +169,7 @@ export function ActivityForm({
                 setStart(event.target.value);
                 dirty();
               }}
-              aria-describedby={error ? "activity-error" : undefined}
+              aria-describedby={`activity-ch-rule${error ? " activity-error" : ""}`}
             />
           </div>
           <div className="field">
@@ -202,53 +183,68 @@ export function ActivityForm({
                 setEnd(event.target.value);
                 dirty();
               }}
-              aria-describedby={error ? "activity-error" : undefined}
+              aria-describedby={`activity-ch-rule${error ? " activity-error" : ""}`}
             />
           </div>
-          <div
-            className="hours-preview"
-            title="CH exata entre início e fim. Ex.: 16h30 às 18h00 = 1h30."
-          >
+          <div className="hours-preview" aria-live="polite">
             <span>CH</span>
             <strong>{formatDuration(minutes)}</strong>
           </div>
         </div>
-        <div className="pair-fields">
-          <div className="field">
-            <label htmlFor="activity-local">Unidade/Local</label>
-            <input
-              id="activity-local"
-              placeholder="Ex.: unidade de saúde, sala, on-line ou -"
-              maxLength={300}
-              value={local}
-              onChange={(event) => {
-                setLocal(event.target.value);
-                dirty();
-              }}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="activity-description">Atividade desenvolvida</label>
-            <input
-              id="activity-description"
-              required
-              placeholder="Ex.: Reunião semanal do GAT"
-              value={description}
-              onChange={(event) => {
-                setDescription(event.target.value);
-                setTemplateId("");
-                dirty();
-              }}
-            />
-          </div>
+        <p id="activity-ch-rule" className="field-hint">
+          Conta o tempo exato. Ex.: 16h30 às 18h = 1h30.
+        </p>
+        <div className="field">
+          <label htmlFor="activity-modality">Modalidade</label>
+          <select
+            id="activity-modality"
+            value={modality}
+            onChange={(event) => {
+              setModality(event.target.value);
+              dirty();
+            }}
+          >
+            {Array.from(new Set([...PROGRAM.modalities, modality])).map(
+              (item) => (
+                <option key={item}>{item}</option>
+              ),
+            )}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="activity-local">Unidade/Local</label>
+          <input
+            id="activity-local"
+            placeholder="Ex.: unidade de saúde, sala ou on-line"
+            maxLength={300}
+            value={local}
+            onChange={(event) => {
+              setLocal(event.target.value);
+              dirty();
+            }}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="activity-description">Atividade desenvolvida</label>
+          <input
+            id="activity-description"
+            required
+            placeholder="Ex.: Reunião semanal do GAT"
+            value={description}
+            onChange={(event) => {
+              setDescription(event.target.value);
+              setTemplateId("");
+              dirty();
+            }}
+          />
         </div>
         <div className="field">
           <label htmlFor="activity-descricao">Descrição</label>
           <textarea
             id="activity-descricao"
-            rows={2}
+            rows={3}
             maxLength={4000}
-            placeholder="Pautas, conteúdos estudados ou produtos da atividade"
+            placeholder="Pautas, conteúdos estudados ou produtos"
             value={descricao}
             onChange={(event) => {
               setDescricao(event.target.value);

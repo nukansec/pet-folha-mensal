@@ -327,7 +327,14 @@ test("entrada apresenta acesso e explicação visível do JSON e PDF antes do FA
   assert.match(html, /O JSON é um arquivo que guarda sua identificação/);
   assert.match(html, /O PDF não permite restaurar/);
   assert.match(html, /Quem usa este navegador pode abrir/);
-  assert.doesNotMatch(html, /Veja como sua folha|preview-disclosure|Sua frequência,|Vamos começar/);
+  assert.doesNotMatch(html, /Veja como sua folha|preview-disclosure|Sua frequência,|Clima/);
+  // Estrutura da entrada no padrão de referência: marca, cartão de acesso,
+  // três passos, dois arquivos e dúvidas, nesta ordem.
+  assert.match(html, /Logo do PET-Saúde: Informação e Saúde Digital/);
+  assert.match(html, /Vamos começar/);
+  assert.ok(html.indexOf('id="acesso"') < html.indexOf('id="como-funciona"'));
+  assert.ok(html.indexOf('id="como-funciona"') < html.indexOf('id="o-que-guardar"'));
+  assert.match(html, /16:30 às 18:00 = 1h30/);
   verifyLabelTargets(html);
   assert.match(html, /Felipe Gonçalves Vidal/);
   assert.match(html, /Robert Francisco Taveira/);

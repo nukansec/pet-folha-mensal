@@ -11,9 +11,9 @@ exata, modalidades, GATs, folha oficial).
 | Épico | Status | Commits | Como verificar | Pendências |
 | --- | --- | --- | --- | --- |
 | E0 Diagnóstico e “antes” | concluído | `docs: diagnóstico de design e capturas de referência` | `docs/validation/design-20261118/antes/` | respostas da lista de dúvidas |
-| E1 Paleta e tokens | pendente | | | |
-| E2 Marca | pendente | | | |
-| E3 Layout e botões | pendente | | | |
+| E1 Paleta e tokens | concluído | `feat(ui): paleta branca e laranja do PET-SD` | `npm run test:contrast` | — |
+| E2 Marca | concluído | `feat(ui): logo do PET-SD na interface e nos ícones` | `python scripts/brand/gerar-marca.py "<PNG oficial>"`; `npm run build` e conferir `<head>` | vetorial oficial e aprovação da coordenação (dúvidas 1 e 4) |
+| E3 Layout e botões | concluído | `feat(ui): layout e hierarquia de botões no padrão do Clima` | `npm run test:e2e`; capturas em `depois/` (E5) | lateral × duas linhas (dúvida 2) |
 | E4 Ferramentas | pendente | | | |
 | E5 Testes e “depois” | pendente | | | |
 | E6 Documentação | pendente | | | |
@@ -73,6 +73,38 @@ de layout é o site.
 - O `npm ci` da linha de base falhou porque um `next dev` deste projeto estava
   aberto e travava o binário do lightningcss; os processos desse dev server
   foram encerrados para reinstalar as dependências.
+
+- **Paleta.** Ação em `#c2410c` (5,18:1 com branco), hover `#9a3412`. Texto
+  laranja em `#b43c0a`, um pouco mais escuro que o botão: o `#c2410c` dava
+  4,48:1 num badge com 10 % de laranja ao fundo, e o script de contraste
+  pegou. `#f26a35` (laranja do logo) só na barra de progresso e na prévia
+  (3,05:1: serve para gráfico, não para texto). Azul do logo `#1a5a8e` em
+  “UFG” e em informação. Escuro: botão `#fb923c` com texto grafite
+  `#1c1917` (7,7:1), porque branco sobre laranja claro não passa.
+- **Perigo** ganhou tokens próprios (`--danger-fill`): o vermelho do botão
+  destrutivo em hover tinha 3,76:1 com branco.
+- **Tema claro como padrão:** sem `pet_theme` salvo, abre claro; quem tinha
+  escolhido escuro continua no escuro.
+- **Ícones e Open Graph.** `favicon.ico`, `icon.png` e `apple-icon.png` são
+  arquivos especiais do Next 16 em `src/app/`. A imagem de compartilhamento
+  foi para `public/` e é declarada no `metadata`, porque o
+  `opengraph-image.alt.txt` não gerou `og:image:alt` no build.
+- **Apple icon com fundo branco:** o iOS preenche transparência com preto.
+- **Marca completa no tema escuro** fica sobre uma placa branca: o subtítulo
+  azul-escuro do logo some no fundo escuro, e não se pode mudar a cor da marca.
+- **CSS novo em arquivo próprio** (`src/app/design-pet-sd.css`, depois de
+  `globals.css`): o `globals.css` tem regras repetidas em camadas, então isolar
+  o layout novo deixa a cascata previsível e o diff revisável. O bloco “tela
+  única” (desktop com altura da janela e cabeçalho em uma linha) foi removido:
+  era ele que cortava o perfil e espremia o formulário.
+- **Formulário à direita, mas primeiro no DOM:** no celular e para quem navega
+  por teclado, o lançamento vem antes da lista; no desktop o grid o coloca à
+  direita, como no Clima.
+- **Uma ação primária por tela:** na entrada, “Começar agora” é contorno e só
+  leva ao cartão; o primário é “Abrir minha folha”.
+- **Selects:** opção escolhida quebra linha em vez de cortar.
+- **Faixa de horas:** “19 de 32 h”, “Faltam 13h para o mínimo mensal” e a regra
+  (referência semanal e excedente) visíveis, não mais só em `title`.
 
 ## Dúvidas para o Brunno
 

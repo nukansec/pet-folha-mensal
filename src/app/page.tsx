@@ -727,13 +727,6 @@ export default function Home() {
                   : "Confira os dados antes de imprimir e assinar."}
               </p>
             </div>
-            {activeTab === "dashboard" && (
-              <StatsGrid
-                totalMinutes={totalMinutes}
-                activitiesCount={activities.length}
-                targetHours={PROGRAM.monthlyTargetHours}
-              />
-            )}
             <label className="workspace-month">
               <Calendar className="size-4 text-brand-text" />
               <span>Mês</span>
@@ -756,6 +749,12 @@ export default function Home() {
           {/* ABA 1: PAINEL DE LANÇAMENTOS */}
           {activeTab === "dashboard" && (
             <div>
+              <StatsGrid
+                totalMinutes={totalMinutes}
+                activitiesCount={activities.length}
+                targetHours={PROGRAM.monthlyTargetHours}
+                monthLabel={monthLabel}
+              />
               <div className="frequency-workbench">
                 <ActivityForm
                   key={`${activeUser.id}-${monthKey}-${formRevision}`}
@@ -987,7 +986,6 @@ export default function Home() {
         </main>
 
         <SiteFooter
-          compact
           onHelp={() => setIsHelpOpen(true)}
           onFeedback={() => setIsFeedbackModalOpen(true)}
         />
