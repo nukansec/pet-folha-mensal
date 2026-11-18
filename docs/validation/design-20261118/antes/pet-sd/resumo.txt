@@ -1,0 +1,23 @@
+pet-sd · https://pet-folha-mensal-three.vercel.app
+ok      entrada-claro-1440
+ok      painel-claro-1440
+ok      modal-editar-claro-1440
+ok      modal-limpar-claro-1440
+ok      modal-ajuda-claro-1440
+ok      modal-configuracoes-claro-1440
+ok      modal-concluir-claro-1440
+ok      folha-claro-1440
+ok      entrada-claro-390
+ok      painel-claro-390
+ok      modal-editar-claro-390
+ok      modal-limpar-claro-390
+ok      modal-ajuda-claro-390
+ok      modal-configuracoes-claro-390
+ok      modal-concluir-claro-390
+ok      folha-claro-390
+ok      entrada-escuro-1440
+ok      painel-escuro-1440
+ok      folha-escuro-1440
+ok      entrada-escuro-390
+ok      painel-escuro-390
+ok      folha-escuro-390
