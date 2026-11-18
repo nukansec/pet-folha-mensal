@@ -366,6 +366,10 @@ test("botão Avaliar o site depende do link configurado", () => {
   assert.equal(PROGRAM.links.feedbackForm, "https://forms.gle/tjpuiFpgJ2Njnx7F7");
   assert.equal(PROGRAM.links.activityForm, "");
   assert.match(footer(), />Avaliar o site</);
+  // Autoria e créditos levam ao LinkedIn de cada pessoa.
+  for (const person of [PROGRAM.author, ...PROGRAM.credits.authors])
+    assert.match(person.url, /^https:\/\/www\.linkedin\.com\/in\/[^/]+\/$/);
+  assert.equal(PROGRAM.author.url, "https://www.linkedin.com/in/brunnobernardes/");
   // Autoria desta versão vem de PROGRAM.author; créditos do original seguem.
   assert.match(footer(), new RegExp(`Feito por <a href="${PROGRAM.author.url}"[^>]*>${PROGRAM.author.name}</a> · adaptado do <a href="${PROGRAM.credits.upstreamRepository}"`));
   assert.match(footer(), /de <a href="https:\/\/www\.linkedin\.com\/in\/vvvvvdal\/"[^>]*>Felipe Gonçalves Vidal<\/a> e <a [^>]*>Robert Francisco Taveira<\/a>/);
