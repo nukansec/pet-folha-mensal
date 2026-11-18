@@ -9,6 +9,7 @@
     "start": "next start -p 5000",
     "lint": "eslint",
     "test:ui": "node scripts/verify-ui.mjs",
+    "test:contrast": "node scripts/checar-contraste.mjs",
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test"
   },

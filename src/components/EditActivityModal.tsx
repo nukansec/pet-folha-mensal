@@ -129,7 +129,7 @@ export function EditActivityModal({
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-line">
           <div className="flex items-center gap-2.5">
-            <div className="size-8 rounded-xl bg-accent/15 text-accent  flex items-center justify-center font-bold">
+            <div className="size-8 rounded-xl bg-brand-text/15 text-brand-text  flex items-center justify-center font-bold">
               <Edit3 className="size-4" />
             </div>
             <div>
@@ -170,7 +170,7 @@ export function EditActivityModal({
                 e.target.value = "";
               }}
               defaultValue=""
-              className="text-xs px-2.5 py-1.5 rounded-lg bg-surface border border-line text-body outline-none cursor-pointer focus:border-accent"
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-surface border border-line text-body outline-none cursor-pointer focus:border-brand-text"
             >
               <option value="" disabled>
                 Selecionar modelo...
@@ -207,7 +207,7 @@ export function EditActivityModal({
                     } catch {}
                   }}
                   required
-                  className="w-full min-h-[44px] pl-3 pr-10 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-accent transition-colors cursor-pointer"
+                  className="w-full min-h-[44px] pl-3 pr-10 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-brand-text transition-colors cursor-pointer"
                 />
                 <Calendar className="absolute right-3 size-4 text-body pointer-events-none z-1" />
               </div>
@@ -233,7 +233,7 @@ export function EditActivityModal({
                     } catch {}
                   }}
                   required
-                  className="w-full min-h-[44px] pl-3 pr-10 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-accent transition-colors cursor-pointer"
+                  className="w-full min-h-[44px] pl-3 pr-10 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-brand-text transition-colors cursor-pointer"
                 />
                 <Clock className="absolute right-3 size-4 text-body pointer-events-none z-1" />
               </div>
@@ -259,7 +259,7 @@ export function EditActivityModal({
                     } catch {}
                   }}
                   required
-                  className="w-full min-h-[44px] pl-3 pr-10 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-accent transition-colors cursor-pointer"
+                  className="w-full min-h-[44px] pl-3 pr-10 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-brand-text transition-colors cursor-pointer"
                 />
                 <Clock className="absolute right-3 size-4 text-body pointer-events-none z-1" />
               </div>
@@ -271,7 +271,7 @@ export function EditActivityModal({
               aria-live="polite"
             >
               <span className="text-[11px] font-medium text-muted">CH</span>
-              <span className="text-sm font-bold text-accent whitespace-nowrap">
+              <span className="text-sm font-bold text-brand-text whitespace-nowrap">
                 {formatDuration(previewMinutes)}
               </span>
             </div>
@@ -319,7 +319,7 @@ export function EditActivityModal({
                 maxLength={300}
                 onChange={(e) => setLocal(e.target.value)}
                 placeholder="Ex.: unidade de saúde, sala, on-line ou -"
-                className="w-full min-h-[44px] px-3 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-accent transition-colors"
+                className="w-full min-h-[44px] px-3 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-brand-text transition-colors"
               />
             </div>
             <div>
@@ -335,7 +335,7 @@ export function EditActivityModal({
                 onChange={(e) => setDescription(e.target.value)}
                 required
                 placeholder="Ex.: Reunião semanal do GAT"
-                className="w-full min-h-[44px] px-3 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-accent transition-colors"
+                className="w-full min-h-[44px] px-3 py-2 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-brand-text transition-colors"
               />
             </div>
           </div>
@@ -355,7 +355,7 @@ export function EditActivityModal({
               onChange={(e) => setDescricao(e.target.value)}
               rows={4}
               placeholder="Pautas, conteúdos estudados ou produtos da atividade"
-              className="w-full px-3.5 py-2.5 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-accent transition-colors resize-y min-h-[110px] max-h-[40vh] [field-sizing:content]"
+              className="w-full px-3.5 py-2.5 text-sm rounded-xl bg-canvas border border-line text-body outline-none focus:border-brand-text transition-colors resize-y min-h-[110px] max-h-[40vh] [field-sizing:content]"
             />
           </div>
 
@@ -370,7 +370,7 @@ export function EditActivityModal({
             </button>
             <button
               type="submit"
-              className="min-h-[44px] px-5 py-2.5 rounded-xl bg-primary hover:bg-[var(--primary-hover)] text-white text-sm font-bold transition-all shadow-[var(--page-shadow)] flex items-center gap-2 cursor-pointer"
+              className="min-h-[44px] px-5 py-2.5 rounded-xl bg-brand hover:bg-brand-strong text-on-brand text-sm font-bold transition-all shadow-[var(--page-shadow)] flex items-center gap-2 cursor-pointer"
             >
               <Check className="size-4" />
               <span>Salvar Alterações</span>

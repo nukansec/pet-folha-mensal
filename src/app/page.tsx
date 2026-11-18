@@ -675,9 +675,9 @@ export default function Home() {
         {toastMessage && (
           <div
             role="status"
-            className="fixed bottom-4 right-4 left-4 sm:left-auto px-3.5 py-2 rounded-lg border border-accent/25 bg-surface shadow-[var(--page-shadow)] text-xs font-medium text-body z-50 flex items-center gap-2 animate-fade-in"
+            className="fixed bottom-4 right-4 left-4 sm:left-auto px-3.5 py-2 rounded-lg border border-brand-text/25 bg-surface shadow-[var(--page-shadow)] text-xs font-medium text-body z-50 flex items-center gap-2 animate-fade-in"
           >
-            <CheckCircle2 className="size-3.5 text-accent shrink-0" />
+            <CheckCircle2 className="size-3.5 text-brand-text shrink-0" />
             <span>{toastMessage}</span>
           </div>
         )}
@@ -735,7 +735,7 @@ export default function Home() {
               />
             )}
             <label className="workspace-month">
-              <Calendar className="size-4 text-accent" />
+              <Calendar className="size-4 text-brand-text" />
               <span>Mês</span>
               <select
                 aria-label="Mês da folha"
@@ -861,7 +861,7 @@ export default function Home() {
                     onClick={() => void handlePrint()}
                     disabled={preparingPrint || attachmentsBusy}
                     aria-busy={preparingPrint}
-                    className="px-3.5 py-1.5 rounded-xl font-semibold bg-primary text-white hover:bg-[var(--primary-hover)] cursor-pointer flex items-center gap-1.5 transition-all text-xs shadow-[var(--page-shadow)]"
+                    className="px-3.5 py-1.5 rounded-xl font-semibold bg-brand text-on-brand hover:bg-brand-strong cursor-pointer flex items-center gap-1.5 transition-all text-xs shadow-[var(--page-shadow)]"
                   >
                     <Printer className="size-3.5" />
                     <span>{preparingPrint ? "Preparando PDF…" : "Imprimir / salvar PDF"}</span>
@@ -978,9 +978,9 @@ export default function Home() {
           {toastMessage && (
             <div
               role="status"
-              className="fixed bottom-4 right-4 left-4 sm:left-auto px-3.5 py-2 rounded-lg border border-accent/25 bg-surface shadow-[var(--page-shadow)] text-xs font-medium text-body z-50 flex items-center gap-2 animate-fade-in"
+              className="fixed bottom-4 right-4 left-4 sm:left-auto px-3.5 py-2 rounded-lg border border-brand-text/25 bg-surface shadow-[var(--page-shadow)] text-xs font-medium text-body z-50 flex items-center gap-2 animate-fade-in"
             >
-              <CheckCircle2 className="size-3.5 text-accent shrink-0" />
+              <CheckCircle2 className="size-3.5 text-brand-text shrink-0" />
               <span>{toastMessage}</span>
             </div>
           )}

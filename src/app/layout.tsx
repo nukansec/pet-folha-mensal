@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" data-theme="dark" suppressHydrationWarning>
+    <html lang="pt-BR" data-theme="light" suppressHydrationWarning>
       <head>
         <Script
           id="pet-theme-init"
@@ -35,7 +35,7 @@ export default function RootLayout({
                   var p = new URLSearchParams(window.location.search);
                   var requested = p.get('theme');
                   var saved = localStorage.getItem('pet_theme');
-                  var t = requested === 'light' || requested === 'dark' ? requested : saved === 'light' ? 'light' : 'dark';
+                  var t = requested === "light" || requested === "dark" ? requested : saved === "dark" ? "dark" : "light";
                   document.documentElement.setAttribute('data-theme', t);
                   if (requested === 'light' || requested === 'dark') localStorage.setItem('pet_theme', t);
                 } catch (e) {}

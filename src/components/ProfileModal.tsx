@@ -95,7 +95,7 @@ export function ProfileModal({
       >
         <div className="flex items-center justify-between pb-3.5 border-b border-line mb-4">
           <div className="flex items-center gap-2">
-            <User className="size-4.5" style={{ color: "#10B981" }} />
+            <User className="size-4.5 text-brand-text" />
             <h3 className="text-sm sm:text-base font-bold text-ink">
               Identificação do Participante
             </h3>
@@ -174,7 +174,7 @@ export function ProfileModal({
             </button>
             <button
               type="submit"
-              className="flex-1 sm:flex-none min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl text-white bg-primary hover:bg-[var(--primary-hover)] cursor-pointer flex items-center justify-center gap-1.5 transition-colors shadow-[var(--page-shadow)]"
+              className="flex-1 sm:flex-none min-h-[44px] px-5 py-2 text-xs sm:text-sm font-bold rounded-xl text-on-brand bg-brand hover:bg-brand-strong cursor-pointer flex items-center justify-center gap-1.5 transition-colors shadow-[var(--page-shadow)]"
             >
               <Check className="size-4" />
               <span>Salvar Alterações</span>
