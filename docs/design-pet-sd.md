@@ -108,18 +108,19 @@ de layout é o site.
 
 ## Dúvidas para o Brunno
 
-1. Existe arquivo vetorial oficial do logo do PET-SD (SVG, PDF, AI)? Hoje uso o
-   PNG de 1024 px da pasta do PET.
-2. O Clima publicado trocou o cabeçalho por **barra lateral** no desktop e
-   **abas inferiores + botão flutuante** no celular. Mantenho o cabeçalho em
-   duas linhas (como pedido) ou migro para a lateral?
-3. Há link de **formulário de avaliação** (botão “Avaliar”) ou de
-   **formulário de atividades** do programa? Sem eles, os botões ficam ocultos.
-4. A coordenação já aprovou o uso do logo no app? (Regra de identidade visual
-   do regimento: materiais precisam de aprovação do GAT/coordenação.)
-5. ~~A folha imprime “GAT: 1”…~~ Respondida pelo próprio repositório:
-   `docs/validation/pet-sd-20261117/README.md` registra “GAT sem zero à
-   esquerda, como no modelo”. Nada a mudar.
+Respostas de 2026-11-18:
+
+1. **Arquivo vetorial do logo:** não existe hoje. Fica o PNG oficial de
+   1024 px como fonte; se um vetorial surgir, basta trocar a entrada do
+   `scripts/brand/gerar-marca.py`.
+2. **Barra lateral × duas linhas:** decisão adiada até ver o site no ar
+   (preview da Vercel no PR). Por ora, duas linhas.
+3. **Links de avaliação e de formulário de atividades:** em aberto (pergunta
+   reformulada ao Brunno). Sem link, os botões continuam ocultos; nada a mudar.
+4. **Aprovação do logo pela coordenação:** ainda não. O PR fica em rascunho e
+   não deve ir para a `main` (produção) antes da aprovação.
+5. GAT sem zero à esquerda na folha: respondida pelo repositório
+   (`docs/validation/pet-sd-20261117/README.md`, “como no modelo”).
 
 ## Ferramentas revisadas (E4)
 
@@ -292,9 +293,8 @@ npm run typecheck && npm run build && npm run test:e2e
 
 ### e) Dúvidas, TODO(design) e o que ficou diferente do Clima
 
-- Dúvidas abertas: 1 (vetorial), 2 (lateral × duas linhas), 3 (links de
-  avaliação e de formulário), 4 (aprovação do logo). A 5 foi respondida pelo
-  próprio repositório.
+- Dúvidas: 1 respondida (não há vetorial); 2 aguarda o preview; 3 em aberto;
+  4 pendente (bloqueia o merge). A 5 foi respondida pelo próprio repositório.
 - `TODO(design)`: nenhum no código. A dívida que fica é o `globals.css` com
   regras repetidas em camadas (as que o `design-pet-sd.css` sobrescreve
   continuam lá); limpar exige revisar tela por tela e fica para outra branch.
