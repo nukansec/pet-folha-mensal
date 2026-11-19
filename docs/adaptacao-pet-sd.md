@@ -191,6 +191,15 @@ em branco ao lado foi exportado pelo Word a partir desse `.docx`.
   atividades já registradas pela pessoa (`src/lib/recommendations.ts`). A chave
   `pet_folha_config_templates_v3` deixou de ser lida e não é apagada; os
   exemplos fictícios usam `PROGRAM.sampleActivities`.
+- **D20 — Concluir e Salvar cópia (19/11/2026).** Concluir não é travado pela
+  CH: o prazo (dia 19) pode chegar antes de o mês fechar. Com menos de 32 h ou
+  de 16 h síncronas/In Loco, um aviso ("Folha com CH incompleta") deixa voltar
+  ou gerar assim mesmo. Salvar cópia continua só `.json` e indica onde baixar
+  PDF e Word. A visão Semanal ganhou a barra única das 16 h síncronas/In Loco.
+- **Pendente — faixas semanais pelo prazo do programa.** Quando o prazo exato
+  das atividades for confirmado, as faixas da visão Semanal passam a seguir o
+  período da folha em vez do mês do calendário (ver ADR 0002: hoje a data é
+  livre e cada GAT fecha num dia).
 
 ## Dúvidas para o Brunno
 
