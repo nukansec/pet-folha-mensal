@@ -139,6 +139,9 @@ for (const viewport of [
       expect(await layoutProblems(page), "confirmar exclusão").toEqual([]);
       await page.getByRole("button", { name: "Cancelar", exact: true }).click();
       await openDialog(page, () => page.getByRole("button", { name: /^Concluir/ }).click());
+      expect(await layoutProblems(page), "aviso de CH").toEqual([]);
+      await page.getByRole("button", { name: "Gerar assim mesmo", exact: true }).click();
+      await expect(page.getByRole("dialog", { name: "Salvar folha e concluir" })).toBeVisible();
       expect(await layoutProblems(page), "concluir").toEqual([]);
       await closeDialog(page);
       await page.getByRole("button", { name: "Folha oficial", exact: true }).click();

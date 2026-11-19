@@ -119,6 +119,11 @@ test.describe("menu do participante", () => {
   test("Concluir continua com o fluxo de antes", async ({ page }) => {
     await createProfile(page);
     await page.getByRole("button", { name: /^Concluir/ }).click();
+    // Sem atividades: avisa que a CH está incompleta, sem impedir.
+    const warning = page.getByRole("dialog", { name: "Folha com CH incompleta" });
+    await expect(warning).toContainText("0h de 32 h no total e 0h de 16 h");
+    await warning.getByRole("button", { name: "Gerar assim mesmo", exact: true }).click();
+    await expect(page.getByText("CH incompleta: a folha será gerada assim mesmo.")).toBeVisible();
     await page.getByRole("button", { name: "Sair / trocar participante", exact: true }).click();
     await expect(page.getByText("Sessão encerrada com sucesso.")).toBeVisible();
   });
