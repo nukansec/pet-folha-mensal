@@ -184,6 +184,19 @@
 .activity-fields input[type="date"] {
   min-width: 150px;
 }
+/* Telas muito estreitas (zoom de 200% num celular: ~195 px de CSS): as três
+   colunas não cabem; Início, Fim e CH empilham em vez de alargar a página. */
+@media (max-width: 299px) {
+  .time-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .time-fields .hours-preview {
+    justify-items: start;
+  }
+  .activity-fields input[type="date"] {
+    min-width: 0;
+  }
+}
 
 /* ---------- B2: rótulos sem partir palavra e entrada ---------- */
 /* "anywhere" partia "Coordenador(a)" em "Coordenador(a" + ")". Um nome muito
@@ -445,6 +458,7 @@
 .sheet-preview-bar .secondary-button {
   min-height: 44px;
   font-size: 15px;
+  white-space: normal;
 }
 .sheet-stage {
   min-width: 0;
@@ -481,4 +495,32 @@
   min-width: 0;
   max-width: none;
   flex: none;
+}
+
+/* ---------- Telas muito estreitas (zoom de 200%: ~195 px de CSS) ---------- */
+/* Fica por último para valer sobre as seções acima. Alternâncias de duas
+   opções viram coluna: sem partir palavra e sem alargar a página. */
+@media (max-width: 299px) {
+  .choice-group--toggle {
+    flex-direction: column;
+  }
+  .sheet-mode-tabs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sheet-preview-bar .secondary-button {
+    width: 100%;
+  }
+  /* Título do modal pode quebrar (entre palavras) quando não cabe. */
+  .dialog-head-icon {
+    display: none;
+  }
+  .dialog-head-text h3 {
+    white-space: normal;
+  }
+  .dialog-footer.dialog-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dialog-footer > button[class] {
+    white-space: normal;
+  }
 }
