@@ -1,6 +1,17 @@
 // Dates are publication dates in São Paulo, not the build or the visitor's date.
 export const RELEASES = [
   {
+    date: "2026-11-19",
+    title: "Datas livres, folha em Word e assinatura gov.br",
+    changes: [
+      "A data da atividade é livre: a folha de Novembro aceita também 26/10, para quem fecha a folha de 26 a 25 ou de 20 a 19.",
+      "Na folha oficial e no Concluir, “Baixar .docx (Word)” gera a sua folha preenchida no modelo oficial, para editar ou completar à mão.",
+      "Novo botão “Assinar no gov.br”, que abre o serviço de assinatura eletrônica.",
+      "Correções: a cópia baixada no celular não deixa mais o aviso de “sem cópia”, e fotos de comprovação voltam a ser aceitas quando o site é aberto pelo IP da rede.",
+      "Nada muda nos seus registros: os dados salvos continuam abrindo iguais.",
+    ],
+  },
+  {
     date: "2026-11-18",
     title: "Ajustes para o celular",
     changes: [

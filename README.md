@@ -30,7 +30,10 @@ telas do app original. Antes, depois, a referência lado a lado e os ajustes de
 - Menu do participante no topo: editar identificação, trocar participante,
   salvar cópia e sair, com os mesmos avisos do Concluir.
 - Lançamento de atividades com data, horários, Unidade/Local, modalidade,
-  atividade desenvolvida e descrição.
+  atividade desenvolvida e descrição. A **data é livre**: cada GAT fecha a folha
+  num dia (26 a 25, 20 a 19…), então a folha de Novembro aceita também 26/10; a
+  atividade fica na folha em que foi lançada
+  ([ADR 0002](docs/adr/0002-datas-livres-na-folha.md)).
 - Preenchimento rápido com quatro modelos: **Reunião Geral** (In Loco, UFG),
   **Capacitação** (Síncrona, Online), **Visita Técnica** (In Loco; o local fica
   para a pessoa preencher) e **Pesquisa Bibliográfica e Estudos Autônomos**
@@ -42,6 +45,10 @@ telas do app original. Antes, depois, a referência lado a lado e os ajustes de
   cada semana e a referência de 8 h).
 - Prévia e impressão da folha oficial (Imprimir / salvar PDF) e modelo em branco
   em `.docx` e PDF.
+- **Folha preenchida em Word (.docx)**, gerada no navegador a partir do modelo
+  oficial, para editar ou completar à mão (sobram linhas em branco).
+- Botão **Assinar no gov.br** na folha oficial e no Concluir, que abre o serviço
+  de assinatura eletrônica do gov.br.
 - Comprovação fotográfica: fotos ou PDFs anexados saem nas páginas seguintes da folha.
 - Cópia de segurança em `.json` para continuar em outro aparelho: a do mês
   (formato 1.3) e a do perfil inteiro (1.4, oferecida antes de excluir).

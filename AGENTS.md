@@ -30,6 +30,10 @@ SEIDIGI/SGTES-MS nº 1/2025; Ministério da Saúde, UFG e SMS Goiânia). Fork de
    "Assíncrona"). Atividades presenciais e in loco exigem comprovação fotográfica.
 5. **Prazo**: o rodapé da folha reproduz o texto do modelo (1º dia útil do mês
    seguinte); o prazo exibido no app vem da config.
+6. **Datas livres**: cada GAT fecha a folha num dia (26 a 25, 20 a 19…). A data
+   da atividade é livre dentro da vigência e a atividade fica na folha em que foi
+   lançada; não recorte período nem mova atividades entre folhas. Motivo:
+   `docs/adr/0002-datas-livres-na-folha.md`.
 
 ## 3. Dados, privacidade e LGPD
 
