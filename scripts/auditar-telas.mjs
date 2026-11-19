@@ -10,6 +10,8 @@
 //   npm run build && npm start          # em outro terminal (porta 5000)
 //   node scripts/auditar-telas.mjs http://127.0.0.1:5000 docs/validation/mobile-20261118/antes
 //   node scripts/auditar-telas.mjs <url> <pasta> --rapido   # só 360 e 1440, claro
+//   node scripts/auditar-telas.mjs <url> <pasta> --so=390-zoom200   # refaz um viewport
+//     e mescla com o achados.json que já está na pasta
 //
 // Saída: <pasta>/<viewport>-<tema>/<tela>.jpg, <pasta>/achados.json e
 // <pasta>/resumo.md (achados únicos por checagem + seletor + viewport).
@@ -20,6 +22,7 @@ import { fileURLToPath } from "node:url";
 
 const args = process.argv.slice(2);
 const quick = args.includes("--rapido");
+const only = args.find((arg) => arg.startsWith("--so="))?.slice(5).split(",");
 const [baseURL, outDir] = args.filter((arg) => !arg.startsWith("--"));
 if (!baseURL || !outDir) {
   console.error("Uso: node scripts/auditar-telas.mjs <baseURL> <pasta> [--rapido]");
@@ -73,7 +76,7 @@ const activities = rows.map(([date, local, description, start, end, modality, de
 }));
 
 // ---------------------------------------------------------------------------
-const VIEWPORTS = quick
+const ALL_VIEWPORTS = quick
   ? [{ name: "360", width: 360, height: 780 }, { name: "1440", width: 1440, height: 900 }]
   : [
       { name: "320", width: 320, height: 640 },
@@ -87,6 +90,7 @@ const VIEWPORTS = quick
       // registrada em docs/auditoria-mobile.md).
       { name: "390-zoom200", width: 195, height: 422, scale: 2, zoomOnly: true },
     ];
+const VIEWPORTS = only ? ALL_VIEWPORTS.filter((vp) => only.includes(vp.name)) : ALL_VIEWPORTS;
 const THEMES = quick ? ["light"] : ["light", "dark"];
 const AXE_VIEWPORTS = new Set(["360", "1440"]);
 
@@ -189,6 +193,8 @@ function inspect() {
     if (!clipX && !clipY) continue;
     if (!el.innerText?.trim()) continue;
     if (el.closest(".official-sheet")) continue; // folha: avaliada à parte
+    // Prévia escalada: a caixa recorta a folha de 1050 px de propósito.
+    if (el.matches(".sheet-fit") && el.closest(".sheet-stage[data-scaled='true']")) continue;
     const overX = clipX && el.scrollWidth > el.clientWidth + 1;
     const overY = clipY && el.scrollHeight > el.clientHeight + 1;
     if (!overX && !overY) continue;
@@ -427,6 +433,13 @@ for (const vp of VIEWPORTS) {
 await browser.close();
 
 // ---------------------------------------------------------------------------
+if (only) {
+  // Mescla: mantém os achados dos outros viewports da rodada anterior.
+  const previous = path.join(outDir, "achados.json");
+  if (fs.existsSync(previous))
+    findings.unshift(...JSON.parse(fs.readFileSync(previous, "utf8")).filter((item) => !only.includes(item.viewport)));
+  log.unshift(`(refeito só: ${only.join(", ")}; os demais viewports vêm da rodada anterior)`);
+}
 fs.writeFileSync(path.join(outDir, "achados.json"), JSON.stringify(findings, null, 1));
 const unique = new Map();
 for (const item of findings) {
