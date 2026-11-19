@@ -109,7 +109,9 @@ Links: `feedbackForm` aponta para o formulário de avaliação do PET-SD (botão
 “Avaliar o site” no rodapé); `activityForm` fica vazio de propósito, porque o
 programa não tem formulário de registro de atividades (link vazio = botão
 oculto). Logo e ícones são gerados do PNG oficial por
-`scripts/brand/gerar-marca.py` (o original não entra no repositório).
+`scripts/brand/gerar-marca.py` (o original não entra no repositório). Os PNGs
+saem em paleta de 256 cores, sem diferença visível; a faixa de logos da ficha,
+que vem do modelo oficial, é recomprimida por `scripts/brand/otimizar_png.py`.
 
 ## Deploy na Vercel
 

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import Module, { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -356,6 +356,18 @@ test("endereço do site só na config; metadados usam PROGRAM.links.site", () =>
     .map((file) => file.replaceAll("\\", "/"));
   assert.deepEqual(files, ["config/program.ts"]);
   assert.match(readFileSync(path.join(root, "src/app/layout.tsx"), "utf8"), /metadataBase: new URL\(PROGRAM\.links\.site\)/);
+});
+
+test("Analytics só no build da Vercel e imagens da marca leves", () => {
+  const layout = readFileSync(path.join(root, "src/app/layout.tsx"), "utf8");
+  assert.match(layout, /process\.env\.VERCEL \? <Analytics \/> : null/);
+  assert.equal((layout.match(/<Analytics \/>/g) || []).length, 1);
+  // Regenerar com scripts/brand/gerar-marca.py ou otimizar_png.py mantém tudo abaixo de 60 KB.
+  const brand = path.join(root, "public/images/pet-sd");
+  for (const file of readdirSync(brand).filter((name) => name.endsWith(".png"))) {
+    const size = statSync(path.join(brand, file)).size;
+    assert.ok(size <= 60 * 1024, `${file} tem ${Math.round(size / 1024)} KB (limite 60 KB)`);
+  }
 });
 
 test("botão Avaliar o site depende do link configurado", () => {

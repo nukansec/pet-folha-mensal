@@ -7,6 +7,9 @@ O original (1024x1024, RGBA, ~1,4 MB) fica fora do repositório; só os derivado
 são versionados. Regra de identidade visual do programa: não redesenhar, não
 mudar cores nem proporções. Aqui só se recorta, redimensiona e comprime.
 
+A faixa de logos da ficha (public/images/pet-sd/cabecalho-ficha.png) vem do
+modelo oficial e não é gerada aqui; para recomprimi-la, use otimizar_png.py.
+
 Saídas (cada uma <= 150 KB):
     public/images/pet-sd/simbolo.png        símbolo (sem o texto), navbar
     public/images/pet-sd/marca-completa.png símbolo + "PET-Saúde" + subtítulo
@@ -22,6 +25,8 @@ import sys
 from pathlib import Path
 
 from PIL import Image
+
+from otimizar_png import best_png
 
 ROOT = Path(__file__).resolve().parents[2]
 LIMIT = 150 * 1024
@@ -75,15 +80,14 @@ def fit(image: Image.Image, size: tuple[int, int], padding: float, background=No
 def save_png(image: Image.Image, path: Path, opaque: bool = False) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     out = image.convert("RGB") if opaque else image
-    out.save(path, optimize=True)
-    if path.stat().st_size > LIMIT:
-        # Paleta de 256 cores com alfa: perda imperceptível neste logo chapado.
-        quantized = image.convert("RGBA").quantize(256, method=Image.FASTOCTREE, dither=Image.NONE)
-        quantized.save(path, optimize=True)
-    size = path.stat().st_size
+    # Paleta de 256 cores refinada por k-means quando o erro de cor é
+    # imperceptível; senão, PNG sem perda (ver otimizar_png.py).
+    data, how = best_png(out)
+    path.write_bytes(data)
+    size = len(data)
     if size > LIMIT:
         raise SystemExit(f"{path} ficou com {size // 1024} KB (limite 150 KB).")
-    print(f"{path.relative_to(ROOT)}  {image.width}x{image.height}  {size // 1024} KB")
+    print(f"{path.relative_to(ROOT)}  {image.width}x{image.height}  {size // 1024} KB  ({how})")
 
 
 def main() -> None:

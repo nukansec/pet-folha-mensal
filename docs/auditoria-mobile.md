@@ -55,7 +55,7 @@ propostos (P1–P6, em [Propostas de PR](#propostas-de-pr)).
 | A04 | Abas Minha frequência / Folha oficial | todos | Alvo de toque com 41–42 px de altura. | média | `design-pet-sd.css:234` (`min-height: 40px`) | esta branch |
 | A05 | Formulário de atividade | zoom 200% | Início e Fim com 29 px de largura: a hora não aparece (coluna da CH fixa em 56 px). | média | `design-pet-sd.css:1097` | esta branch |
 | A06 | Entrada, cartões de perfil | 360, 1440 | axe `label-content-name-mismatch`: o botão "Abrir folha de …" mostra perfil, GAT e meses, que não estão no nome acessível (WCAG 2.5.3). | média | `LandingPage.tsx:252-275` | P1 |
-| A07 | Entrada e painel | todos | `HTTP 404 /_vercel/insights/script.js` fora da Vercel (servidor local, CI). Na Vercel o script existe. | baixa | `layout.tsx` (`<Analytics />` sempre ativo) | P3 |
+| A07 | Entrada e painel | todos | `HTTP 404 /_vercel/insights/script.js` fora da Vercel (servidor local, CI). Na Vercel o script existe. | baixa | `layout.tsx` (`<Analytics />` sempre ativo) | P3 (feito) |
 | A08 | Entrada | zoom 200% | Rolagem horizontal: os ícones do cabeçalho não quebram linha em 195 px de CSS. | média | `design-pet-sd.css` (`.entry-header-inner` sem `flex-wrap`) | P1 |
 | A09 | Configurações | zoom 200% | Conteúdo cortado na largura (240 > 145 px). | média | `AdminModal.tsx:496` | P1 |
 | A10 | Lista de atividades | zoom 200% | Cabeçalho da lista ("Atividades do mês · Limpar mês") cortado. | baixa | `ActivityTable.tsx:98` | P1 |
@@ -288,6 +288,11 @@ e fix(ui): …; sem push.
 ```
 
 ### P3 — `perf: Analytics só na Vercel e imagens da marca menores`
+
+> **Feito** na branch `fix/analytics-imagens-marca`: `<Analytics />` só com
+> `VERCEL` no build (sem o 404 no servidor local) e PNGs da marca de ~450 KB
+> para ~120 KB por `scripts/brand/otimizar_png.py` (mesmas dimensões; erro
+> médio de cor ≤ 1,2 em 255). Guarda em `scripts/verify-ui.mjs` (≤ 60 KB).
 
 - **Problema**: fora da Vercel (servidor local, CI), o `<Analytics />` pede
   `/_vercel/insights/script.js` e recebe 404. As imagens da marca são PNGs de

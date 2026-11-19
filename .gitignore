@@ -51,3 +51,6 @@ next-env.d.ts
 # Evidências locais de testes de navegador
 /test-results/
 /playwright-report/
+
+# Cache do Python (scripts/brand)
+__pycache__/

@@ -45,7 +45,8 @@ de `src/app/globals.css`; nenhum tom bruto nem nome de cor herdado.
 ## Logo
 
 - Arquivos derivados do PNG oficial por `scripts/brand/gerar-marca.py`
-  (recorte, redimensionamento e compressão; sem redesenho nem troca de cor):
+  (recorte, redimensionamento e compressão em paleta de 256 cores refinada por
+  k-means, com erro médio ≤ 1,5 em 255; sem redesenho nem troca de cor):
   `public/images/pet-sd/simbolo.png` (cabeçalho), `marca-completa.png`
   (entrada), `compartilhamento.png` (Open Graph 1200×630) e, em `src/app/`,
   `favicon.ico`, `icon.png` (512) e `apple-icon.png` (180, fundo branco).
