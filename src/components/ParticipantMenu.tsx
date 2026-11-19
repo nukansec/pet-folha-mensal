@@ -106,7 +106,8 @@ export function ParticipantMenu({
         <span>
           <strong>{user.name}</strong>
           <small>
-            {user.role} · GAT {user.gatNumber} · {gatName}
+            {user.role} · GAT {user.gatNumber}
+            <span className="profile-gat-name"> · {gatName}</span>
           </small>
         </span>
         <span className="sr-only">: menu do participante</span>
@@ -121,6 +122,9 @@ export function ParticipantMenu({
           className="participant-menu-list"
           onKeyDown={onMenuKey}
         >
+          <p role="none" className="participant-menu-info">
+            GAT {user.gatNumber} · {gatName}
+          </p>
           {item("Editar identificação", <Pencil size={18} aria-hidden="true" />, onEditProfile)}
           {item("Trocar participante", <Users size={18} aria-hidden="true" />, onSwitchParticipant)}
           {item("Salvar cópia", <Download size={18} aria-hidden="true" />, onSaveCopy)}

@@ -230,3 +230,68 @@
 .gat-full-name {
   margin-top: 0;
 }
+
+/* ---------- B3: topo do painel ---------- */
+/* Cartão do perfil em 2 linhas: nome; "Perfil · GAT nn". O tema do GAT fica
+   no topo do menu (e, no desktop, também na segunda linha). */
+.participant-menu-info {
+  margin: 0 0 4px;
+  padding: 8px 12px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+@media (max-width: 767px) {
+  .profile-button strong,
+  .profile-button small {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: unset;
+  }
+  .profile-gat-name {
+    display: none;
+  }
+}
+/* Abas: alvo de 44 px; ícone de tamanho fixo que não encolhe. Abaixo de
+   360 px as duas abas não cabem com ícone: o rótulo tem prioridade. */
+.workspace-tabs button {
+  min-height: 44px;
+}
+.workspace-tabs button svg {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+@media (max-width: 359px) {
+  .workspace-tabs button {
+    padding-inline: 6px;
+    gap: 6px;
+  }
+  .workspace-tabs button svg {
+    display: none;
+  }
+}
+/* Salvar / Restaurar / Concluir com a mesma altura, numa linha. */
+.backup-tools {
+  align-items: stretch;
+}
+@media (max-width: 767px) {
+  .backup-tools button,
+  .backup-tools .conclude-button {
+    white-space: nowrap;
+    height: 100%;
+  }
+}
+@media (max-width: 359px) {
+  .backup-tools {
+    gap: 4px;
+  }
+  .screen-only .backup-tools button[class],
+  .screen-only .backup-tools button {
+    font-size: 14px;
+    padding-inline: 4px;
+  }
+}

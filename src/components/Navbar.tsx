@@ -100,25 +100,25 @@ export function Navbar({
             aria-pressed={activeTab === "dashboard"}
             onClick={() => onTabChange("dashboard")}
           >
-            <ListChecks size={18} />
+            <ListChecks size={18} aria-hidden="true" />
             Minha frequência
           </button>
           <button
             aria-pressed={activeTab === "official"}
             onClick={() => onTabChange("official")}
           >
-            <FileText size={18} />
+            <FileText size={18} aria-hidden="true" />
             Folha oficial
           </button>
         </nav>
         <div className="backup-tools" aria-label="Cópia de segurança">
-          <button onClick={onExportBackup} title="Baixar a cópia de segurança (.json) deste perfil">
-            <Download size={17} />
-            Salvar cópia
+          <button onClick={onExportBackup} aria-label="Salvar cópia" title="Baixar a cópia de segurança (.json) deste perfil">
+            <Download size={17} aria-hidden="true" />
+            <span>Salvar<span className="label-extra"> cópia</span></span>
           </button>
-          <button onClick={() => fileRef.current?.click()} title="Abrir uma cópia de segurança (.json)">
-            <Upload size={17} />
-            Restaurar cópia
+          <button onClick={() => fileRef.current?.click()} aria-label="Restaurar cópia" title="Abrir uma cópia de segurança (.json)">
+            <Upload size={17} aria-hidden="true" />
+            <span>Restaurar<span className="label-extra"> cópia</span></span>
           </button>
           <button className="conclude-button" onClick={onOpenExitModal} title="Guardar a cópia e o PDF, ou sair">
             Concluir
