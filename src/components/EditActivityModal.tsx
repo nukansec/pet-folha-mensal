@@ -2,8 +2,8 @@
 
 import { Modal } from "./Modal";
 import React, { useState, useEffect } from "react";
-import { Activity, ActivityTemplate } from "@/types";
-import { PROGRAM } from "@/config/program";
+import { Activity } from "@/types";
+import type { Recommendation } from "@/lib/recommendations";
 import {
   calcPetMinutes,
   cleanActivityDescription,
@@ -18,9 +18,8 @@ interface EditActivityModalProps {
   onClose: () => void;
   activity: Activity | null;
   onSave: (data: ActivityDraft, editingId?: string) => boolean | void;
-  defaultGatNumber?: string;
-  defaultGatName?: string;
-  templates?: ActivityTemplate[];
+  /** Atividades já registradas, para o preenchimento rápido. */
+  recommendations?: Recommendation[];
   monthKey?: string;
 }
 
@@ -45,9 +44,7 @@ export function EditActivityModal({
   onClose,
   activity,
   onSave,
-  defaultGatNumber = PROGRAM.defaultGat,
-  defaultGatName,
-  templates = [],
+  recommendations = [],
   monthKey,
 }: EditActivityModalProps) {
   const { alert } = useDialog();
@@ -146,11 +143,9 @@ export function EditActivityModal({
               idPrefix="edit-activity"
               draft={values}
               onChange={(patch) => setDraft({ ...values, ...patch })}
-              templates={templates}
+              recommendations={recommendations}
               templateId={templateId}
               onTemplateChange={setTemplateId}
-              gatNumber={defaultGatNumber}
-              gatName={defaultGatName}
               monthKey={monthKey}
             />
           </div>

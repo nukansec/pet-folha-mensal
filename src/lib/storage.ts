@@ -26,7 +26,9 @@ const ACTIVE_PROFILE_ID_KEY = "pet_folha_active_profile_id_v3";
 const ACTIVITIES_PREFIX = "pet_folha_activities_v3_";
 const GATS_KEY = "pet_folha_config_gats_v3";
 const ROLES_KEY = "pet_folha_config_roles_v3";
-const TEMPLATES_KEY = "pet_folha_config_templates_v3";
+// pet_folha_config_templates_v3 (modelos do preenchimento rápido até
+// 19/11/2026) deixou de ser lida e não é apagada: o preenchimento rápido vem
+// do histórico de atividades (src/lib/recommendations.ts).
 const MIGRATION_KEY = "pet_folha_migrated_from_v2";
 const V2_PROFILES_KEY = "pet_folha_profiles_v2";
 const V2_ACTIVE_PROFILE_ID_KEY = "pet_folha_active_profile_id_v2";
@@ -34,7 +36,8 @@ const V2_ACTIVITIES_PREFIX = "pet_folha_activities_v2_";
 
 export const DEFAULT_PROFILES: UserProfile[] = [];
 
-export const DEFAULT_TEMPLATES: ActivityTemplate[] = PROGRAM.templates.map(
+/** Exemplos fictícios do botão de exemplos (não são o preenchimento rápido). */
+export const SAMPLE_ACTIVITIES: ActivityTemplate[] = PROGRAM.sampleActivities.map(
   (template) => ({ ...template }),
 );
 
@@ -401,6 +404,18 @@ function profileActivityKeys(profileId: string): Array<{ key: string; monthKey: 
   return found.sort((a, b) => a.monthKey.localeCompare(b.monthKey));
 }
 
+/** Todas as atividades do perfil, de todas as folhas (preenchimento rápido). */
+export function getProfileActivityHistory(profileId: string): Activity[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return profileActivityKeys(profileId).flatMap(({ monthKey }) =>
+      getActivitiesForMonth(profileId, monthKey),
+    );
+  } catch {
+    return [];
+  }
+}
+
 /** Meses (AAAA-MM) com pelo menos uma atividade gravada para o perfil. */
 export function listProfileMonths(profileId: string): string[] {
   if (typeof window === "undefined") return [];
@@ -564,69 +579,6 @@ export function updateRoleName(oldRole: string, newRole: string): void {
 }
 
 // ============================================================
-// GESTÃO DINÂMICA DE MODELOS DE ATIVIDADES (ADMIN)
-// ============================================================
-
-const templateSignature = (templates: ActivityTemplate[]) =>
-  JSON.stringify(
-    templates.map((tpl) => [
-      tpl.id,
-      tpl.name,
-      tpl.modality,
-      tpl.local,
-      Boolean(tpl.isGatSpecific),
-    ]),
-  );
-const LEGACY_TEMPLATES_SIGNATURE = templateSignature(
-  PROGRAM.legacyTemplates.map((tpl) => ({ ...tpl })),
-);
-
-/**
- * Lê os modelos salvos. A lista padrão antiga, sem edição, é lida como a lista
- * padrão atual; a chave salva não é reescrita (a troca acontece na leitura).
- * Lista editada pela pessoa (qualquer id, nome, modalidade ou local diferente)
- * é mantida.
- */
-export function getStoredTemplates(): ActivityTemplate[] {
-  if (typeof window === "undefined") return DEFAULT_TEMPLATES;
-  try {
-    const raw = localStorage.getItem(TEMPLATES_KEY);
-    if (!raw) return DEFAULT_TEMPLATES;
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_TEMPLATES;
-    const stored = normalizeTemplates(parsed);
-    return templateSignature(stored) === LEGACY_TEMPLATES_SIGNATURE
-      ? DEFAULT_TEMPLATES
-      : stored;
-  } catch {
-    return DEFAULT_TEMPLATES;
-  }
-}
-
-function normalizeTemplates(parsed: unknown[]): ActivityTemplate[] {
-  return parsed.map((item: unknown, idx: number) => {
-    const stored =
-      typeof item === "object" && item !== null
-        ? (item as Record<string, unknown>)
-        : {};
-    const name = text(stored.name).trim() || `Atividade modelo ${idx + 1}`;
-    return {
-      id: text(stored.id) || `tpl-${idx + 1}`,
-      name,
-      modality: normalizeModality(stored.modality),
-      local: text(stored.local),
-      isGatSpecific:
-        Boolean(stored.isGatSpecific) || name.includes("{gatNumber}"),
-    };
-  });
-}
-
-export function saveTemplates(templates: ActivityTemplate[]): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templates));
-}
-
-// ============================================================
 // GERAÇÃO E CARREGAMENTO DE ATIVIDADES
 // ============================================================
 
@@ -636,7 +588,7 @@ export function generateSeedActivities(
   gatName: string,
   monthKey: string,
 ): Activity[] {
-  const templates = getStoredTemplates();
+  const templates = SAMPLE_ACTIVITIES;
   const defaultSlots = [
     { day: 3, start: "11:00", end: "13:00" },
     { day: 4, start: "14:00", end: "15:30" },

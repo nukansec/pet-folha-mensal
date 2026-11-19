@@ -1,10 +1,10 @@
 "use client";
 
-import type { Activity, ActivityTemplate } from "@/types";
+import type { Activity } from "@/types";
+import type { Recommendation } from "@/lib/recommendations";
 import { PROGRAM } from "@/config/program";
 import {
   calcPetMinutes,
-  cleanActivityDescription,
   crossesMidnight,
   DATE_LIMITS,
   formatDuration,
@@ -14,18 +14,6 @@ import { ModalityChoice } from "./ModalityChoice";
 
 /** Campos editáveis de uma atividade (sem id e sem horas calculadas). */
 export type ActivityDraft = Omit<Activity, "id" | "hours">;
-
-export function fillTemplateName(
-  name: string,
-  gatNumber: string,
-  gatName?: string,
-) {
-  return cleanActivityDescription(
-    name
-      .replaceAll("{gatNumber}", gatNumber)
-      .replaceAll("{gatName}", gatName || `GAT ${gatNumber}`),
-  );
-}
 
 export function lastDayOfMonth(monthKey: string) {
   const [year, month] = monthKey.split("-").map(Number);
@@ -40,11 +28,11 @@ interface ActivityFieldsProps {
   idPrefix: string;
   draft: ActivityDraft;
   onChange: (patch: Partial<ActivityDraft>) => void;
-  templates?: ActivityTemplate[];
+  /** Atividades já registradas, para preencher de novo (ver recommendations.ts). */
+  recommendations?: Recommendation[];
+  /** Chip marcado ("" = Em branco). */
   templateId: string;
   onTemplateChange: (id: string) => void;
-  gatNumber?: string;
-  gatName?: string;
   /** Mês da folha (AAAA-MM): limita a data ao mês. */
   monthKey?: string;
   /** id da mensagem de erro, ligado aos horários por aria-describedby. */
@@ -62,11 +50,9 @@ export function ActivityFields({
   idPrefix,
   draft,
   onChange,
-  templates = [],
+  recommendations,
   templateId,
   onTemplateChange,
-  gatNumber = PROGRAM.defaultGat,
-  gatName,
   monthKey,
   errorId,
 }: ActivityFieldsProps) {
@@ -74,37 +60,43 @@ export function ActivityFields({
   const minutes = calcPetMinutes(draft.start, draft.end);
   return (
     <>
-      {templates.length > 0 && (
+      {recommendations && (
         <div className="field template-field">
           <span className="field-legend" id={id("template-label")}>
             Preenchimento rápido <span className="field-optional">· opcional</span>
           </span>
-          <ChoiceGroup
-            name={id("template")}
-            labelledBy={id("template-label")}
-            variant="chips"
-            value={templateId}
-            onChange={(value) => {
-              onTemplateChange(value);
-              const template = templates.find((item) => item.id === value);
-              // "Em branco" depois de um modelo: limpa o que o modelo preencheu.
-              if (!value) onChange({ description: "", local: "" });
-              else if (template)
-                onChange({
-                  description: fillTemplateName(template.name, gatNumber, gatName),
-                  modality: template.modality,
-                  // Modelo sem local limpa o campo: não herda o do modelo anterior.
-                  local: template.local,
-                });
-            }}
-            options={[
-              { value: "", label: "Em branco" },
-              ...templates.map((template) => ({
-                value: template.id,
-                label: fillTemplateName(template.name, gatNumber, gatName),
-              })),
-            ]}
-          />
+          {recommendations.length === 0 ? (
+            <p className="field-hint">
+              As atividades que você registrar aparecem aqui para preencher de
+              novo com um toque: só a data fica para você escolher.
+            </p>
+          ) : (
+            <ChoiceGroup
+              name={id("template")}
+              labelledBy={id("template-label")}
+              variant="chips"
+              value={templateId}
+              onChange={(value) => {
+                onTemplateChange(value);
+                const recommendation = recommendations.find((item) => item.id === value);
+                // "Em branco" limpa o que a recomendação preencheu (a data fica).
+                if (!value)
+                  onChange({
+                    start: "",
+                    end: "",
+                    modality: PROGRAM.defaultModality,
+                    local: "",
+                    description: "",
+                    descricao: "",
+                  });
+                else if (recommendation) onChange({ ...recommendation.fields });
+              }}
+              options={[
+                { value: "", label: "Em branco" },
+                ...recommendations.map((item) => ({ value: item.id, label: item.label })),
+              ]}
+            />
+          )}
         </div>
       )}
       <div className="field">
