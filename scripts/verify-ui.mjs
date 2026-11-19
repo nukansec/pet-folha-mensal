@@ -1006,18 +1006,18 @@ function referenceBands(monthKey) {
   for (let day = 1; ; day++) {
     const date = new Date(Date.UTC(year, month - 1, day));
     if (date.getUTCMonth() !== month - 1) {
-      if (start < day) out.push(start === day - 1 ? `Dia ${start}` : `${start} a ${day - 1}`);
+      if (start < day) out.push(start === day - 1 ? `Dia ${start}` : `Dias ${start} a ${day - 1}`);
       return out;
     }
     if (date.getUTCDay() === 0) {
-      out.push(start === day ? `Dia ${start}` : `${start} a ${day}`);
+      out.push(start === day ? `Dia ${start}` : `Dias ${start} a ${day}`);
       start = day + 1;
     }
   }
 }
 
 test("faixas de semana: mês que começa no domingo (nov/2026, 6 faixas, como o app original)", () => {
-  assert.deepEqual(bandLabels("2026-11"), ["Dia 1", "2 a 8", "9 a 15", "16 a 22", "23 a 29", "Dia 30"]);
+  assert.deepEqual(bandLabels("2026-11"), ["Dia 1", "Dias 2 a 8", "Dias 9 a 15", "Dias 16 a 22", "Dias 23 a 29", "Dia 30"]);
   const bands = weeks.getMonthWeekBands("2026-11");
   assert.deepEqual(bands.map((b) => b.partial), [true, false, false, false, false, true]);
   assert.deepEqual(bands.map((b) => b.days), [1, 7, 7, 7, 7, 1]);
@@ -1028,10 +1028,10 @@ test("faixas de semana: mês que começa no domingo (nov/2026, 6 faixas, como o 
 test("faixas de semana: mês que começa no sábado e fevereiros", () => {
   // 01/08/2026 é sábado.
   assert.equal(new Date(Date.UTC(2026, 7, 1)).getUTCDay(), 6);
-  assert.deepEqual(bandLabels("2026-08"), ["1 a 2", "3 a 9", "10 a 16", "17 a 23", "24 a 30", "Dia 31"]);
+  assert.deepEqual(bandLabels("2026-08"), ["Dias 1 a 2", "Dias 3 a 9", "Dias 10 a 16", "Dias 17 a 23", "Dias 24 a 30", "Dia 31"]);
   // Fevereiro de 28 dias começando na segunda: quatro semanas inteiras.
   assert.equal(new Date(Date.UTC(2027, 1, 1)).getUTCDay(), 1);
-  assert.deepEqual(bandLabels("2027-02"), ["1 a 7", "8 a 14", "15 a 21", "22 a 28"]);
+  assert.deepEqual(bandLabels("2027-02"), ["Dias 1 a 7", "Dias 8 a 14", "Dias 15 a 21", "Dias 22 a 28"]);
   assert.ok(weeks.getMonthWeekBands("2027-02").every((band) => !band.partial));
   // Fevereiro bissexto.
   assert.deepEqual(bandLabels("2028-02"), referenceBands("2028-02"));
@@ -1053,14 +1053,14 @@ test("faixas de semana: CH exata nos limites; datas de outro mês estendem o per
     a("2026-11-10", "10:00", "09:00"), // fim antes do início vale 0
   ];
   const bands = calendarBands("2026-11", inside);
-  assert.deepEqual(bands.map((b) => b.label), ["Dia 1", "2 a 8", "9 a 15", "16 a 22", "23 a 29", "Dia 30"]);
+  assert.deepEqual(bands.map((b) => b.label), ["Dia 1", "Dias 2 a 8", "Dias 9 a 15", "Dias 16 a 22", "Dias 23 a 29", "Dia 30"]);
   assert.deepEqual(bands.map((b) => b.minutes), [90, 95, 120, 0, 0, 480]);
   assert.equal(formatDuration(bands[1].minutes), "1h35");
   // Datas livres: 31/10 (sábado) e 01/12 entram e o período passa do mês.
   const all = [...inside, a("2026-10-31", "09:00", "17:00"), a("2026-12-01", "09:00", "17:00")];
   const wide = calendarBands("2026-11", all);
   assert.deepEqual(wide.map((b) => b.label), [
-    "31/10 a 01/11", "02/11 a 08/11", "09/11 a 15/11", "16/11 a 22/11", "23/11 a 29/11", "30/11 a 01/12",
+    "Dias 31/10 a 01/11", "Dias 02/11 a 08/11", "Dias 09/11 a 15/11", "Dias 16/11 a 22/11", "Dias 23/11 a 29/11", "Dias 30/11 a 01/12",
   ]);
   assert.deepEqual(wide.map((b) => b.minutes), [570, 95, 120, 0, 0, 960]);
   // A soma das faixas é sempre o total da folha.
@@ -1091,9 +1091,11 @@ test("resumo mensal é o padrão e a visão semanal mostra as faixas com a meta 
   const weekly = renderToStaticMarkup(React.createElement(StatsGrid, props));
   assert.match(weekly, /checked="" value="weekly"/);
   assert.equal([...weekly.matchAll(/class="week-band"/g)].length, 6);
-  assert.match(weekly, /2 a 8<\/strong>/);
+  assert.match(weekly, /Dias 2 a 8<\/strong>/);
   assert.match(weekly, /1h30 de 8 h/);
-  assert.match(weekly, /Semana parcial/);
+  // Aviso de parcial no próprio título (sem linha extra): as barras ficam alinhadas.
+  assert.match(weekly, /Dia 1<span class="week-band-partial"> \(semana parcial\)<\/span><\/strong>/);
+  assert.doesNotMatch(weekly, /week-band-note/);
   assert.match(weekly, /não é reduzida/);
   // localStorage inacessível: volta ao padrão sem erro.
   globalThis.localStorage = { getItem() { throw new Error("bloqueado"); } };

@@ -464,12 +464,21 @@ test.describe("visão semanal", () => {
     await toggle.getByRole("radio", { name: "Semanal" }).click();
     const bands = summary.getByRole("list", { name: /CH por semana/ }).getByRole("listitem");
     await expect(bands).toHaveCount(6);
-    await expect(bands.locator("strong")).toHaveText(["Semana: Dia 1", "Semana: 2 a 8", "Semana: 9 a 15", "Semana: 16 a 22", "Semana: 23 a 29", "Semana: Dia 30"]);
+    await expect(bands.locator("strong")).toHaveText([
+      "Semana: Dia 1 (semana parcial)", "Semana: Dias 2 a 8", "Semana: Dias 9 a 15",
+      "Semana: Dias 16 a 22", "Semana: Dias 23 a 29", "Semana: Dia 30 (semana parcial)",
+    ]);
+    // Barras alinhadas: na mesma linha da grade, a mesma altura (com ou sem "parcial" e "Semana atual").
+    const tracks = await bands.locator(".week-band-track").evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
+    const columns = await bands.evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
+    for (let i = 0; i < tracks.length; i++)
+      for (let j = 0; j < tracks.length; j++)
+        if (columns[i] === columns[j]) expect(Math.abs(tracks[i] - tracks[j]), `faixas ${i} e ${j}`).toBeLessThanOrEqual(1);
     await expect(bands.locator(".week-band-value")).toHaveText(["1h30 de 8 h", "1h30 de 8 h", "2h de 8 h", "8h15 de 8 h", "0h de 8 h", "0h de 8 h"]);
     // Semana atual (18/11/2026, relógio do teste) destacada também por texto.
     await expect(bands.nth(3)).toHaveAttribute("aria-current", "date");
     await expect(bands.nth(3)).toContainText("Semana atual");
-    await expect(bands.nth(0)).toContainText("Semana parcial");
+    await expect(bands.nth(0)).toContainText("(semana parcial)");
     await expect(summary).toContainText("não é reduzida");
     // Lembra a escolha.
     await page.reload();
@@ -484,7 +493,7 @@ test.describe("visão semanal", () => {
     await expect(bands).toHaveCount(6);
     // Faixas acompanham a troca de mês e novas atividades.
     await page.getByLabel("Mês da folha").selectOption("2026-08");
-    await expect(bands.locator("strong").first()).toHaveText("Semana: 1 a 2");
+    await expect(bands.locator("strong").first()).toHaveText("Semana: Dias 1 a 2 (semana parcial)");
     if (testInfo.project.name === "mobile") {
       const lefts = await bands.evaluateAll((items) => items.map((item) => Math.round(item.getBoundingClientRect().left)));
       expect(new Set(lefts).size).toBe(1);
