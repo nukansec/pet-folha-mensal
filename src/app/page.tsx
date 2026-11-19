@@ -40,7 +40,7 @@ import {
   type Attachment,
 } from "@/lib/attachments";
 import { buildProfileBackup, restoreWithAttachments } from "@/lib/attachment-backup";
-import { fileSlug, saveJsonFile } from "@/lib/download";
+import { fileSlug, saveBlobFile, saveJsonFile } from "@/lib/download";
 import {
   calcPetHours,
   calcPetMinutes,
@@ -53,6 +53,7 @@ import {
   getCurrentMonth,
   PROJECT_MONTHS,
   pluralize,
+  isDateAllowed,
 } from "@/lib/pet-calculator";
 import { Navbar } from "@/components/Navbar";
 import { ProfileModal } from "@/components/ProfileModal";
@@ -76,6 +77,8 @@ import {
 import {
   Calendar,
   Download,
+  ExternalLink,
+  FileText,
   Printer,
   CheckCircle2,
   ArrowLeft,
@@ -120,6 +123,7 @@ export default function Home() {
   const [attachmentsBusy, setAttachmentsBusy] = useState(false);
   const [preparingPrint, setPreparingPrint] = useState(false);
   const printInProgress = useRef(false);
+  const adminFromUrl = useRef(false);
   const printSheetRef = useRef<HTMLDivElement>(null);
   const printAttachmentsRef = useRef<HTMLDivElement>(null);
   const clearPrintAttachments = useRef<(() => void) | null>(null);
@@ -160,7 +164,10 @@ export default function Home() {
         typeof window !== "undefined"
           ? new URLSearchParams(window.location.search)
           : null;
-      if (urlParams?.get("admin") === "1") {
+      // Só na primeira leitura: o efeito roda de novo a cada troca de mês e
+      // reabria a administração depois de fechada.
+      if (urlParams?.get("admin") === "1" && !adminFromUrl.current) {
+        adminFromUrl.current = true;
         setIsAdminModalOpen(true);
       }
 
@@ -355,11 +362,12 @@ export default function Home() {
   ) => {
     if (!activeUser) return false;
     if (
-      !data.date.startsWith(monthKey) ||
+      // Datas livres (ADR 0002): só vale a vigência, como no formulário.
+      !isDateAllowed(data.date) ||
       calcPetMinutes(data.start, data.end) <= 0
     ) {
       setStorageError(
-        "Confira a data e os horários: a atividade deve pertencer ao mês selecionado e o fim deve ser posterior ao início.",
+        "Confira a data e os horários: a data deve estar dentro da vigência do programa e o fim deve ser posterior ao início.",
       );
       return false;
     }
@@ -485,7 +493,11 @@ export default function Home() {
         }
       }
 
-      if (!stillCurrent()) return false;
+      if (!stillCurrent()) {
+        // Tira as páginas de comprovante e o listener já preparados.
+        clearPrintAttachments.current?.();
+        return false;
+      }
       window.print();
       return true;
     } catch (error) {
@@ -499,6 +511,42 @@ export default function Home() {
     } finally {
       printInProgress.current = false;
       setPreparingPrint(false);
+    }
+  };
+
+  /**
+   * Folha em Word (.docx) preenchida a partir do modelo oficial, para editar
+   * ou completar à mão. O zip é montado no navegador (fflate, carregado só
+   * aqui); nenhum dado sai do aparelho.
+   */
+  const handleDownloadDocx = async (): Promise<boolean> => {
+    if (!activeUser) return false;
+    try {
+      const { DOCX_MIME, fillSheetDocx, sheetDocxFilename } = await import("@/lib/docx-export");
+      const response = await fetch(PROGRAM.sheet.blankTemplateDocx);
+      if (!response.ok) throw new Error("modelo indisponível");
+      const bytes = fillSheetDocx(new Uint8Array(await response.arrayBuffer()), {
+        user: activeUser,
+        monthLabel: getMonthYearLabel(monthKey),
+        activities,
+      });
+      const outcome = await saveBlobFile(
+        new Blob([bytes as BlobPart], { type: DOCX_MIME }),
+        sheetDocxFilename(fileSlug(activeUser.name), monthKey),
+        { description: "Folha em Word (.docx)", mime: DOCX_MIME, extension: ".docx" },
+      );
+      if (outcome === "cancelled") {
+        showToast("Salvamento cancelado.");
+        return false;
+      }
+      if (outcome === "failed") throw new Error("download");
+      showToast(outcome === "saved" ? "Folha em Word salva." : "Download da folha em Word iniciado.");
+      return true;
+    } catch {
+      setStorageError(
+        "Não foi possível gerar a folha em Word. Verifique a conexão (o modelo é baixado do site) e tente novamente.",
+      );
+      return false;
     }
   };
 
@@ -535,6 +583,9 @@ export default function Home() {
       return false;
     }
     if (outcome === "downloaded") {
+      // Firefox, Safari e celular não têm seletor de pasta: o download é a
+      // forma de salvar ali, e não deve deixar o aviso de "sem cópia" ativo.
+      setHasChanges(false);
       showToast("Download da cópia de segurança iniciado.");
       return true;
     }
@@ -1001,6 +1052,29 @@ export default function Home() {
                     <Printer size={18} aria-hidden="true" />
                     <span>{preparingPrint ? "Preparando PDF…" : "Imprimir / salvar PDF"}</span>
                   </button>
+                  {!showBlankTemplate && (
+                    <button
+                      type="button"
+                      onClick={() => void handleDownloadDocx()}
+                      className="secondary-button"
+                      title="Baixar esta folha preenchida em Word, para editar ou completar à mão"
+                    >
+                      <FileText size={16} aria-hidden="true" />
+                      <span>Baixar .docx (Word)</span>
+                    </button>
+                  )}
+                  {!showBlankTemplate && (
+                    <a
+                      href={PROGRAM.links.govSignature}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="secondary-button"
+                      title="Assinatura eletrônica gratuita do gov.br (abre em nova aba)"
+                    >
+                      <ExternalLink size={16} aria-hidden="true" />
+                      <span>Assinar no gov.br</span>
+                    </a>
+                  )}
                   {showBlankTemplate && (
                     <a
                       href={PROGRAM.sheet.blankTemplateDocx}
@@ -1094,9 +1168,14 @@ export default function Home() {
             templates={templates}
             onProfilesChange={(updated) => {
               setProfiles(updated);
-              if (activeUser && !updated.some((p) => p.id === activeUser.id)) {
-                if (updated.length > 0) handleSelectProfile(updated[0]);
-              }
+              if (!activeUser) return;
+              // Perfil ativo editado: a tela e a folha usam os dados novos.
+              const current = updated.find((p) => p.id === activeUser.id);
+              if (current) setActiveUser(current);
+              else if (updated.length > 0) handleSelectProfile(updated[0]);
+              // Perfil ativo excluído e nenhum outro: encerra a sessão em vez
+              // de seguir gravando atividades de um perfil que não existe.
+              else endSession("exit");
             }}
             onGatsChange={(updated) => setGats(updated)}
             onRolesChange={(updated) => setRoles(updated)}
@@ -1117,6 +1196,7 @@ export default function Home() {
             }
             onDownloadJson={handleExportBackup}
             onDownloadPdf={printParticipantSheet}
+            onDownloadDocx={handleDownloadDocx}
             userName={activeUser.name}
             hasChanges={hasChanges}
           />

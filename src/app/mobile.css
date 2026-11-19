@@ -524,3 +524,14 @@
     white-space: normal;
   }
 }
+
+/* Concluir no celular: o botão de cada opção desce para baixo do texto e
+   ocupa a largura (com o texto ao lado, "Assinar no gov.br" passava da caixa
+   em 390 px). */
+@media (max-width: 520px) {
+  .conclusion-option > :is(button, a, .conclusion-buttons) {
+    grid-column: 2 / -1;
+    justify-self: stretch;
+    justify-content: center;
+  }
+}

@@ -163,6 +163,11 @@ export const PROGRAM = {
      * aba, sem parâmetros: nenhum dado do usuário vai na URL.
      */
     feedbackForm: "https://forms.gle/tjpuiFpgJ2Njnx7F7" as string,
+    /**
+     * Assinatura eletrônica gov.br (instruções da ficha, item 4: assinar pelo
+     * Gov.br). Abre em nova aba, sem parâmetros: nenhum dado vai na URL.
+     */
+    govSignature: "https://www.gov.br/pt-br/servicos/assinatura-eletronica" as string,
     /** Repositório deste fork. */
     repository: "https://github.com/nukansec/pet-folha-mensal",
     /** Endereço público do app (base das URLs absolutas do Open Graph). */
