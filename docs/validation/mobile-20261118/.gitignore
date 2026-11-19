@@ -1,0 +1,11 @@
+# Conjunto completo de capturas (~30 MB por rodada): só local. Gere de novo
+# com scripts/auditar-telas.mjs. Versionadas: 360 px (claro e escuro) e
+# 1440 px (claro), além de resumo.md e achados.json.
+/antes/*/
+/depois/*/
+!/antes/360-claro/
+!/antes/360-escuro/
+!/antes/1440-claro/
+!/depois/360-claro/
+!/depois/360-escuro/
+!/depois/1440-claro/

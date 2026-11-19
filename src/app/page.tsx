@@ -62,6 +62,7 @@ import { ActivityForm } from "@/components/ActivityForm";
 import { ActivityTable } from "@/components/ActivityTable";
 import { EditActivityModal } from "@/components/EditActivityModal";
 import { OfficialSheet } from "@/components/OfficialSheet";
+import { SheetPreview } from "@/components/SheetPreview";
 import { MonthlyAttachments } from "@/components/MonthlyAttachments";
 import { LandingPage } from "@/components/LandingPage";
 import { ExitModal } from "@/components/ExitModal";
@@ -968,8 +969,8 @@ export default function Home() {
           {/* ABA 2: FOLHA OFICIAL (PRÉVIA CARTA PAISAGEM) */}
           {activeTab === "official" && (
             <div className="space-y-4 animate-fade-in">
-              <div className="sheet-toolbar flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3.5 rounded-2xl border border-line bg-surface text-xs shadow-[var(--page-shadow)]">
-                {/* Seletor entre Minha Folha e Template Vazio */}
+              <div className="sheet-toolbar">
+                {/* Controle segmentado: Minha folha | Modelo em branco */}
                 <div className="sheet-mode-tabs" role="group" aria-label="Tipo de folha">
                   <button
                     type="button"
@@ -989,15 +990,25 @@ export default function Home() {
                   </button>
                 </div>
 
-                <div className="flex items-center gap-2">
+                {/* Um só botão primário (imprimir); downloads e Voltar são secundários. */}
+                <div className="sheet-actions">
+                  <button
+                    onClick={() => void handlePrint()}
+                    disabled={preparingPrint || attachmentsBusy}
+                    aria-busy={preparingPrint}
+                    className="primary-button sheet-print"
+                  >
+                    <Printer size={18} aria-hidden="true" />
+                    <span>{preparingPrint ? "Preparando PDF…" : "Imprimir / salvar PDF"}</span>
+                  </button>
                   {showBlankTemplate && (
                     <a
                       href={PROGRAM.sheet.blankTemplateDocx}
                       download
-                      className="px-3 py-1.5 rounded-xl border border-line hover:bg-raised text-body cursor-pointer flex items-center gap-1.5 text-xs font-medium transition-all"
+                      className="secondary-button"
                       title="Baixar o modelo em branco (Word)"
                     >
-                      <Download className="size-3.5" />
+                      <Download size={16} aria-hidden="true" />
                       <span>Baixar .docx</span>
                     </a>
                   )}
@@ -1005,47 +1016,36 @@ export default function Home() {
                     <a
                       href={PROGRAM.sheet.blankTemplatePdf}
                       download
-                      className="px-3 py-1.5 rounded-xl border border-line hover:bg-raised text-body cursor-pointer flex items-center gap-1.5 text-xs font-medium transition-all"
+                      className="secondary-button"
                       title="Baixar o modelo em branco (PDF)"
                     >
-                      <Download className="size-3.5" />
+                      <Download size={16} aria-hidden="true" />
                       <span>Baixar PDF</span>
                     </a>
                   )}
                   <button
-                    onClick={() => void handlePrint()}
-                    disabled={preparingPrint || attachmentsBusy}
-                    aria-busy={preparingPrint}
-                    className="px-3.5 py-1.5 rounded-xl font-semibold bg-brand text-on-brand hover:bg-brand-strong cursor-pointer flex items-center gap-1.5 transition-all text-xs shadow-[var(--page-shadow)]"
-                  >
-                    <Printer className="size-3.5" />
-                    <span>{preparingPrint ? "Preparando PDF…" : "Imprimir / salvar PDF"}</span>
-                  </button>
-                  <button
                     onClick={() => setActiveTab("dashboard")}
-                    className="px-3 py-1.5 rounded-xl border border-line hover:bg-raised text-body cursor-pointer flex items-center gap-1 text-xs transition-colors"
+                    className="secondary-button sheet-back"
                   >
-                    <ArrowLeft className="size-3.5" />
+                    <ArrowLeft size={16} aria-hidden="true" />
                     Voltar
                   </button>
                 </div>
-                <p className="text-sm text-muted w-full">
+                <p className="sheet-hint">
                   Na janela de impressão, escolha papel <strong>Carta</strong> e
                   orientação <strong>Horizontal</strong>, como no modelo oficial.
                 </p>
               </div>
 
-              <div className="sheet-stage overflow-x-auto max-w-full p-2.5 sm:p-8 md:p-10 bg-canvas rounded-2xl border border-line flex justify-start sm:justify-center shadow-inner">
-                <div className="shadow-[var(--page-shadow)] rounded-xs ring-1 ring-line overflow-hidden">
-                  <OfficialSheet
-                    user={activeUser}
-                    monthLabel={monthLabel}
-                    activities={activities}
-                    totalMinutes={totalMinutes}
-                    isBlankTemplate={showBlankTemplate}
-                  />
-                </div>
-              </div>
+              <SheetPreview>
+                <OfficialSheet
+                  user={activeUser}
+                  monthLabel={monthLabel}
+                  activities={activities}
+                  totalMinutes={totalMinutes}
+                  isBlankTemplate={showBlankTemplate}
+                />
+              </SheetPreview>
               {!showBlankTemplate && (
                 <MonthlyAttachments
                   key={JSON.stringify([activeUser.id, monthKey, formRevision])}

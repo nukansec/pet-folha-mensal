@@ -1,0 +1,1280 @@
+[
+ {
+  "screen": "entrada-continuar",
+  "viewport": "320",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "320",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>188"
+ },
+ {
+  "screen": "painel",
+  "viewport": "320",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>194"
+ },
+ {
+  "screen": "painel",
+  "viewport": "320",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "320",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>194"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "320",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>194"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>210"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "320",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>194"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "320",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>194"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>188"
+ },
+ {
+  "screen": "painel",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>194"
+ },
+ {
+  "screen": "painel",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>194"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>194"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>210"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>194"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>194"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "light",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-pessoa-ficticia\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "light",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-outra-pessoa\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "360",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>228"
+ },
+ {
+  "screen": "painel",
+  "viewport": "360",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>234"
+ },
+ {
+  "screen": "painel",
+  "viewport": "360",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "360",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>234"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "360",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>234"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "360",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>250"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "360",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>234"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "360",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>234"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-pessoa-ficticia\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-outra-pessoa\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>228"
+ },
+ {
+  "screen": "painel",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>234"
+ },
+ {
+  "screen": "painel",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>234"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>234"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>250"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>234"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>234"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>258"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>264"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>264"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>264"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>264"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>264"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>258"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>264"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>264"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>264"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>264"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>264"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "414",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "414",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>288"
+ },
+ {
+  "screen": "painel",
+  "viewport": "414",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "414",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>288"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "414",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>288"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "414",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>288"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "414",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>288"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>288"
+ },
+ {
+  "screen": "painel",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>288"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>288"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>288"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>288"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "768",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-pessoa-ficticia\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-outra-pessoa\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "painel",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "rolagem-horizontal",
+  "selector": "header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button",
+  "text": "Ativar tema escuro",
+  "detail": "scrollWidth 247 > 195; header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Continuar",
+  "detail": "34×52"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Primeiro acesso",
+  "detail": "34×52"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Restaurar",
+  "detail": "34×52"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "modal-excluir-perfil",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "rolagem-horizontal",
+  "selector": "header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button",
+  "text": "Ativar tema escuro",
+  "detail": "scrollWidth 247 > 195; header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle"
+ },
+ {
+  "screen": "modal-excluir-perfil",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "modal-mais-largo",
+  "selector": "html > body.min-h-screen.antialiased > dialog.pet-dialog.screen-only > section.conclusion-panel.delete-profile-panel",
+  "text": "Excluir o perfil de Pessoa Fictícia de Exemplo Sobrenome Lon",
+  "detail": "painel 231 px, viewport 195"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "rolagem-horizontal",
+  "selector": "header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button",
+  "text": "Ativar tema escuro",
+  "detail": "scrollWidth 247 > 195; header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>63"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Continuar",
+  "detail": "34×52"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Primeiro acesso",
+  "detail": "34×52"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Restaurar",
+  "detail": "34×52"
+ },
+ {
+  "screen": "entrada-restaurar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "rolagem-horizontal",
+  "selector": "header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button",
+  "text": "Ativar tema escuro",
+  "detail": "scrollWidth 247 > 195; header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle"
+ },
+ {
+  "screen": "entrada-restaurar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Continuar",
+  "detail": "34×52"
+ },
+ {
+  "screen": "entrada-restaurar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Primeiro acesso",
+  "detail": "34×52"
+ },
+ {
+  "screen": "entrada-restaurar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Restaurar",
+  "detail": "34×52"
+ },
+ {
+  "screen": "aviso-restauracao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "rolagem-horizontal",
+  "selector": "header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button",
+  "text": "Ativar tema escuro",
+  "detail": "scrollWidth 247 > 195; header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle"
+ },
+ {
+  "screen": "aviso-restauracao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Continuar",
+  "detail": "34×52"
+ },
+ {
+  "screen": "aviso-restauracao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Primeiro acesso",
+  "detail": "34×52"
+ },
+ {
+  "screen": "aviso-restauracao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Restaurar",
+  "detail": "34×52"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>69"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01",
+  "detail": "largura 127>69"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div > div.frequency-workbench > section.activity-list",
+  "text": "Atividades do mês 10 Limpar mês 03/11/2026 2h Reunião Geral ",
+  "detail": "largura 175>161"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>69"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01",
+  "detail": "largura 127>69"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div > div.frequency-workbench > section.activity-list",
+  "text": "Atividades do mês 10 Limpar mês 03/11/2026 2h Reunião Geral ",
+  "detail": "largura 175>161"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>69"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01",
+  "detail": "largura 127>69"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div > div.frequency-workbench > section.activity-list",
+  "text": "Atividades do mês 10 Limpar mês 03/11/2026 2h Reunião Geral ",
+  "detail": "largura 175>161"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>85"
+ },
+ {
+  "screen": "modal-configuracoes",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > dialog.pet-dialog.screen-only > div.w-full.max-w-4xl",
+  "text": "Configurações Locais Configurações Locais Digite o PIN para ",
+  "detail": "largura 240>177"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>69"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01",
+  "detail": "largura 127>69"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "logos-folha",
+  "selector": "tr > td > div.pet-sheet-header > img",
+  "text": "",
+  "detail": "logos 65×6, natural 1338"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>69"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01",
+  "detail": "largura 127>69"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "logos-folha",
+  "selector": "tr > td > div.pet-sheet-header > img",
+  "text": "",
+  "detail": "logos 65×6, natural 1338"
+ }
+]
