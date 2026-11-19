@@ -649,18 +649,18 @@ test("lista oferece primeiro registro e exemplos opcionais; tabela e cartões ma
 });
 
 test("datas acompanham o mês escolhido e cobrem toda a vigência", () => {
-  assert.equal(getCurrentMonth(new Date(2026, 10, 2)), "2026-11");
-  assert.equal(getCurrentMonth(new Date(2025, 0, 1)), "2025-08");
-  assert.equal(getCurrentMonth(new Date(2029, 0, 1)), "2027-08");
+  assert.equal(getCurrentMonth(new Date("2026-11-02T12:00:00-03:00")), "2026-11");
+  assert.equal(getCurrentMonth(new Date("2025-01-01T12:00:00-03:00")), "2025-08");
+  assert.equal(getCurrentMonth(new Date("2029-01-01T12:00:00-03:00")), "2027-08");
   assert.equal(PROJECT_MONTHS[0], "2025-08");
   assert.equal(PROJECT_MONTHS.at(-1), "2027-08");
   assert.equal(PROJECT_MONTHS.length, 25);
   assert.equal(
-    getDefaultActivityDate("2026-11", new Date(2026, 10, 2)),
+    getDefaultActivityDate("2026-11", new Date("2026-11-02T12:00:00-03:00")),
     "2026-11-02",
   );
   assert.equal(
-    getDefaultActivityDate("2026-10", new Date(2026, 10, 2)),
+    getDefaultActivityDate("2026-10", new Date("2026-11-02T12:00:00-03:00")),
     "2026-10-01",
   );
 });
