@@ -6,6 +6,7 @@ import {
   formatDayMonth,
   formatDuration,
   formatTotalHours,
+  sheetCell,
   sortActivitiesChronologically,
   sumActivityMinutes,
 } from "./pet-calculator";
@@ -107,17 +108,18 @@ export function rolesLine(role: string): string {
     .join(" ");
 }
 
+/** Células da linha da atividade; campo vazio sai como "-", como na folha. */
 export function activityCells(activity: Activity): string[] {
   return [
     formatDayMonth(activity.date),
-    activity.local ?? "",
-    activity.description ?? "",
+    activity.local,
+    activity.description,
     activity.start,
     activity.end,
     formatDuration(calcPetMinutes(activity.start, activity.end)),
-    activity.modality ?? "",
-    activity.descricao ?? "",
-  ];
+    activity.modality,
+    activity.descricao,
+  ].map(sheetCell);
 }
 
 /** Preenche o document.xml do modelo. Lança erro se a estrutura mudar. */

@@ -60,6 +60,7 @@ import { ProfileModal } from "@/components/ProfileModal";
 import { AdminModal } from "@/components/AdminModal";
 import { StatsGrid } from "@/components/StatsGrid";
 import { ActivityForm } from "@/components/ActivityForm";
+import type { ActivityDraft } from "@/components/ActivityFields";
 import { ActivityTable } from "@/components/ActivityTable";
 import { EditActivityModal } from "@/components/EditActivityModal";
 import { OfficialSheet } from "@/components/OfficialSheet";
@@ -113,6 +114,10 @@ export default function Home() {
   const [restoring, setRestoring] = useState(false);
   const importInProgress = useRef(false);
   const [formRevision, setFormRevision] = useState(0);
+  // Duplicar: cópia aberta no formulário e contador próprio na chave do
+  // formulário (formRevision também remonta os comprovantes).
+  const [duplicateDraft, setDuplicateDraft] = useState<ActivityDraft | null>(null);
+  const [duplicateRevision, setDuplicateRevision] = useState(0);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [activeTab, setActiveTab] = useState<"dashboard" | "official">(
     "dashboard",
@@ -367,7 +372,7 @@ export default function Home() {
       calcPetMinutes(data.start, data.end) <= 0
     ) {
       setStorageError(
-        "Confira a data e os horários: a data deve estar dentro da vigência do programa e o fim deve ser posterior ao início.",
+        "Confira a data e os horários: a data deve estar dentro da vigência do programa, o fim não pode ser igual ao início e uma atividade que passa da meia-noite pode durar até 12 h.",
       );
       return false;
     }
@@ -394,6 +399,22 @@ export default function Home() {
     );
     if (saved) setEditingActivity(null);
     return saved;
+  };
+
+  const handleDuplicateActivity = async (activity: Activity) => {
+    if (draftDirty && !(await confirmDraft())) return;
+    setEditingActivity(null);
+    setDuplicateDraft({
+      date: activity.date,
+      start: activity.start,
+      end: activity.end,
+      modality: activity.modality,
+      local: activity.local ?? "",
+      description: activity.description,
+      descricao: activity.descricao ?? "",
+    });
+    setDuplicateRevision((revision) => revision + 1);
+    showToast("Atividade copiada no formulário: ajuste a data e clique em Adicionar.");
   };
 
   const handleDeleteActivity = async (id: string) => {
@@ -965,8 +986,10 @@ export default function Home() {
               />
               <div className="frequency-workbench">
                 <ActivityForm
-                  key={`${activeUser.id}-${monthKey}-${formRevision}`}
+                  key={`${activeUser.id}-${monthKey}-${formRevision}-${duplicateRevision}`}
                   monthKey={monthKey}
+                  initialDraft={duplicateDraft ?? undefined}
+                  onInitialDraftUsed={() => setDuplicateDraft(null)}
                   onDirtyChange={setDraftDirty}
                   onSave={handleSaveActivity}
                   defaultGatNumber={activeUser.gatNumber}
@@ -983,6 +1006,7 @@ export default function Home() {
                   editingId={editingActivity ? editingActivity.id : null}
                   onEdit={(act) => setEditingActivity(act)}
                   onDelete={handleDeleteActivity}
+                  onDuplicate={(act) => void handleDuplicateActivity(act)}
                   user={activeUser}
                   monthLabel={monthLabel}
                   onLoadSamples={handleLoadSamples}

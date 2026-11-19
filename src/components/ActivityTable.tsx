@@ -10,7 +10,7 @@ import {
   formatTotalHours,
   pluralize,
 } from "@/lib/pet-calculator";
-import { Pencil, Trash2, ListChecks } from "lucide-react";
+import { Copy, Pencil, Trash2, ListChecks } from "lucide-react";
 import { ConfirmModal } from "./ConfirmModal";
 
 interface ActivityTableProps {
@@ -19,6 +19,8 @@ interface ActivityTableProps {
   editingId: string | null;
   onEdit: (activity: Activity) => void;
   onDelete: (id: string) => void;
+  /** Copia a atividade para o formulário de adicionar (outra data, mesmos dados). */
+  onDuplicate?: (activity: Activity) => void;
   user: UserProfile;
   monthLabel: string;
   onLoadSamples: () => void;
@@ -31,6 +33,7 @@ export function ActivityTable({
   editingId,
   onEdit,
   onDelete,
+  onDuplicate,
   user,
   monthLabel,
   onLoadSamples,
@@ -83,6 +86,16 @@ export function ActivityTable({
         >
           <Pencil size={18} />
         </button>
+        {onDuplicate && (
+          <button
+            className="icon-button"
+            onClick={() => onDuplicate(activity)}
+            aria-label={`Duplicar atividade: ${cleanActivityDescription(activity.description)}`}
+            title="Duplicar"
+          >
+            <Copy size={18} />
+          </button>
+        )}
         <button
           className="icon-button"
           onClick={() => onDelete(activity.id)}
