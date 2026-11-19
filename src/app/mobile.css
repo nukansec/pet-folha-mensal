@@ -173,3 +173,60 @@
 .activity-fields input[type="date"] {
   min-width: 150px;
 }
+
+/* ---------- B2: rótulos sem partir palavra e entrada ---------- */
+/* "anywhere" partia "Coordenador(a)" em "Coordenador(a" + ")". Um nome muito
+   longo ainda quebra (break-word) em vez de sair da caixa. */
+.choice-text,
+.profile-card-text strong,
+.full-select-display {
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: manual;
+}
+.choice-group--cards .choice-text,
+.choice-group--segmented .choice-text,
+.choice-group--toggle .choice-text,
+.ui-segmented button,
+.workspace-tabs button,
+.backup-tools button,
+.sheet-mode-option {
+  overflow-wrap: normal;
+}
+/* Parte opcional de um rótulo (ex.: " cópia"): some no celular; o nome
+   acessível completo fica no aria-label do botão. */
+@media (max-width: 479px) {
+  .label-extra {
+    display: none;
+  }
+}
+.ui-segmented button {
+  min-height: 44px;
+}
+@media (max-width: 479px) {
+  .ui-segmented {
+    gap: 2px;
+  }
+  .screen-only .ui-segmented button {
+    padding: 6px 4px;
+    font-size: 15px;
+    line-height: 1.25;
+  }
+}
+/* Perfil: cartões de 2 colunas; 1 coluna abaixo de 360 px. */
+.choice-group--cards > label.choice {
+  min-height: 48px;
+}
+@media (max-width: 359px) {
+  .choice-group--cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* GAT em uma linha com reticências; o nome completo vai na linha de baixo. */
+.full-select--single .full-select-display > span {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.gat-full-name {
+  margin-top: 0;
+}

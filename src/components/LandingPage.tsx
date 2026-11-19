@@ -239,7 +239,7 @@ export function LandingPage({
                     <SegmentedControlItem selected={currentTab === "local"} onClick={() => setTab("local")}>Continuar</SegmentedControlItem>
                   )}
                   <SegmentedControlItem selected={currentTab === "create"} onClick={() => setTab("create")}>Primeiro acesso</SegmentedControlItem>
-                  <SegmentedControlItem selected={currentTab === "upload"} onClick={() => setTab("upload")}>Restaurar cópia</SegmentedControlItem>
+                  <SegmentedControlItem selected={currentTab === "upload"} onClick={() => setTab("upload")} aria-label="Restaurar cópia">Restaurar<span className="label-extra"> cópia</span></SegmentedControlItem>
                 </SegmentedControl>
                 {currentTab === "local" ? (
                   <div className="start-form">
@@ -335,6 +335,8 @@ export function LandingPage({
                         value={gat}
                         onChange={(event) => setGat(event.target.value)}
                         required
+                        singleLine
+                        aria-describedby="entry-gat-name"
                       >
                         {gatList.map((item) => (
                           <option key={item.number} value={item.number}>
@@ -342,6 +344,9 @@ export function LandingPage({
                           </option>
                         ))}
                       </FullSelect>
+                      <p className="field-hint gat-full-name" id="entry-gat-name">
+                        {gats[gat]?.name}
+                      </p>
                     </div>
                     <button
                       className="primary-button w-full"
