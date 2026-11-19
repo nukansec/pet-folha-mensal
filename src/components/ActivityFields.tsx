@@ -5,6 +5,7 @@ import { PROGRAM } from "@/config/program";
 import {
   calcPetMinutes,
   cleanActivityDescription,
+  crossesMidnight,
   DATE_LIMITS,
   formatDuration,
 } from "@/lib/pet-calculator";
@@ -157,6 +158,13 @@ export function ActivityFields({
           )}
         </div>
       </div>
+      {crossesMidnight(draft.start, draft.end) && (
+        <p className="field-hint" aria-live="polite">
+          {minutes > 0
+            ? "Termina no dia seguinte: a CH conta inteira no dia em que começou."
+            : "Passa da meia-noite com mais de 12 h: confira o início e o fim."}
+        </p>
+      )}
       <ModalityChoice
         id={id("modality")}
         value={draft.modality}

@@ -1,24 +1,40 @@
 import { Activity } from "@/types";
 import { PROGRAM } from "@/config/program";
 
+/** Maior duração aceita para uma atividade que passa da meia-noite. */
+export const MAX_OVERNIGHT_MINUTES = 12 * 60;
+
+function clockMinutes(value: string): number {
+  const match = /^(\d{2}):(\d{2})$/.exec(value ?? "");
+  if (!match) return NaN;
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (hours > 23 || minutes > 59) return NaN;
+  return hours * 60 + minutes;
+}
+
+/** Fim antes do início: a atividade termina no dia seguinte (23:00–03:00). */
+export function crossesMidnight(startTimeStr: string, endTimeStr: string): boolean {
+  const start = clockMinutes(startTimeStr);
+  const end = clockMinutes(endTimeStr);
+  return !Number.isNaN(start) && !Number.isNaN(end) && end < start;
+}
+
 /**
  * Carga horária (CH) do PET-SD: duração exata entre início e fim, em minutos.
  * Sem arredondamento: 16:30–18:00 = 90 min ("1h30"); 11:00–13:00 = 120 min ("2h").
- * Fim igual ou anterior ao início, ou horário inválido, vale 0.
+ * Fim antes do início = a atividade passou da meia-noite e conta inteira no
+ * dia em que começou: 23:00–03:00 = 240 min ("4h"). Para não transformar erro
+ * de digitação (14:00–13:00) em 23 h, a virada só vale até 12 h de duração.
+ * Início igual ao fim, virada acima de 12 h ou horário inválido valem 0.
  */
 export function calcPetMinutes(startTimeStr: string, endTimeStr: string): number {
-  const toMinutes = (value: string) => {
-    const match = /^(\d{2}):(\d{2})$/.exec(value ?? "");
-    if (!match) return NaN;
-    const hours = Number(match[1]);
-    const minutes = Number(match[2]);
-    if (hours > 23 || minutes > 59) return NaN;
-    return hours * 60 + minutes;
-  };
-  const start = toMinutes(startTimeStr);
-  const end = toMinutes(endTimeStr);
-  if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return 0;
-  return end - start;
+  const start = clockMinutes(startTimeStr);
+  const end = clockMinutes(endTimeStr);
+  if (Number.isNaN(start) || Number.isNaN(end) || end === start) return 0;
+  if (end > start) return end - start;
+  const overnight = end + 24 * 60 - start;
+  return overnight <= MAX_OVERNIGHT_MINUTES ? overnight : 0;
 }
 
 /** CH em horas decimais (ex.: 1.5). Para somar, prefira minutos. */
@@ -35,6 +51,11 @@ export function sumActivityMinutes(activities: Pick<Activity, "start" | "end">[]
 }
 
 /** Formato da coluna CH (h) da ficha: "2h", "1h30", "0h05". */
+/** Célula da folha: campo vazio sai como "-" (linha de atividade, não a em branco). */
+export function sheetCell(value: string | undefined | null): string {
+  return value?.trim() ? value : "-";
+}
+
 /** "1 atividade", "3 atividades". */
 export function pluralize(count: number, singular: string, plural: string): string {
   return `${count} ${count === 1 ? singular : plural}`;

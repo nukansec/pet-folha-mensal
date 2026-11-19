@@ -82,7 +82,7 @@ export function EditActivityModal({
     if (calcPetMinutes(values.start, values.end) <= 0) {
       await alert({
         title: "Horário inválido",
-        message: "O fim deve ser posterior ao início.",
+        message: "Confira os horários: o fim não pode ser igual ao início, e uma atividade que passa da meia-noite pode durar até 12 h.",
         variant: "warning",
       });
       return;
