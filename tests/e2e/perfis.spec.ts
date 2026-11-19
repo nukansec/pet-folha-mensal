@@ -234,7 +234,7 @@ test.describe("gerenciar perfis na entrada", () => {
     const downloadPromise = page.waitForEvent("download");
     await dialog.getByRole("button", { name: "Salvar cópia antes", exact: true }).click();
     const download = await downloadPromise;
-    expect(download.suggestedFilename()).toBe("backup-perfil-completo-ana-fictícia.json");
+    expect(download.suggestedFilename()).toBe("backup-perfil-completo-ana-ficticia.json");
     const backupPath = testInfo.outputPath("perfil.json");
     await download.saveAs(backupPath);
     await expect(dialog.getByText(/Cópia acionada/)).toBeVisible();

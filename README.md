@@ -30,7 +30,13 @@ telas do app original. Antes, depois, a referência lado a lado e os ajustes de
 - Menu do participante no topo: editar identificação, trocar participante,
   salvar cópia e sair, com os mesmos avisos do Concluir.
 - Lançamento de atividades com data, horários, Unidade/Local, modalidade,
-  atividade desenvolvida e descrição.
+  atividade desenvolvida e descrição. A **data é livre**: cada GAT fecha a folha
+  num dia (26 a 25, 20 a 19…), então a folha de Novembro aceita também 26/10; a
+  atividade fica na folha em que foi lançada
+  ([ADR 0002](docs/adr/0002-datas-livres-na-folha.md)). **Duplicar** copia uma
+  atividade lançada para o formulário, para repetir em outra data.
+- Na folha, campo vazio de uma atividade (Unidade/Local, Descrição) sai como
+  "-"; as linhas em branco continuam vazias para completar à mão.
 - Preenchimento rápido com quatro modelos: **Reunião Geral** (In Loco, UFG),
   **Capacitação** (Síncrona, Online), **Visita Técnica** (In Loco; o local fica
   para a pessoa preencher) e **Pesquisa Bibliográfica e Estudos Autônomos**
@@ -42,6 +48,10 @@ telas do app original. Antes, depois, a referência lado a lado e os ajustes de
   cada semana e a referência de 8 h).
 - Prévia e impressão da folha oficial (Imprimir / salvar PDF) e modelo em branco
   em `.docx` e PDF.
+- **Folha preenchida em Word (.docx)**, gerada no navegador a partir do modelo
+  oficial, para editar ou completar à mão (sobram linhas em branco).
+- Botão **Assinar no gov.br** na folha oficial e no Concluir, que abre o serviço
+  de assinatura eletrônica do gov.br.
 - Comprovação fotográfica: fotos ou PDFs anexados saem nas páginas seguintes da folha.
 - Cópia de segurança em `.json` para continuar em outro aparelho: a do mês
   (formato 1.3) e a do perfil inteiro (1.4, oferecida antes de excluir).
@@ -53,7 +63,9 @@ Fonte: Regimento Interno do PET-SD/UFG e o modelo oficial da ficha. Resumo em
 
 - **CH = duração exata** entre início e fim, em minutos, sem arredondar:
   16:30–18:00 = `1h30`; 11:00–13:00 = `2h`; 18:00–19:00 = `1h`.
-- Fim igual ou anterior ao início não é aceito (CH = 0).
+- Fim antes do início = a atividade **passou da meia-noite** e conta inteira no
+  dia em que começou: 23:00–03:00 = `4h`. Vale até 12 h (um plantão das 19h às
+  7h); acima disso, ou com fim igual ao início, o app pede para conferir.
 - O total do mês soma minutos e aparece como `34 horas` ou `33h30`.
 - Mínimo de **32 h no mês**; o excedente **não** passa para o mês seguinte.
 - Modalidades: **Interação em tempo real (In Loco)**, **Interação em tempo real

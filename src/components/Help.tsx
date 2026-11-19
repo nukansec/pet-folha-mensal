@@ -31,7 +31,7 @@ const questions = [
   ],
   [
     "Como a carga horária (CH) é calculada?",
-    `A CH é a duração exata entre início e fim, em minutos: 16h30 às 18h00 = 1h30; 11h00 às 13h00 = 2h. O mínimo é de ${PROGRAM.monthlyTargetHours}h no mês e o excedente não passa para o mês seguinte.`,
+    `A CH é a duração exata entre início e fim, em minutos: 16h30 às 18h00 = 1h30; 11h00 às 13h00 = 2h. Atividade que passa da meia-noite conta inteira no dia em que começou: 23h00 às 3h00 = 4h (até 12 h). A data é livre: lance também dias do mês anterior se a folha do seu GAT fecha no dia 25 ou no dia 19. O mínimo é de ${PROGRAM.monthlyTargetHours}h no mês e o excedente não passa para o mês seguinte.`,
   ],
   [
     "Preciso comprovar as atividades?",

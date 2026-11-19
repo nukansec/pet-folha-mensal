@@ -13,6 +13,8 @@ import {
   calcPetHours,
   calcPetMinutes,
   cleanActivityDescription,
+  getCurrentMonth,
+  shiftMonthKey,
   sortActivitiesChronologically,
 } from "./pet-calculator";
 
@@ -868,6 +870,12 @@ function readActivities(records: unknown): Activity[] | null {
   return sortActivitiesChronologically(activities);
 }
 
+/** Data a no máximo um mês da folha (antes ou depois). */
+function nearMonth(date: string, monthKey: string): boolean {
+  const month = date.slice(0, 7);
+  return month >= shiftMonthKey(monthKey, -1) && month <= shiftMonthKey(monthKey, 1);
+}
+
 const validMonthKey = (value: unknown): value is string =>
   typeof value === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
 
@@ -910,12 +918,19 @@ export function inspectUserData(jsonStr: string): RestoreResult {
   if (typeof profile.email === "string") user.email = profile.email;
 
   if (data.version === PROFILE_BACKUP_VERSION) {
-    if (
-      !Array.isArray(data.months) ||
-      data.months.length === 0 ||
-      data.months.length > MAX_BACKUP_MONTHS
-    )
+    if (!Array.isArray(data.months) || data.months.length > MAX_BACKUP_MONTHS)
       return restoreFailure("INVALID_BACKUP");
+    // Perfil sem atividades nem comprovantes: a cópia (que o app gera e diz
+    // "salva") restaura só a identificação, no mês atual.
+    if (data.months.length === 0)
+      return {
+        success: true,
+        code: "RESTORED",
+        user,
+        monthKey: getCurrentMonth(),
+        activities: [],
+        months: [],
+      };
     const months: RestoreMonth[] = [];
     const seen = new Set<string>();
     for (const month of data.months) {
@@ -926,7 +941,9 @@ export function inspectUserData(jsonStr: string): RestoreResult {
         seen.has(month.monthKey) ||
         !activities ||
         !Array.isArray(month.attachments) ||
-        activities.some((activity) => !activity.date.startsWith(month.monthKey))
+        // Datas livres: a folha pode ter dias de outro mês (ex.: 26/10 na de
+        // Novembro). Só não pode ficar longe dela (cópia corrompida).
+        activities.some((activity) => !nearMonth(activity.date, month.monthKey))
       )
         return restoreFailure("INVALID_BACKUP");
       seen.add(month.monthKey);

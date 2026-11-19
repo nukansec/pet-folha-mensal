@@ -1262,10 +1262,19 @@ html[data-theme="dark"] .brand-mark {
   line-height: 1.6;
   margin-top: 8px;
 }
-.conclusion-option > :is(button, a) {
+.conclusion-option > :is(button, a, .conclusion-buttons) {
   grid-column: 3;
   align-self: center;
   justify-self: start;
+}
+/* Folha para assinatura: PDF, Word e gov.br no mesmo passo, empilhados. */
+.conclusion-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.conclusion-buttons > :is(button, a) {
+  justify-content: center;
 }
 .conclusion-actions {
   display: flex;

@@ -54,6 +54,9 @@ export function StatsGrid({
   const [view, setView] = useState<SummaryView>(readView);
   const toggleId = useId();
   const targetMinutes = targetHours * 60;
+  // Um só valor arredondado: aria-valuenow nunca passa de aria-valuemax
+  // (32h05 dava 32,1 contra máximo de 32,08).
+  const currentHours = Math.round((totalMinutes / 60) * 10) / 10;
   const progress = Math.min(
     100,
     Math.max(0, (totalMinutes / targetMinutes) * 100),
@@ -163,9 +166,9 @@ export function StatsGrid({
               className="progress-track"
               role="progressbar"
               aria-label={`CH do mês em relação ao mínimo de ${targetHours} h`}
-              aria-valuenow={Math.round((totalMinutes / 60) * 10) / 10}
+              aria-valuenow={currentHours}
               aria-valuemin={0}
-              aria-valuemax={Math.max(targetHours, totalMinutes / 60)}
+              aria-valuemax={Math.max(targetHours, currentHours)}
               aria-valuetext={`${formatTotalHours(totalMinutes)} de ${targetHours} h`}
             >
               <span style={{ width: `${progress}%` }} />

@@ -246,12 +246,23 @@ async function validateAttachment(id: string, name: string, blob: Blob): Promise
   return { id, name, file, pages };
 }
 
+/**
+ * crypto.randomUUID só existe em contexto seguro (HTTPS ou localhost); aberto
+ * pelo IP da rede local (http://192.168…), todo comprovante era recusado.
+ */
+function newAttachmentId(): string {
+  return (
+    globalThis.crypto?.randomUUID?.() ??
+    `att-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+  );
+}
+
 export async function addAttachments(scope: AttachmentScope, files: File[]) {
   const rejected: string[] = [];
   const candidates: Attachment[] = [];
   for (const file of files) {
     try {
-      const candidate = await validateAttachment(crypto.randomUUID(), file.name, file);
+      const candidate = await validateAttachment(newAttachmentId(), file.name, file);
       const error = limitError([...candidates, candidate]);
       if (error) throw new Error(error);
       candidates.push(candidate);

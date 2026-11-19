@@ -165,6 +165,22 @@ em branco ao lado foi exportado pelo Word a partir desse `.docx`.
   seletor; título completo em `description`. Editáveis no painel local.
 - **D10 — Vigência.** Meses selecionáveis de ago/2025 a ago/2027 (cronograma do
   GAT; o edital fala em 24 meses a partir do início).
+- **D15 — Datas livres (19/11/2026).** A folha deixou de limitar a data ao mês
+  do calendário: há GATs que fecham de 26 a 25 e outros de 20 a 19. A data vale
+  dentro da vigência (com um mês de folga antes) e a atividade fica na folha em
+  que foi lançada. Sem mudança no formato salvo. Ver
+  [ADR 0002](adr/0002-datas-livres-na-folha.md).
+- **D16 — Folha em Word e assinatura (19/11/2026).** "Baixar .docx (Word)" gera
+  a folha preenchida a partir do modelo oficial em branco, no navegador
+  (`src/lib/docx-export.ts`, com `fflate`). "Assinar no gov.br" abre
+  `https://www.gov.br/pt-br/servicos/assinatura-eletronica` (instruções da ficha,
+  item 4), configurado em `PROGRAM.links.govSignature`.
+- **D17 — Meia-noite, Duplicar e "-" (19/11/2026).** Fim antes do início passa
+  a ser atividade que atravessou a meia-noite: CH = fim + 24 h − início, contada
+  no dia de início (23:00–03:00 = 4h), limitada a 12 h para não aceitar erro de
+  digitação como 23 h. "Duplicar" em cada atividade copia os campos para o
+  formulário (a lista de preenchimento rápido não mudou). Na folha e no .docx,
+  campo vazio de atividade sai como "-".
 
 ## Dúvidas para o Brunno
 

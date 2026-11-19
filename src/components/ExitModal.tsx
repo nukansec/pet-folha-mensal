@@ -11,6 +11,8 @@ interface ExitModalProps {
   onConfirmExit: () => void;
   onDownloadJson: () => Promise<boolean> | boolean | void;
   onDownloadPdf: () => Promise<boolean> | boolean | void;
+  /** Folha preenchida em Word (.docx). Sem a função, a opção não aparece. */
+  onDownloadDocx?: () => Promise<boolean> | boolean | void;
   userName: string;
   hasChanges?: boolean;
   /** Texto do botão principal: Concluir usa o padrão; o menu do topo, "Trocar participante" ou "Sair". */
@@ -28,24 +30,29 @@ function Conclusion({
   onConfirmExit,
   onDownloadJson,
   onDownloadPdf,
+  onDownloadDocx,
   userName,
   hasChanges = false,
   leaveLabel = "Sair / trocar participante",
 }: ExitModalProps) {
   const [jsonTriggered, setJsonTriggered] = useState(false);
   const [pdfTriggered, setPdfTriggered] = useState(false);
+  const [docxTriggered, setDocxTriggered] = useState(false);
   const [exitWarning, setExitWarning] = useState(false);
   const [busy, setBusy] = useState(false);
-  async function download(kind: "json" | "pdf") {
+  async function download(kind: "json" | "pdf" | "docx") {
     if (busy) return;
     setBusy(true);
     try {
       const result = await (kind === "json"
         ? onDownloadJson()
-        : onDownloadPdf());
+        : kind === "pdf"
+          ? onDownloadPdf()
+          : onDownloadDocx?.());
       if (result !== false) {
         if (kind === "json") setJsonTriggered(true);
-        else setPdfTriggered(true);
+        else if (kind === "pdf") setPdfTriggered(true);
+        else setDocxTriggered(true);
       }
     } finally {
       setBusy(false);
@@ -96,21 +103,45 @@ function Conclusion({
           <div>
             <h3>Folha para assinatura</h3>
             <p>
-              Salve o PDF completo em papel Carta na horizontal para assinar.
+              Salve o PDF em papel Carta na horizontal (ou em Word, para
+              completar à mão) e assine pelo gov.br.
             </p>
             {pdfTriggered && (
               <p role="status">
                 Impressão aberta. Salve o PDF ou imprima na janela do navegador.
               </p>
             )}
+            {docxTriggered && (
+              <p role="status">Download da folha em Word acionado.</p>
+            )}
           </div>
-          <button
-            className="secondary-button"
-            disabled={busy}
-            onClick={() => void download("pdf")}
-          >
-            Imprimir / salvar PDF
-          </button>
+          <div className="conclusion-buttons">
+            <button
+              className="secondary-button"
+              disabled={busy}
+              onClick={() => void download("pdf")}
+            >
+              Imprimir / salvar PDF
+            </button>
+            {onDownloadDocx && (
+              <button
+                className="secondary-button"
+                disabled={busy}
+                onClick={() => void download("docx")}
+              >
+                Baixar .docx (Word)
+              </button>
+            )}
+            <a
+              className="secondary-button"
+              href={PROGRAM.links.govSignature}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Assinar no gov.br (abre em nova aba)"
+            >
+              Assinar no gov.br
+            </a>
+          </div>
         </div>
         {PROGRAM.links.activityForm && (
           <div className="conclusion-option">

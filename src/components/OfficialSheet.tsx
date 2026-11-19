@@ -9,6 +9,7 @@ import {
   formatDayMonth,
   formatDuration,
   formatTotalHours,
+  sheetCell,
   sortActivitiesChronologically,
 } from '@/lib/pet-calculator';
 
@@ -136,14 +137,15 @@ export function OfficialSheet({
                 <tbody>
                   {sortedActivities.map((act) => (
                     <tr key={act.id}>
-                      <td>{formatDayMonth(act.date)}</td>
-                      <td>{act.local}</td>
-                      <td>{act.description}</td>
-                      <td>{act.start}</td>
-                      <td>{act.end}</td>
+                      {/* Campo vazio sai como "-" para não parecer esquecido. */}
+                      <td>{sheetCell(formatDayMonth(act.date))}</td>
+                      <td>{sheetCell(act.local)}</td>
+                      <td>{sheetCell(act.description)}</td>
+                      <td>{sheetCell(act.start)}</td>
+                      <td>{sheetCell(act.end)}</td>
                       <td>{formatDuration(calcPetMinutes(act.start, act.end))}</td>
-                      <td>{act.modality}</td>
-                      <td className="pet-sheet-description">{act.descricao}</td>
+                      <td>{sheetCell(act.modality)}</td>
+                      <td className="pet-sheet-description">{sheetCell(act.descricao)}</td>
                     </tr>
                   ))}
                   {Array.from({ length: emptyRows }).map((_, i) => (

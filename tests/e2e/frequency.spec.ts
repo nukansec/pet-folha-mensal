@@ -752,9 +752,10 @@ test("cópias com comprovantes levam os originais e a restauração reverte falh
 test("novidades mostram data de publicação nos dois temas", async ({ page }, testInfo) => {
   await page.goto("/");
   const section = page.getByRole("region", { name: "Novidades do site" });
-  await expect(section.getByRole("heading", { name: "Ajustes para o celular" })).toBeVisible();
-  await expect(section.getByText("Última atualização", { exact: false })).toContainText("18 de novembro de 2026");
+  await expect(section.getByRole("heading", { name: "Datas livres, folha em Word e assinatura gov.br" })).toBeVisible();
+  await expect(section.getByText("Última atualização", { exact: false })).toContainText("19 de novembro de 2026");
   await section.getByText("Ver histórico de atualizações", { exact: true }).click();
+  await expect(section.getByRole("heading", { name: "Ajustes para o celular" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Perfis, menu do participante e visão semanal" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Ajustes no formulário e nova modalidade" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Novo visual com a marca do PET-SD" })).toBeVisible();
@@ -1001,4 +1002,81 @@ test("modais: botões ficam dentro da caixa; aviso de rascunho só com rascunho"
   // Confirmação de exclusão.
   await page.getByRole("button", { name: /Excluir/ }).first().click();
   expect(await buttonsOutsideDialog(page), "excluir").toEqual([]);
+});
+
+test("data livre: 26/10 na folha de Novembro, folha em Word e assinatura gov.br", async ({ page }) => {
+  await create(page);
+  await expect(page.getByLabel("Mês da folha")).toHaveValue("2026-11");
+  // Quem fecha a folha de 26 a 25 lança 26/10 na folha de Novembro.
+  await page.getByLabel("Data", { exact: true }).fill("2026-10-26");
+  await page.getByLabel("Início", { exact: true }).fill("16:30");
+  await page.getByLabel("Fim", { exact: true }).fill("18:00");
+  await page.getByLabel("Atividade desenvolvida", { exact: true }).fill("Reunião sintética & <teste>");
+  await page.getByRole("button", { name: "Adicionar atividade", exact: true }).click();
+  await expect(page.locator(".summary-total strong")).toHaveText("1h30");
+  await expect(page.getByLabel("Mês da folha")).toHaveValue("2026-11");
+
+  await page.getByRole("button", { name: "Folha oficial", exact: true }).click();
+  const sheet = page.locator(".sheet-stage .official-sheet");
+  await expect(sheet).toContainText("26/10");
+  await expect(sheet).toContainText("Total de CH no mês: 1h30");
+  const gov = page.getByRole("link", { name: "Assinar no gov.br" });
+  await expect(gov).toHaveAttribute("href", "https://www.gov.br/pt-br/servicos/assinatura-eletronica");
+  await expect(gov).toHaveAttribute("target", "_blank");
+  await expect(gov).toHaveAttribute("rel", "noopener noreferrer");
+
+  // Download direto (sem seletor de pasta), como no Firefox e no celular.
+  await page.evaluate(() =>
+    Object.defineProperty(window, "showSaveFilePicker", { configurable: true, value: undefined }),
+  );
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Baixar .docx (Word)", exact: true }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe("folha-pet-sd-participante-sintetico-2026-11.docx");
+  const { unzipSync, strFromU8 } = await import("fflate");
+  const files = unzipSync(new Uint8Array(await readFile((await download.path())!)));
+  const xml = strFromU8(files["word/document.xml"]);
+  expect(xml).toContain(">PARTICIPANTE SINTÉTICO<");
+  expect(xml).toContain(">Novembro/2026<");
+  expect(xml).toContain(">26/10<");
+  expect(xml).toContain("Reunião sintética &amp; &lt;teste&gt;");
+  expect(xml).toContain("Total de CH no mês: 1h30");
+  expect(files["word/media/image1.png"]).toBeTruthy();
+});
+
+test("atividade que passa da meia-noite conta no dia de início; Duplicar copia para o formulário", async ({ page }) => {
+  await create(page);
+  await page.getByLabel("Data", { exact: true }).fill("2026-11-05");
+  await page.getByLabel("Início", { exact: true }).fill("23:00");
+  await page.getByLabel("Fim", { exact: true }).fill("03:00");
+  await expect(page.getByText("Termina no dia seguinte", { exact: false })).toBeVisible();
+  await expect(page.locator(".hours-preview strong")).toHaveText("4h");
+  await page.getByLabel("Atividade desenvolvida", { exact: true }).fill("Plantão sintético");
+  await page.getByRole("button", { name: "Adicionar atividade", exact: true }).click();
+  await expect(page.locator(".summary-total strong")).toHaveText("4");
+
+  // Erro de digitação (14:00 → 13:00 = 23 h) é recusado.
+  await page.getByLabel("Início", { exact: true }).fill("14:00");
+  await page.getByLabel("Fim", { exact: true }).fill("13:00");
+  await expect(page.getByText("confira o início e o fim", { exact: false })).toBeVisible();
+  await page.getByLabel("Atividade desenvolvida", { exact: true }).fill("Digitação errada");
+  await page.getByRole("button", { name: "Adicionar atividade", exact: true }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "até 12 h" })).toBeVisible();
+  await expect(page.locator(".summary-total strong")).toHaveText("4");
+
+  // Duplicar com rascunho pede confirmação; descartar abre a cópia.
+  await page.getByRole("button", { name: "Duplicar atividade: Plantão sintético" }).first().click();
+  await page.getByRole("button", { name: "Descartar preenchimento", exact: true }).click();
+  await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Plantão sintético");
+  await expect(page.getByLabel("Início", { exact: true })).toHaveValue("23:00");
+  await expect(page.getByLabel("Fim", { exact: true })).toHaveValue("03:00");
+  await expect(page.getByLabel("Data", { exact: true })).toBeFocused();
+  await page.getByLabel("Data", { exact: true }).fill("2026-11-12");
+  await page.getByRole("button", { name: "Adicionar atividade", exact: true }).click();
+  await expect(page.locator(".summary-total strong")).toHaveText("8");
+
+  // Folha: Unidade/Local e Descrição vazios saem como "-".
+  await page.getByRole("button", { name: "Folha oficial", exact: true }).click();
+  const firstRow = page.locator(".sheet-stage .pet-sheet-activities tbody tr").first();
+  await expect(firstRow.locator("td")).toHaveText(["05/11", "-", "Plantão sintético", "23:00", "03:00", "4h", "Interação em tempo real (Síncrona)", "-"]);
 });
