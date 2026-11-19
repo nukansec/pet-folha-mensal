@@ -16,9 +16,10 @@ export { todayInBrasilia };
  * (datas livres: há GATs que fecham a folha de 26 a 25, outros de 20 a 19).
  * Assim a soma das faixas é sempre o total da folha.
  *
- * - Só o mês: rótulos curtos, como no app original. Novembro/2026 (dia 1 é
- *   domingo) dá "Dia 1", "2 a 8", "9 a 15", "16 a 22", "23 a 29", "Dia 30".
- * - Período que passa do mês: rótulos com dia e mês ("26/10 a 01/11").
+ * - Só o mês: Novembro/2026 (dia 1 é domingo) dá "Dia 1", "Dias 2 a 8",
+ *   "Dias 9 a 15", "Dias 16 a 22", "Dias 23 a 29" e "Dia 30".
+ * - Período que passa do mês: dia e mês ("Dias 26/10 a 01/11").
+ * O aviso "(semana parcial)" é acrescentado na tela (StatsGrid).
  *
  * Tudo é calculado sobre texto AAAA-MM-DD e o calendário em UTC (dia da
  * semana de Date.UTC): nenhuma conversão de fuso mexe no dia. "Hoje" vem do
@@ -28,7 +29,7 @@ export interface WeekBand {
   /** Primeiro e último dia da faixa, AAAA-MM-DD. */
   start: string;
   end: string;
-  /** "Dia 1", "2 a 8" ou "26/10 a 01/11". */
+  /** "Dia 1", "Dias 2 a 8" ou "Dias 26/10 a 01/11" (sem o aviso de parcial). */
   label: string;
   /** Dias da faixa (1 a 7). */
   days: number;
@@ -73,14 +74,9 @@ export function getMonthWeekBands(
     if (date > last) last = date;
   }
   const short = first.startsWith(`${monthKey}-`) && last.startsWith(`${monthKey}-`);
+  const day = (date: string) => (short ? String(Number(date.slice(8))) : formatDayMonth(date));
   const label = (start: string, end: string, days: number) =>
-    short
-      ? days === 1
-        ? `Dia ${Number(start.slice(8))}`
-        : `${Number(start.slice(8))} a ${Number(end.slice(8))}`
-      : days === 1
-        ? formatDayMonth(start)
-        : `${formatDayMonth(start)} a ${formatDayMonth(end)}`;
+    days === 1 ? `Dia ${day(start)}` : `Dias ${day(start)} a ${day(end)}`;
 
   const bands: WeekBand[] = [];
   const lastTime = toUtc(last);

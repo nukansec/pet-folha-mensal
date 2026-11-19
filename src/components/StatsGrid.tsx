@@ -148,6 +148,9 @@ export function StatsGrid({
                       <strong>
                         <span className="sr-only">Semana: </span>
                         {band.label}
+                        {band.partial && (
+                          <span className="week-band-partial"> (semana parcial)</span>
+                        )}
                       </strong>
                       {band.isCurrent && <span className="week-band-tag">Semana atual</span>}
                       <span className="week-band-value">
@@ -157,9 +160,6 @@ export function StatsGrid({
                     <div className="week-band-track" aria-hidden="true">
                       <span style={{ width: `${width}%` }} />
                     </div>
-                    {band.partial && (
-                      <small className="week-band-note">Semana parcial</small>
-                    )}
                   </li>
                 );
               })}
