@@ -1,0 +1,3125 @@
+[
+ {
+  "screen": "entrada-continuar",
+  "viewport": "320",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "modal-excluir-perfil",
+  "viewport": "320",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > section.conclusion-panel.delete-profile-panel > div.dialog-actions > button.danger-button",
+  "text": "Excluir perfil",
+  "detail": "rodapé só aparece rolando (797 px > 640)"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "320",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Coordenador(a)",
+  "detail": "\"Coordenador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "320",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Preceptor(a)",
+  "detail": "\"Preceptor(a)\" em 2 linhas"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "320",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Orientador(a) de serviço",
+  "detail": "\"Orientador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "painel",
+  "viewport": "320",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "137×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "320",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "137×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "320",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "320",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "137×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "320",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "137×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "320",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "137×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "320",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "137×41"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>178"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Coordenador(a)",
+  "detail": "\"Coordenador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Preceptor(a)",
+  "detail": "\"Preceptor(a)\" em 2 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Orientador(a) de serviço",
+  "detail": "\"Orientador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-md > form.space-y-4 > div.dialog-actions.pt-2 > button.px-5.py-2",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (855 px > 640)"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "320",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.flex.items-center > span.full-select.text-xs > span.full-select-display > span",
+  "text": "Selecionar modelo...",
+  "detail": "\"Selecionar\" em 3 linhas"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "320",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.flex.items-center > span.full-select.text-xs > span.full-select-display > span",
+  "text": "Selecionar modelo...",
+  "detail": "\"modelo...\" em 3 linhas"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "320",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-2xl > form.space-y-4 > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (1274 px > 640)"
+ },
+ {
+  "screen": "modal-concluir",
+  "viewport": "320",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > section.conclusion-panel > div.conclusion-actions > button.primary-button",
+  "text": "Sair / trocar participante",
+  "detail": "rodapé só aparece rolando (727 px > 640)"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "320",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>266"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "320",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "137×41"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "320",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "137×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "320",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>266"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "320",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "137×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "320",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "137×41"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "modal-excluir-perfil",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > section.conclusion-panel.delete-profile-panel > div.dialog-actions > button.danger-button",
+  "text": "Excluir perfil",
+  "detail": "rodapé só aparece rolando (797 px > 640)"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Coordenador(a)",
+  "detail": "\"Coordenador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Preceptor(a)",
+  "detail": "\"Preceptor(a)\" em 2 linhas"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Orientador(a) de serviço",
+  "detail": "\"Orientador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "painel",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "137×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "137×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "137×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "137×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "137×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "137×41"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>178"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Coordenador(a)",
+  "detail": "\"Coordenador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Preceptor(a)",
+  "detail": "\"Preceptor(a)\" em 2 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Orientador(a) de serviço",
+  "detail": "\"Orientador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-md > form.space-y-4 > div.dialog-actions.pt-2 > button.px-5.py-2",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (855 px > 640)"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "palavra-partida",
+  "selector": "div.flex.items-center > span.full-select.text-xs > span.full-select-display > span",
+  "text": "Selecionar modelo...",
+  "detail": "\"Selecionar\" em 3 linhas"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "palavra-partida",
+  "selector": "div.flex.items-center > span.full-select.text-xs > span.full-select-display > span",
+  "text": "Selecionar modelo...",
+  "detail": "\"modelo...\" em 3 linhas"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-2xl > form.space-y-4 > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (1274 px > 640)"
+ },
+ {
+  "screen": "modal-concluir",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > section.conclusion-panel > div.conclusion-actions > button.primary-button",
+  "text": "Sair / trocar participante",
+  "detail": "rodapé só aparece rolando (727 px > 640)"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>266"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "137×41"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "137×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>266"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "137×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "320",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "137×41"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "light",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-pessoa-ficticia\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "light",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-outra-pessoa\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "360",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Coordenador(a)",
+  "detail": "\"Coordenador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "painel",
+  "viewport": "360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "157×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "157×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "360",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "157×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "157×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "157×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "157×41"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "360",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>218"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "360",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Coordenador(a)",
+  "detail": "\"Coordenador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "360",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-md > form.space-y-4 > div.dialog-actions.pt-2 > button.px-5.py-2",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (813 px > 780)"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "360",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.flex.items-center > span.full-select.text-xs > span.full-select-display > span",
+  "text": "Selecionar modelo...",
+  "detail": "\"Selecionar\" em 2 linhas"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "360",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-2xl > form.space-y-4 > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (1210 px > 780)"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "360",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>306"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "157×41"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "157×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "360",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>306"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "157×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "157×41"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-pessoa-ficticia\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-outra-pessoa\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Coordenador(a)",
+  "detail": "\"Coordenador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "painel",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "157×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "157×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "157×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "157×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "157×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "157×41"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>218"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Coordenador(a)",
+  "detail": "\"Coordenador(a)\" em 2 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-md > form.space-y-4 > div.dialog-actions.pt-2 > button.px-5.py-2",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (813 px > 780)"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "palavra-partida",
+  "selector": "div.flex.items-center > span.full-select.text-xs > span.full-select-display > span",
+  "text": "Selecionar modelo...",
+  "detail": "\"Selecionar\" em 2 linhas"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-2xl > form.space-y-4 > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (1210 px > 780)"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>306"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "157×41"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "157×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>306"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "157×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "157×41"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "172×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "172×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "172×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "172×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "172×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "172×41"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "390",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>248"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "390",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-2xl > form.space-y-4 > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (1166 px > 844)"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>336"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "172×41"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "172×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>336"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "172×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "172×41"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "172×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "172×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "172×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "172×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "172×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "172×41"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>248"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-2xl > form.space-y-4 > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (1166 px > 844)"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>336"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "172×41"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "172×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>336"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "172×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "172×41"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "414",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "414",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "184×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "414",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "184×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "414",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "414",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "184×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "414",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "184×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "414",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "184×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "414",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "184×41"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "414",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-2xl > form.space-y-4 > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (1110 px > 896)"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "414",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>360"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "414",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "184×41"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "414",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "184×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "414",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>360"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "414",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "184×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "414",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "184×41"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "184×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "184×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "184×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "184×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "184×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "184×41"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-2xl > form.space-y-4 > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (1110 px > 896)"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>360"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "184×41"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "184×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>360"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "184×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "414",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "184×41"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "768",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>638"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "193×42"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "153×42"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>638"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "193×42"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "153×42"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "painel",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>638"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "193×42"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "153×42"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "largura 333>216"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "reticencias-com-title",
+  "selector": "div.participant-menu > button.profile-button > span > small",
+  "text": "Monitor(a) · GAT 01 · Alerta de violências com IA",
+  "detail": "largura 319>216"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>638"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "193×42"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "768",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "153×42"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "modal-excluir-perfil",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > section.conclusion-panel.delete-profile-panel > div.dialog-actions > button.danger-button",
+  "text": "Excluir perfil",
+  "detail": "rodapé só aparece rolando (489 px > 360)"
+ },
+ {
+  "screen": "painel",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "347×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "347×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "347×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "347×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "347×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "347×41"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-md > form.space-y-4 > div.dialog-actions.pt-2 > button.px-5.py-2",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (743 px > 360)"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-2xl > form.space-y-4 > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (744 px > 360)"
+ },
+ {
+  "screen": "modal-concluir",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > section.conclusion-panel > div.conclusion-actions > button.primary-button",
+  "text": "Sair / trocar participante",
+  "detail": "rodapé só aparece rolando (511 px > 360)"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>642"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "347×41"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "347×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>642"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "347×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "740x360",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "347×41"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "modal-excluir-perfil",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > section.conclusion-panel.delete-profile-panel > div.dialog-actions > button.danger-button",
+  "text": "Excluir perfil",
+  "detail": "rodapé só aparece rolando (489 px > 360)"
+ },
+ {
+  "screen": "painel",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "347×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "347×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "347×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "347×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "347×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "347×41"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-md > form.space-y-4 > div.dialog-actions.pt-2 > button.px-5.py-2",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (743 px > 360)"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-2xl > form.space-y-4 > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (744 px > 360)"
+ },
+ {
+  "screen": "modal-concluir",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > section.conclusion-panel > div.conclusion-actions > button.primary-button",
+  "text": "Sair / trocar participante",
+  "detail": "rodapé só aparece rolando (511 px > 360)"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>642"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "347×41"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "347×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>642"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "347×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "740x360",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "347×41"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-pessoa-ficticia\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "axe:label-content-name-mismatch",
+  "selector": "button[aria-describedby=\"profile-card-outra-pessoa\"]",
+  "text": "",
+  "detail": "serious · Elements must have their visible text as part of their accessible name"
+ },
+ {
+  "screen": "painel",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "painel",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "painel",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "193×42"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "153×42"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "193×42"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "1440",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "153×42"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "painel",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "painel",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "painel",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "195×42"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "152×42"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "193×42"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "153×42"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "193×42"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "1440",
+  "theme": "dark",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "153×42"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "rolagem-horizontal",
+  "selector": "header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button",
+  "text": "Ativar tema escuro",
+  "detail": "scrollWidth 247 > 195; header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "li.profile-card > button.profile-card-open > span.profile-card-text > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "\"Sobrenome\" em 2 linhas"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Continuar",
+  "detail": "32×63"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Primeiro acesso",
+  "detail": "32×63"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Restaurar cópia",
+  "detail": "32×63"
+ },
+ {
+  "screen": "entrada-continuar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "modal-excluir-perfil",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "rolagem-horizontal",
+  "selector": "header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button",
+  "text": "Ativar tema escuro",
+  "detail": "scrollWidth 247 > 195; header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle"
+ },
+ {
+  "screen": "modal-excluir-perfil",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "modal-mais-largo",
+  "selector": "html > body.min-h-screen.antialiased > dialog.pet-dialog.screen-only > section.conclusion-panel.delete-profile-panel",
+  "text": "Excluir o perfil de Pessoa Fictícia de Exemplo Sobrenome Lon",
+  "detail": "painel 199 px, viewport 195"
+ },
+ {
+  "screen": "modal-excluir-perfil",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > section.conclusion-panel.delete-profile-panel > div.dialog-actions > button.danger-button",
+  "text": "Excluir perfil",
+  "detail": "rodapé só aparece rolando (1102 px > 535)"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "rolagem-horizontal",
+  "selector": "header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button",
+  "text": "Ativar tema escuro",
+  "detail": "scrollWidth 247 > 195; header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Coordenador(a)",
+  "detail": "\"Coordenador(a)\" em 5 linhas"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Tutor(a)",
+  "detail": "\"Tutor(a)\" em 3 linhas"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Preceptor(a)",
+  "detail": "\"Preceptor(a)\" em 4 linhas"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Orientador(a) de serviço",
+  "detail": "\"Orientador(a)\" em 4 linhas"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Orientador(a) de serviço",
+  "detail": "\"serviço\" em 3 linhas"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Monitor(a)",
+  "detail": "\"Monitor(a)\" em 4 linhas"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field > span.full-select > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "\"violências\" em 2 linhas"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Continuar",
+  "detail": "32×63"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Primeiro acesso",
+  "detail": "32×63"
+ },
+ {
+  "screen": "entrada-primeiro-acesso",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Restaurar cópia",
+  "detail": "32×63"
+ },
+ {
+  "screen": "entrada-restaurar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "rolagem-horizontal",
+  "selector": "header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button",
+  "text": "Ativar tema escuro",
+  "detail": "scrollWidth 247 > 195; header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle"
+ },
+ {
+  "screen": "entrada-restaurar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Continuar",
+  "detail": "32×63"
+ },
+ {
+  "screen": "entrada-restaurar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Primeiro acesso",
+  "detail": "32×63"
+ },
+ {
+  "screen": "entrada-restaurar",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Restaurar cópia",
+  "detail": "32×63"
+ },
+ {
+  "screen": "aviso-restauracao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "rolagem-horizontal",
+  "selector": "header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button",
+  "text": "Ativar tema escuro",
+  "detail": "scrollWidth 247 > 195; header.entry-header > div.entry-header-inner > nav.entry-tools > button.icon-button | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle | nav.entry-tools > button.icon-button > svg.lucide.lucide-settings-2 > circle"
+ },
+ {
+  "screen": "aviso-restauracao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Continuar",
+  "detail": "32×63"
+ },
+ {
+  "screen": "aviso-restauracao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Primeiro acesso",
+  "detail": "32×63"
+ },
+ {
+  "screen": "aviso-restauracao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "div.ui-frame > div.ui-frame-panel > div.ui-segmented > button",
+  "text": "Restaurar cópia",
+  "detail": "32×63"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div > div.frequency-workbench > section.activity-list",
+  "text": "Atividades do mês 10 Limpar mês 03/11/2026 2h Reunião Geral ",
+  "detail": "largura 175>161"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "\"Sobrenome\" em 2 linhas"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.summary-progress-head > div.choice-group.choice-group--toggle > label.choice > span.choice-text",
+  "text": "Mensal",
+  "detail": "\"Mensal\" em 3 linhas"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.summary-progress-head > div.choice-group.choice-group--toggle > label.choice > span.choice-text",
+  "text": "Semanal",
+  "detail": "\"Semanal\" em 3 linhas"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "75×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "75×41"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "input#activity-start",
+  "text": "",
+  "detail": "29×46"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "input#activity-end",
+  "text": "",
+  "detail": "29×46"
+ },
+ {
+  "screen": "painel",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "erro-console",
+  "selector": "console",
+  "text": "",
+  "detail": "HTTP 404 /_vercel/insights/script.js"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div > div.frequency-workbench > section.activity-list",
+  "text": "Atividades do mês 10 Limpar mês 03/11/2026 2h Reunião Geral ",
+  "detail": "largura 175>161"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "\"Sobrenome\" em 2 linhas"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.summary-progress-head > div.choice-group.choice-group--toggle > label.choice > span.choice-text",
+  "text": "Mensal",
+  "detail": "\"Mensal\" em 2 linhas"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.summary-progress-head > div.choice-group.choice-group--toggle > label.choice > span.choice-text",
+  "text": "Semanal",
+  "detail": "\"Semanal\" em 3 linhas"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "75×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "75×41"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "input#activity-start",
+  "text": "",
+  "detail": "29×46"
+ },
+ {
+  "screen": "resumo-semanal",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "input#activity-end",
+  "text": "",
+  "detail": "29×46"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div > div.frequency-workbench > section.activity-list",
+  "text": "Atividades do mês 10 Limpar mês 03/11/2026 2h Reunião Geral ",
+  "detail": "largura 175>161"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "\"Sobrenome\" em 2 linhas"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.summary-progress-head > div.choice-group.choice-group--toggle > label.choice > span.choice-text",
+  "text": "Mensal",
+  "detail": "\"Mensal\" em 3 linhas"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.summary-progress-head > div.choice-group.choice-group--toggle > label.choice > span.choice-text",
+  "text": "Semanal",
+  "detail": "\"Semanal\" em 3 linhas"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "75×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "75×41"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "input#activity-start",
+  "text": "",
+  "detail": "29×46"
+ },
+ {
+  "screen": "menu-participante",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "input#activity-end",
+  "text": "",
+  "detail": "29×46"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "reticencias-com-title",
+  "selector": "div.field > span.full-select.full-select--single > span.full-select-display > span",
+  "text": "GAT 01 · Alerta de violências com IA",
+  "detail": "largura 272>53"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Coordenador(a)",
+  "detail": "\"Coordenador(a)\" em 7 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Tutor(a)",
+  "detail": "\"Tutor(a)\" em 3 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Preceptor(a)",
+  "detail": "\"Preceptor(a)\" em 5 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Orientador(a) de serviço",
+  "detail": "\"Orientador(a)\" em 6 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Orientador(a) de serviço",
+  "detail": "\"serviço\" em 3 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--cards > label.choice > span.choice-text",
+  "text": "Monitor(a)",
+  "detail": "\"Monitor(a)\" em 5 linhas"
+ },
+ {
+  "screen": "modal-identificacao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-md > form.space-y-4 > div.dialog-actions.pt-2 > button.px-5.py-2",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (1364 px > 422)"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.flex.items-center > span.full-select.text-xs > span.full-select-display > span",
+  "text": "Selecionar modelo...",
+  "detail": "\"Selecionar\" em 8 linhas"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.flex.items-center > span.full-select.text-xs > span.full-select-display > span",
+  "text": "Selecionar modelo...",
+  "detail": "\"modelo...\" em 6 linhas"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.field.choice-field > div.choice-group.choice-group--segmented > label.choice > span.choice-text",
+  "text": "Assíncrona",
+  "detail": "\"Assíncrona\" em 2 linhas"
+ },
+ {
+  "screen": "modal-editar-atividade",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "div.w-full.max-w-2xl > form.space-y-4 > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Salvar alterações",
+  "detail": "rodapé só aparece rolando (1639 px > 422)"
+ },
+ {
+  "screen": "modal-confirmar-exclusao",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > div.w-full.max-w-md > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Sim, excluir",
+  "detail": "rodapé só aparece rolando (458 px > 422)"
+ },
+ {
+  "screen": "modal-concluir",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > section.conclusion-panel > div.conclusion-actions > button.primary-button",
+  "text": "Sair / trocar participante",
+  "detail": "rodapé só aparece rolando (1137 px > 422)"
+ },
+ {
+  "screen": "modal-configuracoes",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > dialog.pet-dialog.screen-only > div.w-full.max-w-4xl",
+  "text": "Configurações Locais Configurações Locais Digite o PIN para ",
+  "detail": "largura 240>145"
+ },
+ {
+  "screen": "aviso-rascunho",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "modal-rodape-fora-da-tela",
+  "selector": "dialog.pet-dialog.screen-only > div.w-full.max-w-md > div.dialog-actions.pt-3 > button.px-5.py-2.5",
+  "text": "Descartar preenchimento",
+  "detail": "rodapé só aparece rolando (485 px > 422)"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: PESSOA FI",
+  "detail": "largura 1050>141"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "\"Sobrenome\" em 2 linhas"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "75×41"
+ },
+ {
+  "screen": "folha-minha",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "75×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "texto-cortado",
+  "selector": "main#conteudo > div.space-y-4.animate-fade-in > div.sheet-stage.overflow-x-auto > div.rounded-xs.ring-1",
+  "text": "REGISTRO DE FREQUÊNCIA E ATIVIDADES – PET-SD Nome: GAT: Perf",
+  "detail": "largura 1050>141"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "palavra-partida",
+  "selector": "div.participant-menu > button.profile-button > span > strong",
+  "text": "Pessoa Fictícia de Exemplo Sobrenome Longo",
+  "detail": "\"Sobrenome\" em 2 linhas"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Minha frequência",
+  "detail": "75×41"
+ },
+ {
+  "screen": "folha-modelo-em-branco",
+  "viewport": "390-zoom200",
+  "theme": "light",
+  "check": "alvo-pequeno",
+  "selector": "header.workspace-nav > div.workspace-nav-bottom > nav.workspace-tabs > button",
+  "text": "Folha oficial",
+  "detail": "75×41"
+ }
+]
