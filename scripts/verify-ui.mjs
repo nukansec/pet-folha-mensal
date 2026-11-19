@@ -1303,7 +1303,12 @@ test("editar atividade tem um só diálogo; concluir oferece Word e assinatura g
   assert.equal((edit.match(/role="dialog"/g) || []).length + (edit.match(/<dialog/g) || []).length, 1);
   const base = { userName: sampleUser.name, onConfirmExit: noop, onDownloadJson: noop, onDownloadPdf: noop, isOpen: true, onClose: noop };
   const exit = render(React.createElement(ExitModal, { ...base, onDownloadDocx: noop }));
-  assert.match(exit, /Baixar \.docx \(Word\)/);
+  assert.match(exit, /Baixar \.docx/);
+  assert.match(exit, /Assine o documento online após gerar o arquivo PDF ou \.docx\./);
+  // Concluir (topo): o principal é "Concluir" e não "Sair / trocar participante".
+  const concluding = render(React.createElement(ExitModal, { ...base, onDownloadDocx: noop, onConclude: noop }));
+  assert.match(concluding, /<\/svg> Concluir<\/button>/);
+  assert.doesNotMatch(concluding, /Sair \/ trocar participante/);
   assert.match(exit, /href="https:\/\/www\.gov\.br\/pt-br\/servicos\/assinatura-eletronica"/);
   assert.match(exit, /target="_blank" rel="noopener noreferrer"/);
   // Sem a função de Word, a opção não aparece (a assinatura continua).

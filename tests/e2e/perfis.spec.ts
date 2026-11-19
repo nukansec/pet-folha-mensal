@@ -116,7 +116,7 @@ test.describe("menu do participante", () => {
     expect((await download).suggestedFilename()).toMatch(/^backup-frequencia-.*-2026-11\.json$/);
   });
 
-  test("Concluir continua com o fluxo de antes", async ({ page }) => {
+  test("Concluir avisa a CH incompleta e volta para Minha frequência sem encerrar a sessão", async ({ page }) => {
     await createProfile(page);
     await page.getByRole("button", { name: /^Concluir/ }).click();
     // Sem atividades: avisa que a CH está incompleta, sem impedir.
@@ -124,8 +124,17 @@ test.describe("menu do participante", () => {
     await expect(warning).toContainText("0h de 32 h no total e 0h de 16 h");
     await warning.getByRole("button", { name: "Gerar assim mesmo", exact: true }).click();
     await expect(page.getByText("CH incompleta: a folha será gerada assim mesmo.")).toBeVisible();
-    await page.getByRole("button", { name: "Sair / trocar participante", exact: true }).click();
-    await expect(page.getByText("Sessão encerrada com sucesso.")).toBeVisible();
+    const conclusion = page.getByRole("dialog", { name: "Salvar folha e concluir" });
+    // Imprimir e Baixar .docx juntos; a assinatura numa seção própria.
+    await expect(conclusion.getByRole("button", { name: "Imprimir", exact: true })).toBeVisible();
+    await expect(conclusion.getByRole("button", { name: "Baixar .docx", exact: true })).toBeVisible();
+    await expect(conclusion).toContainText("Assine o documento online após gerar o arquivo PDF ou .docx.");
+    await expect(conclusion.getByRole("button", { name: /Sair|trocar/ })).toHaveCount(0);
+    await page.getByRole("button", { name: /menu do participante/ }).waitFor();
+    await conclusion.getByRole("button", { name: "Concluir", exact: true }).click();
+    await expect(conclusion).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Minha frequência", exact: true })).toBeVisible();
+    await expect(page.getByText("Sessão encerrada com sucesso.")).toHaveCount(0);
   });
 
   test("GAT do modal de identificação fica em uma linha, com o nome inteiro no title", async ({ page }) => {
