@@ -92,7 +92,6 @@ export function StatsGrid({
             {activitiesCount}{" "}
             {activitiesCount === 1 ? "atividade" : "atividades"}
           </strong>
-          {monthLabel && <span>{monthLabel}</span>}
           {monthKey && (
             <>
               <span className="sr-only" id={toggleId}>
