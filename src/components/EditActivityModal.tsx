@@ -7,6 +7,7 @@ import { PROGRAM } from "@/config/program";
 import {
   calcPetMinutes,
   cleanActivityDescription,
+  isDateAllowed,
 } from "@/lib/pet-calculator";
 import { X, Check, Edit3 } from "lucide-react";
 import { useDialog } from "@/context/DialogContext";
@@ -87,10 +88,10 @@ export function EditActivityModal({
       return;
     }
 
-    if (monthKey && !values.date.startsWith(monthKey)) {
+    if (!isDateAllowed(values.date)) {
       await alert({
         title: "Confira a data",
-        message: "Escolha uma data no mês desta folha.",
+        message: "Informe uma data válida dentro da vigência do programa.",
         variant: "warning",
       });
       return;
@@ -118,7 +119,8 @@ export function EditActivityModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} label="Editar atividade">
-      <div className="dialog-panel edit-activity-panel" role="dialog" aria-modal="true">
+      {/* O diálogo (nome e modal) é o <Modal>; aqui é só o painel. */}
+      <div className="dialog-panel edit-activity-panel">
         <div className="dialog-head">
           <span className="dialog-head-icon" aria-hidden="true">
             <Edit3 size={16} />
