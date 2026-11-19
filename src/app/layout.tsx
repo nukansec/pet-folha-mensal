@@ -77,7 +77,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen antialiased">
         <DialogProvider>{children}</DialogProvider>
-        <Analytics />
+        {/* O script /_vercel/insights/script.js só existe na Vercel; fora dela
+            (servidor local, CI) o pedido dá 404. VERCEL=1 vem do build da
+            Vercel; esta página é pré-renderizada, então vale o valor do build. */}
+        {process.env.VERCEL ? <Analytics /> : null}
       </body>
     </html>
   );
