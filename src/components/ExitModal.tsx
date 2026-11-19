@@ -14,6 +14,8 @@ interface ExitModalProps {
   /** Folha preenchida em Word (.docx). Sem a função, a opção não aparece. */
   onDownloadDocx?: () => Promise<boolean> | boolean | void;
   userName: string;
+  /** Resumo da CH ("CH completa" ou o que falta), abaixo do nome. */
+  hoursStatus?: string;
   hasChanges?: boolean;
   /** Texto do botão principal: Concluir usa o padrão; o menu do topo, "Trocar participante" ou "Sair". */
   leaveLabel?: string;
@@ -32,6 +34,7 @@ function Conclusion({
   onDownloadPdf,
   onDownloadDocx,
   userName,
+  hoursStatus,
   hasChanges = false,
   leaveLabel = "Sair / trocar participante",
 }: ExitModalProps) {
@@ -72,6 +75,7 @@ function Conclusion({
           <div>
             <h2>Guarde sua folha</h2>
             <p className="access-hint">{userName}</p>
+            {hoursStatus && <p className="access-hint">{hoursStatus}</p>}
           </div>
           <button className="icon-button" onClick={onClose} aria-label="Fechar">
             <X size={20} />

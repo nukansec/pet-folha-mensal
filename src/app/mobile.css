@@ -399,6 +399,11 @@
   font-size: 15px;
   white-space: nowrap;
 }
+/* Mesmo tamanho para botões e links da barra (links herdavam 14 px de
+   .sheet-toolbar a e botões 16 px). */
+.sheet-toolbar .sheet-actions > :is(a, button) {
+  font-size: 15px;
+}
 .sheet-hint {
   margin: 0;
   color: var(--muted);
@@ -432,7 +437,7 @@
   .sheet-actions > .sheet-back {
     grid-column: 1 / -1;
   }
-  .sheet-actions > a.secondary-button {
+  .sheet-toolbar .sheet-actions > :is(a, button) {
     padding-inline: 8px;
     font-size: 14px;
   }

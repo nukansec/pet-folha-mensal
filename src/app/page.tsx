@@ -45,6 +45,7 @@ import {
   calcPetMinutes,
   formatDuration,
   sumActivityMinutes,
+  sumSynchronousMinutes,
   getMonthYearLabel,
   formatDateBR,
   cleanActivityDescription,
@@ -79,7 +80,6 @@ import {
   Calendar,
   Download,
   ExternalLink,
-  FileText,
   Printer,
   CheckCircle2,
   ArrowLeft,
@@ -217,7 +217,7 @@ export default function Home() {
     const discard = await confirm({
       title: "Atividade ainda não adicionada",
       message:
-        "O formulário tem alterações. Deseja descartá-las para continuar?",
+        "Há uma atividade preenchida e ainda não adicionada. Volte e clique em Adicionar atividade, ou descarte o preenchimento para continuar.",
       confirmText: "Descartar preenchimento",
       cancelText: "Continuar editando",
       variant: "warning",
@@ -239,12 +239,30 @@ export default function Home() {
     setMonthKey(value);
   };
 
+  /**
+   * Concluir não é travado pela CH (o prazo, dia 19, pode chegar antes de o
+   * mês fechar): com menos de 32 h ou de 16 h síncronas/In Loco, avisa e
+   * deixa gerar a folha assim mesmo.
+   */
   const openConclusion = async () => {
-    if (await confirmDraft()) {
-      setDraftDirty(false);
-      setExitMode("conclude");
-      setIsExitModalOpen(true);
+    if (!(await confirmDraft())) return;
+    setDraftDirty(false);
+    const total = sumActivityMinutes(activities);
+    const sync = sumSynchronousMinutes(activities);
+    const target = PROGRAM.monthlyTargetHours * 60;
+    const syncTarget = PROGRAM.synchronousTargetHours * 60;
+    if (total < target || sync < syncTarget) {
+      const proceed = await confirm({
+        title: "Folha com CH incompleta",
+        message: `${formatDuration(total)} de ${PROGRAM.monthlyTargetHours} h no total e ${formatDuration(sync)} de ${PROGRAM.synchronousTargetHours} h em atividades síncronas/In Loco. Deseja gerar a folha assim mesmo?`,
+        confirmText: "Gerar assim mesmo",
+        cancelText: "Voltar e completar",
+        variant: "warning",
+      });
+      if (!proceed) return;
     }
+    setExitMode("conclude");
+    setIsExitModalOpen(true);
   };
 
   const endSession = (mode: "conclude" | "switch" | "exit") => {
@@ -593,7 +611,7 @@ export default function Home() {
     const outcome = await saveJsonFile(jsonString, filename);
     if (outcome === "saved") {
       setHasChanges(false);
-      showToast("Cópia da folha salva com sucesso!");
+      showToast("Cópia (.json) salva. Para PDF ou Word, use Concluir ou a aba Folha oficial.");
       return true;
     }
     if (outcome === "cancelled") {
@@ -604,7 +622,7 @@ export default function Home() {
       // Firefox, Safari e celular não têm seletor de pasta: o download é a
       // forma de salvar ali, e não deve deixar o aviso de "sem cópia" ativo.
       setHasChanges(false);
-      showToast("Download da cópia de segurança iniciado.");
+      showToast("Download da cópia (.json) iniciado. Para PDF ou Word, use Concluir ou a aba Folha oficial.");
       return true;
     }
     setStorageError(
@@ -1071,9 +1089,10 @@ export default function Home() {
                     disabled={preparingPrint || attachmentsBusy}
                     aria-busy={preparingPrint}
                     className="primary-button sheet-print"
+                    title="Imprimir ou salvar em PDF (na janela de impressão, escolha Salvar como PDF)"
                   >
                     <Printer size={18} aria-hidden="true" />
-                    <span>{preparingPrint ? "Preparando PDF…" : "Imprimir / salvar PDF"}</span>
+                    <span>{preparingPrint ? "Preparando…" : "Imprimir"}</span>
                   </button>
                   {!showBlankTemplate && (
                     <button
@@ -1082,8 +1101,8 @@ export default function Home() {
                       className="secondary-button"
                       title="Baixar esta folha preenchida em Word, para editar ou completar à mão"
                     >
-                      <FileText size={16} aria-hidden="true" />
-                      <span>Baixar .docx (Word)</span>
+                      <Download size={16} aria-hidden="true" />
+                      <span>Baixar .docx</span>
                     </button>
                   )}
                   {!showBlankTemplate && (
@@ -1131,6 +1150,8 @@ export default function Home() {
                 <p className="sheet-hint">
                   Na janela de impressão, escolha papel <strong>Carta</strong> e
                   orientação <strong>Horizontal</strong>, como no modelo oficial.
+                  Para guardar em PDF, escolha <strong>Salvar como PDF</strong>{" "}
+                  como impressora.
                 </p>
               </div>
 
@@ -1214,6 +1235,14 @@ export default function Home() {
             onDownloadJson={handleExportBackup}
             onDownloadPdf={printParticipantSheet}
             onDownloadDocx={handleDownloadDocx}
+            hoursStatus={
+              exitMode !== "conclude"
+                ? undefined
+                : totalMinutes >= PROGRAM.monthlyTargetHours * 60 &&
+                    sumSynchronousMinutes(activities) >= PROGRAM.synchronousTargetHours * 60
+                  ? `CH completa: ${PROGRAM.monthlyTargetHours} h no mês, com ${PROGRAM.synchronousTargetHours} h síncronas/In Loco.`
+                  : "CH incompleta: a folha será gerada assim mesmo."
+            }
             userName={activeUser.name}
             hasChanges={hasChanges}
           />
