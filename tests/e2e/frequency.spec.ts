@@ -1043,3 +1043,40 @@ test("data livre: 26/10 na folha de Novembro, folha em Word e assinatura gov.br"
   expect(xml).toContain("Total de CH no mês: 1h30");
   expect(files["word/media/image1.png"]).toBeTruthy();
 });
+
+test("atividade que passa da meia-noite conta no dia de início; Duplicar copia para o formulário", async ({ page }) => {
+  await create(page);
+  await page.getByLabel("Data", { exact: true }).fill("2026-11-05");
+  await page.getByLabel("Início", { exact: true }).fill("23:00");
+  await page.getByLabel("Fim", { exact: true }).fill("03:00");
+  await expect(page.getByText("Termina no dia seguinte", { exact: false })).toBeVisible();
+  await expect(page.locator(".hours-preview strong")).toHaveText("4h");
+  await page.getByLabel("Atividade desenvolvida", { exact: true }).fill("Plantão sintético");
+  await page.getByRole("button", { name: "Adicionar atividade", exact: true }).click();
+  await expect(page.locator(".summary-total strong")).toHaveText("4");
+
+  // Erro de digitação (14:00 → 13:00 = 23 h) é recusado.
+  await page.getByLabel("Início", { exact: true }).fill("14:00");
+  await page.getByLabel("Fim", { exact: true }).fill("13:00");
+  await expect(page.getByText("confira o início e o fim", { exact: false })).toBeVisible();
+  await page.getByLabel("Atividade desenvolvida", { exact: true }).fill("Digitação errada");
+  await page.getByRole("button", { name: "Adicionar atividade", exact: true }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "até 12 h" })).toBeVisible();
+  await expect(page.locator(".summary-total strong")).toHaveText("4");
+
+  // Duplicar com rascunho pede confirmação; descartar abre a cópia.
+  await page.getByRole("button", { name: "Duplicar atividade: Plantão sintético" }).first().click();
+  await page.getByRole("button", { name: "Descartar preenchimento", exact: true }).click();
+  await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Plantão sintético");
+  await expect(page.getByLabel("Início", { exact: true })).toHaveValue("23:00");
+  await expect(page.getByLabel("Fim", { exact: true })).toHaveValue("03:00");
+  await expect(page.getByLabel("Data", { exact: true })).toBeFocused();
+  await page.getByLabel("Data", { exact: true }).fill("2026-11-12");
+  await page.getByRole("button", { name: "Adicionar atividade", exact: true }).click();
+  await expect(page.locator(".summary-total strong")).toHaveText("8");
+
+  // Folha: Unidade/Local e Descrição vazios saem como "-".
+  await page.getByRole("button", { name: "Folha oficial", exact: true }).click();
+  const firstRow = page.locator(".sheet-stage .pet-sheet-activities tbody tr").first();
+  await expect(firstRow.locator("td")).toHaveText(["05/11", "-", "Plantão sintético", "23:00", "03:00", "4h", "Interação em tempo real (Síncrona)", "-"]);
+});

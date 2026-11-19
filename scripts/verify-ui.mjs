@@ -48,6 +48,7 @@ const {
   PROJECT_MONTHS,
 } = load("./src/lib/pet-calculator.ts");
 const storage = load("./src/lib/storage.ts");
+const calcModule = load("./src/lib/pet-calculator.ts");
 const { DEFAULT_GATS, DEFAULT_ROLES } = load("./src/types/index.ts");
 const { LandingPage, weekdayShort } = load("./src/components/LandingPage.tsx");
 const { FAQ, HelpModal } = load("./src/components/Help.tsx");
@@ -109,8 +110,9 @@ test("CH do PET-SD é a duração exata em minutos, sem arredondar", () => {
   assert.equal(formatDuration(5), "0h05");
 });
 
-test("fim igual ou anterior ao início e horários inválidos valem zero", () => {
+test("fim igual ao início, virada acima de 12 h e horários inválidos valem zero", () => {
   assert.equal(calcPetMinutes("14:00", "14:00"), 0);
+  // 15:00–14:00 seria 23 h passando da meia-noite: erro de digitação, vale 0.
   assert.equal(calcPetMinutes("15:00", "14:00"), 0);
   assert.equal(calcPetMinutes("", ""), 0);
   assert.equal(calcPetMinutes("25:00", "26:00"), 0);
@@ -119,6 +121,32 @@ test("fim igual ou anterior ao início e horários inválidos valem zero", () =>
   assert.equal(calcPetMinutes("9:00", "10:00"), 0);
 });
 
+test("atividade que passa da meia-noite conta inteira no dia em que começou", () => {
+  const { crossesMidnight, MAX_OVERNIGHT_MINUTES } = calcModule;
+  assert.equal(calcPetMinutes("23:00", "03:00"), 240);
+  assert.equal(formatDuration(calcPetMinutes("23:00", "03:00")), "4h");
+  assert.equal(calcPetMinutes("22:30", "00:00"), 90);
+  assert.equal(calcPetMinutes("23:59", "00:01"), 2);
+  // Limite de 12 h: plantão 19h–7h vale; 19h–7h01 não.
+  assert.equal(MAX_OVERNIGHT_MINUTES, 720);
+  assert.equal(calcPetMinutes("19:00", "07:00"), 720);
+  assert.equal(calcPetMinutes("19:00", "07:01"), 0);
+  assert.equal(crossesMidnight("23:00", "03:00"), true);
+  assert.equal(crossesMidnight("08:00", "09:00"), false);
+  assert.equal(crossesMidnight("08:00", "08:00"), false);
+  // Soma do mês e faixa da semana: conta no dia de início (domingo 01/11).
+  const night = { date: "2026-11-01", start: "23:00", end: "03:00" };
+  assert.equal(sumActivityMinutes([night, { start: "08:00", end: "09:30" }]), 330);
+  const bands = weeks.getMonthWeekBands("2026-11", [night]);
+  assert.equal(bands[0].label, "Dia 1");
+  assert.equal(bands[0].minutes, 240);
+  assert.equal(bands[1].minutes, 0);
+  // Cópia de segurança com atividade noturna é aceita.
+  isolatedStorage();
+  storage.saveProfiles([sampleUser]);
+  const backup = { version: "1.3", user: sampleUser, monthKey: "2026-11", activities: [{ ...sampleActivity, date: "2026-11-01", start: "23:00", end: "03:00" }] };
+  assert.equal(storage.inspectUserData(JSON.stringify(backup)).success, true);
+});
 test("soma do mês em minutos e total no formato da ficha", () => {
   const month = [
     { start: "16:30", end: "18:00" },
@@ -1239,4 +1267,37 @@ test("editar atividade tem um só diálogo; concluir oferece Word e assinatura g
   const noDocx = render(React.createElement(ExitModal, base));
   assert.doesNotMatch(noDocx, /Baixar \.docx/);
   assert.match(noDocx, /Assinar no gov\.br/);
+});
+
+test("folha e .docx: campo vazio da atividade sai como \"-\"; linha em branco continua vazia", () => {
+  const bare = { ...sampleActivity, id: "vazio", local: "", descricao: "  " };
+  const html = renderToStaticMarkup(
+    React.createElement(OfficialSheet, { user: sampleUser, monthLabel: "Novembro/2026", activities: [bare], totalMinutes: 90 }),
+  );
+  const row = /<tbody>\s*<tr>([\s\S]*?)<\/tr>/.exec(html.split("pet-sheet-activities")[1])[1];
+  const cells = [...row.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((m) => m[1]);
+  assert.equal(cells[1], "-");
+  assert.equal(cells[7], "-");
+  assert.match(html, /pet-sheet-empty-row"><td><\/td>/);
+  const xml = docxXml(docx.fillSheetDocx(docxTemplate, { user: sampleUser, monthLabel: "Novembro/2026", activities: [bare] }));
+  const rows = xml.match(/<w:tbl>[\s\S]*?<\/w:tbl>/g)[1].match(/<w:tr\b[\s\S]*?<\/w:tr>/g);
+  const docCells = rows[1].match(/<w:tc>[\s\S]*?<\/w:tc>/g).map(cellText);
+  assert.equal(docCells[1], "-");
+  assert.equal(docCells[7], "-");
+  assert.equal(cellText(rows[2]), "");
+  assert.equal(calcModule.sheetCell(""), "-");
+  assert.equal(calcModule.sheetCell("UFG"), "UFG");
+});
+
+test("lista oferece Duplicar em cada atividade quando a página passa a função", () => {
+  const html = render(React.createElement(ActivityTable, {
+    activities: [sampleActivity], totalMinutes: 90, editingId: null, onEdit: noop, onDelete: noop,
+    onDuplicate: noop, user: sampleUser, monthLabel: "Novembro/2026", onLoadSamples: noop, onClearMonth: noop,
+  }));
+  assert.match(html, /aria-label="Duplicar atividade: /);
+  const without = render(React.createElement(ActivityTable, {
+    activities: [sampleActivity], totalMinutes: 90, editingId: null, onEdit: noop, onDelete: noop,
+    user: sampleUser, monthLabel: "Novembro/2026", onLoadSamples: noop, onClearMonth: noop,
+  }));
+  assert.doesNotMatch(without, /Duplicar/);
 });
