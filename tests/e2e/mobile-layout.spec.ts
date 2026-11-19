@@ -222,6 +222,8 @@ test.describe("B1–B6", () => {
     await page.keyboard.press("Escape");
     const heights = await page.locator(".backup-tools button").evaluateAll((items) => items.map((b) => Math.round(b.getBoundingClientRect().height)));
     expect(new Set(heights).size).toBe(1);
+    const fonts = await page.locator(".backup-tools button").evaluateAll((items) => items.map((b) => getComputedStyle(b).fontSize));
+    expect(new Set(fonts).size).toBe(1);
     expect(await page.getByRole("button", { name: "Salvar cópia", exact: true }).evaluate((el) => (el as HTMLElement).innerText.trim())).toBe("Salvar");
     const icons = await page.locator(".workspace-tabs button svg").evaluateAll((items) => items.map((svg) => svg.getBoundingClientRect().width));
     expect(icons.every((width) => width === 18)).toBe(true);

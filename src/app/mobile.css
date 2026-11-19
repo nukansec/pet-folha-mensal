@@ -295,6 +295,12 @@
     white-space: nowrap;
     height: 100%;
   }
+  /* Mesma fonte nos três ("Concluir" tem classe e pegava 14 px em
+     globals.css; os outros, 16 px). */
+  .screen-only .backup-tools button[class],
+  .screen-only .backup-tools button {
+    font-size: 15px;
+  }
 }
 @media (max-width: 359px) {
   .backup-tools {
