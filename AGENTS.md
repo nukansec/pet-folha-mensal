@@ -27,7 +27,9 @@ SEIDIGI/SGTES-MS nº 1/2025; Ministério da Saúde, UFG e SMS Goiânia). Fork de
    12 h; acima disso, ou fim igual ao início, vale 0. Some minutos inteiros
    (`sumActivityMinutes`), nunca horas decimais. **Não** use a regra do projeto
    original (`CEILING(saída) − FLOOR(chegada)`).
-3. **Meta**: mínimo de 32 h no mês; o excedente não passa para o mês seguinte.
+3. **Meta**: mínimo de 32 h no mês, das quais 16 h em atividades Síncronas ou
+   In Loco (`synchronousTargetHours` e `synchronousModalities` na config, por
+   nome); o excedente não passa para o mês seguinte.
 4. **Modalidades**: as da config (padrão: "Interação em tempo real (Síncrona)" e
    "Assíncrona"). Atividades presenciais e in loco exigem comprovação fotográfica.
 5. **Prazo**: o rodapé da folha reproduz o texto do modelo (1º dia útil do mês

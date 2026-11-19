@@ -2,6 +2,16 @@
 export const RELEASES = [
   {
     date: "2026-11-19",
+    title: "Meta síncrona e preenchimento pelo histórico",
+    changes: [
+      "A barra do mês mostra, em laranja mais escuro, as horas em atividades Síncronas ou In Loco, com a marca das 16 h obrigatórias.",
+      "O preenchimento rápido agora mostra as atividades que você já registrou: escolha uma e só ajuste a data.",
+      "Saíram os modelos padrão do preenchimento rápido.",
+      "Nada muda nos seus registros: os dados salvos continuam abrindo iguais.",
+    ],
+  },
+  {
+    date: "2026-11-19",
     title: "Datas livres, folha em Word e assinatura gov.br",
     changes: [
       "A data da atividade é livre: a folha de Novembro aceita também 26/10, para quem fecha a folha de 26 a 25 ou de 20 a 19.",
