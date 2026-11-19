@@ -22,9 +22,11 @@ SEIDIGI/SGTES-MS nº 1/2025; Ministério da Saúde, UFG e SMS Goiânia). Fork de
    Fim | CH (h) | Modalidade | Descrição. Rodapé com "Total de CH no mês", nota de
    prazo, assinaturas do participante e do responsável e página de instruções.
 2. **CH exata**: `fim − início` em minutos, sem arredondamento
-   (16:30–18:00 = `1h30`; 11:00–13:00 = `2h`). Fim ≤ início vale 0. Some minutos
-   inteiros (`sumActivityMinutes`), nunca horas decimais. **Não** use a regra do
-   projeto original (`CEILING(saída) − FLOOR(chegada)`).
+   (16:30–18:00 = `1h30`; 11:00–13:00 = `2h`). Fim antes do início = passou da
+   meia-noite e conta inteira no dia em que começou (23:00–03:00 = `4h`), até
+   12 h; acima disso, ou fim igual ao início, vale 0. Some minutos inteiros
+   (`sumActivityMinutes`), nunca horas decimais. **Não** use a regra do projeto
+   original (`CEILING(saída) − FLOOR(chegada)`).
 3. **Meta**: mínimo de 32 h no mês; o excedente não passa para o mês seguinte.
 4. **Modalidades**: as da config (padrão: "Interação em tempo real (Síncrona)" e
    "Assíncrona"). Atividades presenciais e in loco exigem comprovação fotográfica.

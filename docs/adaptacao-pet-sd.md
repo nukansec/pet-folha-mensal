@@ -175,6 +175,12 @@ em branco ao lado foi exportado pelo Word a partir desse `.docx`.
   (`src/lib/docx-export.ts`, com `fflate`). "Assinar no gov.br" abre
   `https://www.gov.br/pt-br/servicos/assinatura-eletronica` (instruções da ficha,
   item 4), configurado em `PROGRAM.links.govSignature`.
+- **D17 — Meia-noite, Duplicar e "-" (19/11/2026).** Fim antes do início passa
+  a ser atividade que atravessou a meia-noite: CH = fim + 24 h − início, contada
+  no dia de início (23:00–03:00 = 4h), limitada a 12 h para não aceitar erro de
+  digitação como 23 h. "Duplicar" em cada atividade copia os campos para o
+  formulário (a lista de preenchimento rápido não mudou). Na folha e no .docx,
+  campo vazio de atividade sai como "-".
 
 ## Dúvidas para o Brunno
 

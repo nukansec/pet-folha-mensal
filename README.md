@@ -33,7 +33,10 @@ telas do app original. Antes, depois, a referência lado a lado e os ajustes de
   atividade desenvolvida e descrição. A **data é livre**: cada GAT fecha a folha
   num dia (26 a 25, 20 a 19…), então a folha de Novembro aceita também 26/10; a
   atividade fica na folha em que foi lançada
-  ([ADR 0002](docs/adr/0002-datas-livres-na-folha.md)).
+  ([ADR 0002](docs/adr/0002-datas-livres-na-folha.md)). **Duplicar** copia uma
+  atividade lançada para o formulário, para repetir em outra data.
+- Na folha, campo vazio de uma atividade (Unidade/Local, Descrição) sai como
+  "-"; as linhas em branco continuam vazias para completar à mão.
 - Preenchimento rápido com quatro modelos: **Reunião Geral** (In Loco, UFG),
   **Capacitação** (Síncrona, Online), **Visita Técnica** (In Loco; o local fica
   para a pessoa preencher) e **Pesquisa Bibliográfica e Estudos Autônomos**
@@ -60,7 +63,9 @@ Fonte: Regimento Interno do PET-SD/UFG e o modelo oficial da ficha. Resumo em
 
 - **CH = duração exata** entre início e fim, em minutos, sem arredondar:
   16:30–18:00 = `1h30`; 11:00–13:00 = `2h`; 18:00–19:00 = `1h`.
-- Fim igual ou anterior ao início não é aceito (CH = 0).
+- Fim antes do início = a atividade **passou da meia-noite** e conta inteira no
+  dia em que começou: 23:00–03:00 = `4h`. Vale até 12 h (um plantão das 19h às
+  7h); acima disso, ou com fim igual ao início, o app pede para conferir.
 - O total do mês soma minutos e aparece como `34 horas` ou `33h30`.
 - Mínimo de **32 h no mês**; o excedente **não** passa para o mês seguinte.
 - Modalidades: **Interação em tempo real (In Loco)**, **Interação em tempo real
