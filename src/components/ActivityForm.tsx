@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { ActivityTemplate } from "@/types";
+import type { Recommendation } from "@/lib/recommendations";
 import { PROGRAM } from "@/config/program";
 import {
   calcPetMinutes,
@@ -13,14 +13,11 @@ import {
 import { Plus } from "lucide-react";
 import { ActivityFields, type ActivityDraft } from "./ActivityFields";
 
-// Reexportado para quem já importava daqui.
-export { fillTemplateName } from "./ActivityFields";
 
 interface ActivityFormProps {
   onSave: (data: ActivityDraft, editingId?: string) => boolean | void;
-  defaultGatNumber?: string;
-  defaultGatName?: string;
-  templates?: ActivityTemplate[];
+  /** Atividades já registradas, para o preenchimento rápido. */
+  recommendations?: Recommendation[];
   monthKey?: string;
   onDirtyChange?: (dirty: boolean) => void;
   /**
@@ -34,9 +31,7 @@ interface ActivityFormProps {
 
 export function ActivityForm({
   onSave,
-  defaultGatNumber = PROGRAM.defaultGat,
-  defaultGatName,
-  templates = [],
+  recommendations = [],
   monthKey = getCurrentMonth(),
   onDirtyChange,
   initialDraft,
@@ -115,11 +110,9 @@ export function ActivityForm({
           idPrefix="activity"
           draft={draft}
           onChange={change}
-          templates={templates}
+          recommendations={recommendations}
           templateId={templateId}
           onTemplateChange={setTemplateId}
-          gatNumber={defaultGatNumber}
-          gatName={defaultGatName}
           monthKey={monthKey}
           errorId={error ? "activity-error" : undefined}
         />

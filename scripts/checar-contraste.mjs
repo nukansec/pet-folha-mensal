@@ -67,6 +67,10 @@ function ratio(a, b) {
 const TEXT = 4.5;
 const LARGE = 3;
 const UI = 3;
+// Trecho síncrono sobre o total na barra do mês: a cor não é o único meio (o
+// valor está escrito ao lado e há um filete entre os trechos), então vale o
+// mínimo para distinguir os dois laranjas, não o de 1.4.11.
+const SEGMENT = 2;
 
 // [descrição, cor do texto/elemento, fundo, mínimo]. Fundos podem ser
 // funções que recebem o tema já resolvido (para misturas e transparências).
@@ -92,6 +96,7 @@ const pairs = [
   ["Borda de controle sobre cartão", "control-border", "surface", UI],
   ["Borda de controle sobre a página", "control-border", "background", UI],
   ["Barra de progresso (decorativa) sobre cartão", "brand-vivid", "surface", LARGE],
+  ["Barra síncrona/In Loco sobre a barra total", "brand-deep", "brand-vivid", SEGMENT],
   ["Informação (azul) sobre cartão", "info", "surface", TEXT],
   ["Informação (azul) sobre a página", "info", "background", TEXT],
   ["Badge de informação", "info", (t) => mix(t.info, 10, t.surface), TEXT],

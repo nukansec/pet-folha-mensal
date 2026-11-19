@@ -160,11 +160,12 @@ test.describe("B1–B6", () => {
     const edit = page.getByRole("dialog", { name: "Editar atividade", exact: true });
     // Mesmos componentes: pílulas de preenchimento rápido e modalidade em grupo.
     const chips = edit.getByRole("radiogroup", { name: /Preenchimento rápido/ });
-    await expect(chips.getByRole("radio")).toHaveCount(5);
+    // Em branco + as duas atividades do histórico.
+    await expect(chips.getByRole("radio")).toHaveCount(3);
     await expect(edit.getByRole("radiogroup", { name: "Modalidade", exact: true })).toBeVisible();
     await expect(edit.locator("select")).toHaveCount(0);
-    await chips.getByRole("radio", { name: "Capacitação" }).check();
-    await expect(edit.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Capacitação");
+    await chips.getByRole("radio", { name: "Pesquisa Bibliográfica e Estudos Autônomos" }).check();
+    await expect(edit.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Pesquisa Bibliográfica e Estudos Autônomos");
     // Cabeçalho: título numa linha, subtítulo oculto, fechar 44 px alinhado.
     const title = await edit.getByRole("heading", { name: "Editar atividade" }).boundingBox();
     expect(title!.height).toBeLessThan(32);

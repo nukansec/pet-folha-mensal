@@ -181,6 +181,16 @@ em branco ao lado foi exportado pelo Word a partir desse `.docx`.
   digitação como 23 h. "Duplicar" em cada atividade copia os campos para o
   formulário (a lista de preenchimento rápido não mudou). Na folha e no .docx,
   campo vazio de atividade sai como "-".
+- **D18 — Meta síncrona (19/11/2026).** Das 32 h do mês, no mínimo 16 h em
+  atividades Síncronas ou In Loco (informado pelo Brunno). A barra do mês ganhou
+  o trecho síncrono em `--brand-deep`, a marca das 16 h, a legenda com o valor e
+  uma segunda `progressbar` para leitor de tela; "Mínimo mensal alcançado" só
+  com as duas metas.
+- **D19 — Preenchimento rápido pelo histórico (19/11/2026).** Saíram os modelos
+  padrão e a aba de modelos do painel de configurações. Os chips são as
+  atividades já registradas pela pessoa (`src/lib/recommendations.ts`). A chave
+  `pet_folha_config_templates_v3` deixou de ser lida e não é apagada; os
+  exemplos fictícios usam `PROGRAM.sampleActivities`.
 
 ## Dúvidas para o Brunno
 

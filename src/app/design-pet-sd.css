@@ -413,12 +413,58 @@
   border: 1px solid var(--border);
   overflow: hidden;
 }
+.progress-track {
+  position: relative;
+}
 .progress-track > span {
+  position: absolute;
+  inset: 0 auto 0 0;
   display: block;
   height: 100%;
   border-radius: inherit;
   background: var(--brand-vivid);
   transition: width 0.3s ease;
+}
+/* Trecho síncrono/In Loco por cima do total, em laranja mais escuro; o filete
+   à direita separa os dois trechos também no tema escuro. */
+.progress-track > .progress-sync {
+  background: var(--brand-deep);
+  box-shadow: 2px 0 0 var(--surface);
+}
+/* Marca do mínimo síncrono (16 de 32 h). */
+.progress-marker {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--foreground);
+  opacity: 0.55;
+}
+.summary-sync {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--body);
+}
+.summary-sync strong {
+  color: var(--foreground);
+}
+.summary-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+.summary-swatch--sync {
+  background: var(--brand-deep);
+}
+.summary-swatch--total {
+  margin-left: 10px;
+  background: var(--brand-vivid);
 }
 .summary-rule {
   margin-top: 10px;

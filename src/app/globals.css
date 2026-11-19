@@ -28,6 +28,8 @@ html[data-theme="light"] {
   --brand-soft: #fff4ed;
   --brand-text: #b43c0a;
   --brand-vivid: #f26a35;
+  /* Trecho síncrono/In Loco da barra do mês, sobre o --brand-vivid. */
+  --brand-deep: #7c2d12;
   --on-brand: #ffffff;
   --focus-ring: #c2410c;
   --info: #1a5a8e;
@@ -55,6 +57,7 @@ html[data-theme="dark"] {
   --brand-soft: #fb923c1a;
   --brand-text: #fb923c;
   --brand-vivid: #f26a35;
+  --brand-deep: #9a3412;
   --on-brand: #1c1917;
   --focus-ring: #fb923c;
   --info: #8cc4ec;

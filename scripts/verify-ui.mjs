@@ -335,30 +335,59 @@ test("modalidades antigas mapeiam por nome; In Loco é aceita em cópias e model
   ]);
 });
 
-test("modelos rápidos: lista padrão antiga vira a nova; lista editada é mantida", () => {
+test("preenchimento rápido vem do histórico: mais recentes primeiro, sem repetir, sem a data", () => {
+  const { buildRecommendations, recommendationKey, MAX_RECOMMENDATIONS } = load("./src/lib/recommendations.ts");
+  const act = (id, date, start, description, extra = {}) => ({
+    ...sampleActivity, id, date, start, end: "23:00", description, local: "", descricao: "", ...extra,
+  });
+  const history = [
+    act("a", "2026-10-06", "09:00", "Reunião Geral", { local: "UFG", descricao: "Pauta antiga" }),
+    act("b", "2026-11-03", "14:00", "  reunião   GERAL ", { local: "Sala nova", descricao: "Pauta nova" }),
+    act("c", "2026-11-02", "08:00", "Visita técnica fictícia"),
+    act("d", "2026-11-03", "08:00", "Estudo dirigido"),
+  ];
+  const list = buildRecommendations(history);
+  // "Reunião Geral" aparece uma vez, com os dados da ocorrência mais recente.
+  assert.deepEqual(list.map((r) => r.label), ["reunião GERAL", "Estudo dirigido", "Visita técnica fictícia"]);
+  assert.deepEqual(list[0].fields, {
+    start: "14:00", end: "23:00", modality: sampleActivity.modality, local: "Sala nova",
+    description: "  reunião   GERAL ", descricao: "Pauta nova",
+  });
+  assert.equal("date" in list[0].fields, false);
+  assert.equal(recommendationKey(" Reunião  Geral "), recommendationKey("reunião geral"));
+  // Limite de chips e histórico vazio.
+  const many = Array.from({ length: 12 }, (_, i) => act(`m${i}`, `2026-11-${String(i + 1).padStart(2, "0")}`, "08:00", `Atividade ${i}`));
+  assert.equal(buildRecommendations(many).length, MAX_RECOMMENDATIONS);
+  assert.equal(buildRecommendations(many)[0].label, "Atividade 11");
+  assert.deepEqual(buildRecommendations([]), []);
+  // Os exemplos fictícios continuam com a lista própria; os modelos antigos salvos não são lidos nem apagados.
   const { PROGRAM } = load("./src/config/program.ts");
-  assert.deepEqual(PROGRAM.templates.map((t) => [t.name, t.modality, t.local]), [
-    ["Reunião Geral", "Interação em tempo real (In Loco)", "UFG"],
-    ["Capacitação", "Interação em tempo real (Síncrona)", "Online"],
-    ["Visita Técnica", "Interação em tempo real (In Loco)", ""],
-    ["Pesquisa Bibliográfica e Estudos Autônomos", "Assíncrona", "Online"],
+  assert.deepEqual(PROGRAM.sampleActivities.map((t) => t.name), [
+    "Reunião Geral", "Capacitação", "Visita Técnica", "Pesquisa Bibliográfica e Estudos Autônomos",
   ]);
-  // Lista antiga salva sem edição (como o painel admin gravava).
+  assert.equal("templates" in PROGRAM, false);
   const records = isolatedStorage();
-  const legacy = PROGRAM.legacyTemplates.map((t) => ({ ...t, isGatSpecific: Boolean(t.isGatSpecific) }));
-  records.set("pet_folha_config_templates_v3", JSON.stringify(legacy));
-  assert.deepEqual(storage.getStoredTemplates().map((t) => t.id), PROGRAM.templates.map((t) => t.id));
-  // A chave salva não é reescrita na leitura.
-  assert.equal(records.get("pet_folha_config_templates_v3"), JSON.stringify(legacy));
-  // Lista editada: um local diferente basta para manter a da pessoa.
-  const edited = legacy.map((t, i) => (i === 3 ? { ...t, local: "Sala fictícia" } : t));
-  records.set("pet_folha_config_templates_v3", JSON.stringify(edited));
-  assert.deepEqual(storage.getStoredTemplates().map((t) => [t.id, t.local]), edited.map((t) => [t.id, t.local]));
-  // Lista antiga com um modelo a menos também é da pessoa.
-  records.set("pet_folha_config_templates_v3", JSON.stringify(legacy.slice(1)));
-  assert.equal(storage.getStoredTemplates().length, 6);
+  records.set("pet_folha_config_templates_v3", "[]");
+  storage.saveProfiles([sampleUser]);
+  storage.saveActivitiesForMonth(sampleUser.id, "2026-10", [history[0]]);
+  storage.saveActivitiesForMonth(sampleUser.id, "2026-11", [history[1], history[2]]);
+  assert.deepEqual(storage.getProfileActivityHistory(sampleUser.id).map((a) => a.id).sort(), ["a", "b", "c"]);
+  assert.equal(records.get("pet_folha_config_templates_v3"), "[]");
+  assert.equal(storage.generateSeedActivities("01", "GAT 01", "2026-11").length, 4);
 });
 
+test("formulário: sem histórico, explica o preenchimento rápido; com histórico, mostra os chips", () => {
+  const { buildRecommendations } = load("./src/lib/recommendations.ts");
+  const empty = render(React.createElement(ActivityForm, { onSave: noop, recommendations: [] }));
+  assert.match(empty, /As atividades que você registrar aparecem aqui/);
+  assert.doesNotMatch(empty, /role="radiogroup"[^>]*template/);
+  const full = render(React.createElement(ActivityForm, {
+    onSave: noop,
+    recommendations: buildRecommendations([{ ...sampleActivity, description: "Reunião fictícia" }]),
+  }));
+  assert.match(full, /Em branco/);
+  assert.match(full, /Reunião fictícia/);
+});
 test("cartão de exemplo da entrada: dia da semana vem da data e linhas em ordem", () => {
   assert.equal(weekdayShort("2026-10-07"), "qua");
   assert.equal(weekdayShort("2026-10-06"), "ter");
@@ -533,7 +562,7 @@ test("formulários e modais renderizam com campos rotulados e diálogos nativos"
   const form = render(
     React.createElement(ActivityForm, {
       onSave: noop,
-      templates: storage.DEFAULT_TEMPLATES,
+      recommendations: [],
     }),
   );
   verifyLabelTargets(form);
@@ -546,7 +575,7 @@ test("formulários e modais renderizam com campos rotulados e diálogos nativos"
   const components = [
     [
       EditActivityModal,
-      { activity: sampleActivity, onSave: noop, templates: [] },
+      { activity: sampleActivity, onSave: noop },
     ],
     [
       ProfileModal,
@@ -1110,7 +1139,7 @@ test("datas livres: limite só na vigência; mês aberto e data sugerida pelo fu
   assert.equal(calc.shiftMonthKey("2027-01", -1), "2026-12");
   // O formulário aceita a vigência inteira, não só o mês da folha.
   const form = renderToStaticMarkup(
-    React.createElement(DialogProvider, null, React.createElement(ActivityForm, { monthKey: "2026-11", onSave: () => true, templates: [] })),
+    React.createElement(DialogProvider, null, React.createElement(ActivityForm, { monthKey: "2026-11", onSave: () => true })),
   );
   assert.match(form, /min="2025-07-01"/);
   assert.match(form, /max="2027-08-31"/);
@@ -1267,7 +1296,7 @@ test("barra de progresso: aria-valuenow nunca passa de aria-valuemax", () => {
 
 test("editar atividade tem um só diálogo; concluir oferece Word e assinatura gov.br", () => {
   const edit = render(
-    React.createElement(EditActivityModal, { activity: sampleActivity, onSave: noop, templates: [], isOpen: true, onClose: noop }),
+    React.createElement(EditActivityModal, { activity: sampleActivity, onSave: noop, isOpen: true, onClose: noop }),
   );
   assert.equal((edit.match(/role="dialog"/g) || []).length + (edit.match(/<dialog/g) || []).length, 1);
   const base = { userName: sampleUser.name, onConfirmExit: noop, onDownloadJson: noop, onDownloadPdf: noop, isOpen: true, onClose: noop };
@@ -1312,4 +1341,51 @@ test("lista oferece Duplicar em cada atividade quando a página passa a função
     user: sampleUser, monthLabel: "Novembro/2026", onLoadSamples: noop, onClearMonth: noop,
   }));
   assert.doesNotMatch(without, /Duplicar/);
+});
+
+// ============================================================
+// Meta síncrona: 16 das 32 h em atividades síncronas ou In Loco
+// ============================================================
+test("meta síncrona: soma só Síncrona e In Loco, pelo nome da modalidade", () => {
+  const a = (start, end, modality) => ({ start, end, modality });
+  const list = [
+    a("08:00", "12:00", "Interação em tempo real (Síncrona)"),
+    a("23:00", "03:00", "Interação em tempo real (In Loco)"), // passa da meia-noite: 4h
+    a("08:00", "18:00", "Assíncrona"),
+    a("08:00", "09:00", "Modalidade personalizada"),
+  ];
+  assert.equal(calcModule.sumSynchronousMinutes(list), 480);
+  assert.equal(sumActivityMinutes(list), 1140);
+});
+
+test("barra do mês: trecho síncrono, marca das 16 h e segunda barra acessível", () => {
+  const { StatsGrid } = load("./src/components/StatsGrid.tsx");
+  isolatedStorage();
+  const sync = (date, start, end) => ({ date, start, end, modality: "Interação em tempo real (Síncrona)" });
+  const async = (date, start, end) => ({ date, start, end, modality: "Assíncrona" });
+  const props = (activities) => ({
+    totalMinutes: sumActivityMinutes(activities), activitiesCount: activities.length,
+    monthLabel: "Novembro/2026", monthKey: "2026-11", activities, targetHours: 32,
+  });
+  // 10 h síncronas + 14 h assíncronas = 24 h.
+  const partial = [sync("2026-11-03", "08:00", "18:00"), async("2026-11-04", "08:00", "22:00")];
+  const html = renderToStaticMarkup(React.createElement(StatsGrid, props(partial)));
+  assert.match(html, /class="progress-total" style="width:75%"/);
+  assert.match(html, /class="progress-sync" style="width:31\.25%"/);
+  assert.match(html, /class="progress-marker" style="left:50%"/);
+  assert.equal((html.match(/role="progressbar"/g) || []).length, 2);
+  assert.match(html, /aria-label="CH síncrona\/In Loco em relação ao mínimo de 16 h" aria-valuenow="10"/);
+  assert.match(html, /Síncronas\/In Loco: <strong>10h<\/strong> de 16 h/);
+  // 32 h, mas só 10 síncronas: a meta não fecha.
+  const unbalanced = [sync("2026-11-03", "08:00", "18:00"), async("2026-11-04", "00:00", "22:00")];
+  const html2 = renderToStaticMarkup(React.createElement(StatsGrid, props(unbalanced)));
+  assert.match(html2, /data-reached="false"/);
+  assert.match(html2, /32 h alcançadas; faltam 6h síncronas\/In Loco/);
+  // 16 síncronas + 16 assíncronas: fecha.
+  const done = [sync("2026-11-03", "06:00", "22:00"), async("2026-11-04", "06:00", "22:00")];
+  const html3 = renderToStaticMarkup(React.createElement(StatsGrid, props(done)));
+  assert.match(html3, /Mínimo mensal alcançado/);
+  // Sem atividade síncrona, não há trecho escuro.
+  const none = renderToStaticMarkup(React.createElement(StatsGrid, props([async("2026-11-04", "08:00", "10:00")])));
+  assert.doesNotMatch(none, /progress-sync/);
 });

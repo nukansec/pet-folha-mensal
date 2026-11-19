@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import { PROGRAM } from "@/config/program";
 import type { Activity } from "@/types";
-import { formatDuration, formatTotalHours } from "@/lib/pet-calculator";
+import { formatDuration, formatTotalHours, sumSynchronousMinutes } from "@/lib/pet-calculator";
 import { getMonthWeekBands, todayInBrasilia } from "@/lib/weeks";
 import { ChoiceGroup } from "@/components/ui/choice-group";
 
@@ -14,7 +14,7 @@ interface StatsGridProps {
   monthLabel?: string;
   /** Mês (AAAA-MM) e atividades: necessários para a visão semanal. */
   monthKey?: string;
-  activities?: Pick<Activity, "date" | "start" | "end">[];
+  activities?: Pick<Activity, "date" | "start" | "end" | "modality">[];
 }
 
 /** Preferência de tela (não é dado da folha): lembra Mensal ou Semanal. */
@@ -61,7 +61,17 @@ export function StatsGrid({
     100,
     Math.max(0, (totalMinutes / targetMinutes) * 100),
   );
-  const reached = totalMinutes >= targetMinutes;
+  // Das 32 h, no mínimo 16 h síncronas/In Loco: a meta só fecha com as duas.
+  const syncTargetHours = PROGRAM.synchronousTargetHours;
+  const syncTargetMinutes = syncTargetHours * 60;
+  const syncMinutes = sumSynchronousMinutes(activities);
+  const syncHours = Math.round((syncMinutes / 60) * 10) / 10;
+  // Mesma escala da barra (32 h): o trecho síncrono fica por cima do total.
+  const syncProgress = Math.min(progress, Math.max(0, (syncMinutes / targetMinutes) * 100));
+  const syncMarker = Math.min(100, (syncTargetMinutes / targetMinutes) * 100);
+  const syncReached = syncMinutes >= syncTargetMinutes;
+  const totalReached = totalMinutes >= targetMinutes;
+  const reached = totalReached && syncReached;
   // "19 horas" vira "19" + "de 32 h"; "1h30" já traz a unidade.
   const [amount] = formatTotalHours(totalMinutes).split(" ");
   const weekly = PROGRAM.weeklyReferenceHours;
@@ -86,7 +96,9 @@ export function StatsGrid({
         <span className="summary-remaining">
           {reached
             ? "Mínimo mensal alcançado"
-            : `Faltam ${formatDuration(targetMinutes - totalMinutes)} para o mínimo mensal`}
+            : totalReached
+              ? `${targetHours} h alcançadas; faltam ${formatDuration(syncTargetMinutes - syncMinutes)} síncronas/In Loco`
+              : `Faltam ${formatDuration(targetMinutes - totalMinutes)} para o mínimo mensal`}
         </span>
       </div>
       <div className="summary-progress">
@@ -171,12 +183,34 @@ export function StatsGrid({
               aria-valuemax={Math.max(targetHours, currentHours)}
               aria-valuetext={`${formatTotalHours(totalMinutes)} de ${targetHours} h`}
             >
-              <span style={{ width: `${progress}%` }} />
+              <span className="progress-total" style={{ width: `${progress}%` }} />
+              {syncMinutes > 0 && (
+                <span className="progress-sync" style={{ width: `${syncProgress}%` }} />
+              )}
+              <i className="progress-marker" style={{ left: `${syncMarker}%` }} aria-hidden="true" />
             </div>
+            <div
+              className="sr-only"
+              role="progressbar"
+              aria-label={`CH síncrona/In Loco em relação ao mínimo de ${syncTargetHours} h`}
+              aria-valuenow={syncHours}
+              aria-valuemin={0}
+              aria-valuemax={Math.max(syncTargetHours, syncHours)}
+              aria-valuetext={`${formatTotalHours(syncMinutes)} de ${syncTargetHours} h`}
+            />
+            <p className="summary-sync" data-reached={syncReached}>
+              <span className="summary-swatch summary-swatch--sync" aria-hidden="true" />
+              Síncronas/In Loco: <strong>{formatDuration(syncMinutes)}</strong> de{" "}
+              {syncTargetHours} h
+              <span className="summary-swatch summary-swatch--total" aria-hidden="true" />
+              Total
+            </p>
             <p className="summary-rule">
-              Mínimo de {targetHours} h no mês (referência de{" "}
-              {PROGRAM.weeklyReferenceHours} h por semana); o excedente não passa
-              para o mês seguinte. Confira a distribuição semanal antes do envio.
+              Mínimo de {targetHours} h no mês, das quais {syncTargetHours} h
+              em atividades síncronas ou In Loco (a marca na barra); referência
+              de {PROGRAM.weeklyReferenceHours} h por semana. O excedente não
+              passa para o mês seguinte. Confira a distribuição semanal antes do
+              envio.
             </p>
           </>
         )}

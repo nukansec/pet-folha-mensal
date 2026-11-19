@@ -1,16 +1,13 @@
 "use client";
 
 import { Modal } from "./Modal";
-import { PROGRAM } from "@/config/program";
 import React, { useEffect, useState } from "react";
-import { UserProfile, GATInfo, ActivityTemplate, ModalityType, sortedGats } from "@/types";
+import { UserProfile, GATInfo, sortedGats } from "@/types";
 import {
   saveGats,
   saveRoles,
-  saveTemplates,
   updateRoleName,
   updateGatInfo,
-  DEFAULT_TEMPLATES,
 } from "@/lib/storage";
 import {
   Shield,
@@ -18,14 +15,12 @@ import {
   Lock,
   Briefcase,
   Layers,
-  CalendarDays,
   Plus,
   Trash2,
   Edit2,
   Check,
   AlertTriangle,
   LogOut,
-  RotateCcw,
 } from "lucide-react";
 import { useDialog } from "@/context/DialogContext";
 
@@ -35,12 +30,10 @@ interface AdminModalProps {
   profiles?: UserProfile[];
   gats: Record<string, GATInfo>;
   roles: string[];
-  templates: ActivityTemplate[];
   onProfilesChange?: (updated: UserProfile[]) => void;
   onGatsChange: (updated: Record<string, GATInfo>) => void;
   onRolesChange: (updated: string[]) => void;
-  onTemplatesChange: (updated: ActivityTemplate[]) => void;
-  defaultTab?: "roles" | "gats" | "templates";
+  defaultTab?: "roles" | "gats";
 }
 
 type AdminAccessStatus =
@@ -50,7 +43,6 @@ type AdminAccessStatus =
   | "unconfigured"
   | "unavailable";
 
-const GAT_TEMPLATE_NAME = "Reunião semanal do GAT {gatNumber}";
 // Eixos do Edital (item 1.4); um GAT pode atuar em mais de um.
 const AXIS_OPTIONS = [
   "Eixo 1",
@@ -68,11 +60,9 @@ export function AdminModal({
   profiles = [],
   gats,
   roles,
-  templates,
   onProfilesChange,
   onGatsChange,
   onRolesChange,
-  onTemplatesChange,
   defaultTab = "roles",
 }: AdminModalProps) {
   const { confirm, alert } = useDialog();
@@ -81,11 +71,11 @@ export function AdminModal({
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState<"roles" | "gats" | "templates">(
+  const [activeTab, setActiveTab] = useState<"roles" | "gats">(
     () => {
       if (typeof window !== "undefined") {
         const tab = new URLSearchParams(window.location.search).get("tab");
-        if (tab === "templates" || tab === "roles" || tab === "gats")
+        if (tab === "roles" || tab === "gats")
           return tab;
       }
       return defaultTab;
@@ -108,16 +98,6 @@ export function AdminModal({
     string | null
   >(null);
   const [editingGat, setEditingGat] = useState<GATInfo | null>(null);
-
-  // Formulário de Edição / Novo Template (Sem datas nem horários!)
-  const [newTplName, setNewTplName] = useState("");
-  const [newTplModality, setNewTplModality] = useState<ModalityType>(
-    PROGRAM.defaultModality,
-  );
-  const [newTplLocal, setNewTplLocal] = useState("");
-  const [newTplGatSpecific, setNewTplGatSpecific] = useState(false);
-  const [editingTemplate, setEditingTemplate] =
-    useState<ActivityTemplate | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -404,92 +384,6 @@ export function AdminModal({
     }
   };
 
-  // ============================================================
-  // AÇÕES: TEMPLATES DE ATIVIDADES (SEM DATAS/HORÁRIOS, COM EDIÇÃO)
-  // ============================================================
-
-  const handleAddTemplate = (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanName = newTplGatSpecific
-      ? GAT_TEMPLATE_NAME
-      : newTplName.trim();
-
-    if (!cleanName) return;
-
-    const newTpl: ActivityTemplate = {
-      id: `tpl-${Date.now().toString(36)}`,
-      name: cleanName,
-      modality: newTplModality,
-      local: newTplLocal.trim(),
-      isGatSpecific: newTplGatSpecific,
-    };
-
-    const updated = [...templates, newTpl];
-    saveTemplates(updated);
-    onTemplatesChange(updated);
-
-    setNewTplName("");
-    setNewTplLocal("");
-    setNewTplGatSpecific(false);
-  };
-
-  const handleStartEditTemplate = (tpl: ActivityTemplate) => {
-    setEditingTemplate({
-      ...tpl,
-      name: tpl.name,
-    });
-  };
-
-  const handleSaveEditTemplate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingTemplate) return;
-
-    const cleanName = editingTemplate.isGatSpecific
-      ? GAT_TEMPLATE_NAME
-      : editingTemplate.name.trim();
-
-    if (!cleanName) return;
-
-    const finalTpl: ActivityTemplate = {
-      ...editingTemplate,
-      name: cleanName,
-    };
-
-    const updated = templates.map((t) =>
-      t.id === editingTemplate.id ? finalTpl : t,
-    );
-    saveTemplates(updated);
-    onTemplatesChange(updated);
-    setEditingTemplate(null);
-  };
-
-  const handleDeleteTemplate = async (id: string, name?: string) => {
-    const ok = await confirm({
-      title: "Excluir Modelo",
-      message: `Deseja realmente excluir o modelo de atividade "${name || "selecionado"}"?`,
-      confirmText: "Excluir",
-      variant: "danger",
-    });
-    if (!ok) return;
-
-    const updated = templates.filter((t) => t.id !== id);
-    saveTemplates(updated);
-    onTemplatesChange(updated);
-  };
-
-  const handleResetTemplates = async () => {
-    const ok = await confirm({
-      title: "Restaurar Modelos",
-      message: "Deseja restaurar os modelos padrão do PET-SD?",
-      confirmText: "Restaurar",
-      variant: "warning",
-    });
-    if (ok) {
-      saveTemplates(DEFAULT_TEMPLATES);
-      onTemplatesChange(DEFAULT_TEMPLATES);
-    }
-  };
-
   return (
     <Modal isOpen={isOpen} onClose={handleClose} label="Configurações locais">
       <div
@@ -554,8 +448,8 @@ export function AdminModal({
                 Configurações Locais
               </h4>
               <p className="text-xs sm:text-sm text-body mt-1.5 max-w-md">
-                Digite o PIN para acessar as configurações de templates, GATs e
-                funções deste navegador.
+                Digite o PIN para acessar as configurações de GATs e funções
+                deste navegador.
               </p>
             </div>
 
@@ -642,17 +536,6 @@ export function AdminModal({
               >
                 <Layers className="size-4" />
                 <span>GATs ({Object.keys(gats).length})</span>
-              </button>
-              <button
-                onClick={() => setActiveTab("templates")}
-                className={`min-h-[48px] py-3 px-3.5 sm:px-4 flex items-center gap-2 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
-                  activeTab === "templates"
-                    ? "border-brand-text text-brand-text"
-                    : "border-transparent text-muted hover:text-body"
-                }`}
-              >
-                <CalendarDays className="size-4" />
-                <span>Modelos de atividades ({templates.length})</span>
               </button>
             </div>
 
@@ -1042,292 +925,6 @@ export function AdminModal({
                 </div>
               )}
 
-              {/* ============================================================
-                  ABA 3: TEMPLATES DE ATIVIDADES (SEM DATAS NEM HORÁRIOS)
-                  ============================================================ */}
-              {activeTab === "templates" && (
-                <div className="space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                    <span className="text-xs sm:text-sm text-body">
-                      Configure os modelos de atividades (nomes e modalidades)
-                      usados para preenchimento rápido.
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleResetTemplates}
-                      className="min-h-[40px] px-3.5 py-2 rounded-xl border border-line text-body hover:text-ink text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer transition-colors shrink-0"
-                    >
-                      <RotateCcw className="size-3.5" />
-                      <span>Restaurar Padrão</span>
-                    </button>
-                  </div>
-
-                  {/* Edição de Template */}
-                  {editingTemplate && (
-                    <form
-                      onSubmit={handleSaveEditTemplate}
-                      className="p-4 sm:p-5 rounded-2xl border border-brand-text/40 bg-brand-text/10 space-y-4 animate-fade-in"
-                    >
-                      <div className="font-bold text-base text-brand-text">
-                        Editando Modelo de Atividade
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                        <div className="sm:col-span-2">
-                          <label
-                            htmlFor="adminmodal-field-9"
-                            className="block text-xs sm:text-sm text-body font-medium mb-1.5"
-                          >
-                            Nome / Descrição da Atividade
-                          </label>
-                          <input
-                            id="adminmodal-field-9"
-                            type="text"
-                            required
-                            disabled={editingTemplate.isGatSpecific}
-                            value={
-                              editingTemplate.isGatSpecific
-                                ? GAT_TEMPLATE_NAME
-                                : editingTemplate.name
-                            }
-                            onChange={(e) =>
-                              setEditingTemplate({
-                                ...editingTemplate,
-                                name: e.target.value,
-                              })
-                            }
-                            className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text disabled:opacity-50"
-                          />
-                        </div>
-                        <div>
-                          <label
-                            htmlFor="adminmodal-field-10"
-                            className="block text-xs sm:text-sm text-body font-medium mb-1.5"
-                          >
-                            Modalidade
-                          </label>
-                          <select
-                            id="adminmodal-field-10"
-                            value={editingTemplate.modality}
-                            onChange={(e) =>
-                              setEditingTemplate({
-                                ...editingTemplate,
-                                modality: e.target.value as ModalityType,
-                              })
-                            }
-                            className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text cursor-pointer"
-                          >
-                            {Array.from(new Set([...PROGRAM.modalities, editingTemplate.modality])).map((item) => (
-                              <option key={item} value={item}>{item}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="adminmodal-template-local"
-                          className="block text-xs sm:text-sm text-body font-medium mb-1.5"
-                        >
-                          Unidade/Local padrão
-                        </label>
-                        <input
-                          id="adminmodal-template-local"
-                          type="text"
-                          value={editingTemplate.local ?? ""}
-                          onChange={(e) =>
-                            setEditingTemplate({
-                              ...editingTemplate,
-                              local: e.target.value,
-                            })
-                          }
-                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text"
-                        />
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-                        <label className="flex items-center gap-2 text-xs sm:text-sm text-body cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={editingTemplate.isGatSpecific || false}
-                            onChange={(e) =>
-                              setEditingTemplate({
-                                ...editingTemplate,
-                                isGatSpecific: e.target.checked,
-                              })
-                            }
-                            className="size-4 rounded accent-[var(--brand)]"
-                          />
-                          <span>Atividade própria do GAT (dinâmica)</span>
-                        </label>
-                        <div className="flex gap-2.5">
-                          <button
-                            type="button"
-                            onClick={() => setEditingTemplate(null)}
-                            className="min-h-[44px] px-4 py-2 rounded-xl text-body hover:bg-raised text-sm font-semibold cursor-pointer transition-colors"
-                          >
-                            Cancelar
-                          </button>
-                          <button
-                            type="submit"
-                            className="min-h-[44px] px-5 py-2 font-semibold text-sm rounded-xl bg-brand text-on-brand hover:bg-brand-strong cursor-pointer transition-all"
-                          >
-                            Salvar Modelo
-                          </button>
-                        </div>
-                      </div>
-                    </form>
-                  )}
-
-                  {/* Adicionar Novo Template (Sem Dia, Sem Entrada, Sem Saída) */}
-                  <form
-                    onSubmit={handleAddTemplate}
-                    className="p-4 sm:p-5 rounded-2xl border border-line bg-canvas space-y-4"
-                  >
-                    <div className="font-bold text-base text-ink">
-                      Adicionar Novo Modelo de Atividade
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="adminmodal-field-11"
-                          className="block text-xs sm:text-sm text-body font-medium mb-1.5"
-                        >
-                          Nome da Atividade
-                        </label>
-                        <input
-                          id="adminmodal-field-11"
-                          type="text"
-                          required={!newTplGatSpecific}
-                          disabled={newTplGatSpecific}
-                          placeholder={
-                            newTplGatSpecific
-                              ? "Reunião do GAT (automática)"
-                              : "Ex.: Oficina, seminário, visita técnica..."
-                          }
-                          value={
-                            newTplGatSpecific
-                              ? GAT_TEMPLATE_NAME
-                              : newTplName
-                          }
-                          onChange={(e) => setNewTplName(e.target.value)}
-                          className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text disabled:opacity-50"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="adminmodal-field-12"
-                          className="block text-xs sm:text-sm text-body font-medium mb-1.5"
-                        >
-                          Modalidade
-                        </label>
-                        <select
-                          id="adminmodal-field-12"
-                          value={newTplModality}
-                          onChange={(e) =>
-                            setNewTplModality(e.target.value as ModalityType)
-                          }
-                          className="w-full min-h-[44px] px-3 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text cursor-pointer"
-                        >
-                          {Array.from(new Set([...PROGRAM.modalities, newTplModality])).map((item) => (
-                            <option key={item} value={item}>{item}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="adminmodal-new-template-local"
-                        className="block text-xs sm:text-sm text-body font-medium mb-1.5"
-                      >
-                        Unidade/Local padrão (opcional)
-                      </label>
-                      <input
-                        id="adminmodal-new-template-local"
-                        type="text"
-                        placeholder="Ex.: UFG, Google Meet ou -"
-                        value={newTplLocal}
-                        onChange={(e) => setNewTplLocal(e.target.value)}
-                        className="w-full min-h-[44px] px-3.5 py-2 text-sm sm:text-base rounded-xl bg-surface border border-line text-ink outline-none focus:border-brand-text"
-                      />
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-                      <label className="flex items-center gap-2 text-xs sm:text-sm text-body cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={newTplGatSpecific}
-                          onChange={(e) =>
-                            setNewTplGatSpecific(e.target.checked)
-                          }
-                          className="size-4 rounded accent-[var(--brand)]"
-                        />
-                        <span>
-                          Atividade própria do GAT (injeta número e nome
-                          automaticamente)
-                        </span>
-                      </label>
-
-                      <button
-                        type="submit"
-                        className="min-h-[44px] px-5 py-2.5 font-semibold text-sm rounded-xl bg-brand text-on-brand hover:bg-brand-strong cursor-pointer flex items-center justify-center gap-2 transition-all shadow-[var(--page-shadow)]"
-                      >
-                        <Plus className="size-4" />
-                        <span>Adicionar Modelo</span>
-                      </button>
-                    </div>
-                  </form>
-
-                  {/* Lista de Modelos de Atividades com Edição e Exclusão */}
-                  <div className="space-y-2.5">
-                    {templates.map((tpl, i) => (
-                      <div
-                        key={tpl.id || i}
-                        className="p-3.5 sm:p-4 rounded-xl border border-line bg-canvas flex items-center justify-between gap-3 hover:border-line transition-colors"
-                      >
-                        <div>
-                          <div className="text-sm sm:text-base font-semibold text-body">
-                            {tpl.name || "Modelo"}
-                          </div>
-                          <div className="text-xs sm:text-sm text-body mt-1">
-                            Tipo:{" "}
-                            <span className="text-brand-text font-medium">
-                              {tpl.modality}
-                            </span>
-                            {tpl.local && (
-                              <span className="ml-2 text-muted">• {tpl.local}</span>
-                            )}
-                            {tpl.isGatSpecific && (
-                              <span className="ml-2 text-info font-medium">
-                                • GAT Dinâmico
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            aria-label="Editar modelo"
-                            type="button"
-                            onClick={() => handleStartEditTemplate(tpl)}
-                            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-brand-text hover:bg-raised cursor-pointer transition-colors"
-                            title="Editar modelo"
-                          >
-                            <Edit2 className="size-4" />
-                          </button>
-                          <button
-                            aria-label="Excluir modelo"
-                            type="button"
-                            onClick={() =>
-                              handleDeleteTemplate(tpl.id, tpl.name)
-                            }
-                            className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-danger hover:bg-raised cursor-pointer transition-colors"
-                            title="Excluir modelo"
-                          >
-                            <Trash2 className="size-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}

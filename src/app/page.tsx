@@ -6,7 +6,6 @@ import {
   Activity,
   UserRole,
   GATInfo,
-  ActivityTemplate,
 } from "@/types";
 import { PROGRAM } from "@/config/program";
 import {
@@ -24,7 +23,7 @@ import {
   type RestoreCode,
   getStoredGats,
   getStoredRoles,
-  getStoredTemplates,
+  getProfileActivityHistory,
   registerProfile,
   updateUserProfileAdmin,
   deleteUserProfile,
@@ -60,6 +59,7 @@ import { ProfileModal } from "@/components/ProfileModal";
 import { AdminModal } from "@/components/AdminModal";
 import { StatsGrid } from "@/components/StatsGrid";
 import { ActivityForm } from "@/components/ActivityForm";
+import { buildRecommendations } from "@/lib/recommendations";
 import type { ActivityDraft } from "@/components/ActivityFields";
 import { ActivityTable } from "@/components/ActivityTable";
 import { EditActivityModal } from "@/components/EditActivityModal";
@@ -147,7 +147,6 @@ export default function Home() {
   // Estados Dinâmicos de Configuração (GATs, Funções e Templates)
   const [gats, setGats] = useState<Record<string, GATInfo>>({});
   const [roles, setRoles] = useState<string[]>([]);
-  const [templates, setTemplates] = useState<ActivityTemplate[]>([]);
 
   // Inicialização Local-First
   useEffect(() => {
@@ -162,8 +161,6 @@ export default function Home() {
       const loadedRoles = getStoredRoles();
       setRoles(loadedRoles);
 
-      const loadedTemplates = getStoredTemplates();
-      setTemplates(loadedTemplates);
 
       const urlParams =
         typeof window !== "undefined"
@@ -818,6 +815,14 @@ export default function Home() {
     </>
   );
 
+  // Preenchimento rápido: atividades já registradas em todas as folhas do
+  // perfil. `activities` entra nas dependências porque gravar muda o histórico.
+  const recommendations = React.useMemo(
+    () => (activeUser ? buildRecommendations(getProfileActivityHistory(activeUser.id)) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- activities só sinaliza que o histórico mudou.
+    [activeUser, activities],
+  );
+
   if (!ready)
     return (
       <main className="loading-sheet" aria-busy="true">
@@ -881,13 +886,11 @@ export default function Home() {
           profiles={profiles}
           gats={gats}
           roles={roles}
-          templates={templates}
           onProfilesChange={(updated) => {
             setProfiles(updated);
           }}
           onGatsChange={(updated) => setGats(updated)}
           onRolesChange={(updated) => setRoles(updated)}
-          onTemplatesChange={(updated) => setTemplates(updated)}
         />
 
         {/* Modal de Feedback & Avaliação */}
@@ -992,11 +995,7 @@ export default function Home() {
                   onInitialDraftUsed={() => setDuplicateDraft(null)}
                   onDirtyChange={setDraftDirty}
                   onSave={handleSaveActivity}
-                  defaultGatNumber={activeUser.gatNumber}
-                  defaultGatName={
-                    activeUser.gatName || gats[activeUser.gatNumber]?.name
-                  }
-                  templates={templates}
+                  recommendations={recommendations}
                 />
 
                 <ActivityTable
@@ -1174,11 +1173,7 @@ export default function Home() {
             onClose={() => setEditingActivity(null)}
             activity={editingActivity}
             onSave={handleSaveActivity}
-            defaultGatNumber={activeUser.gatNumber}
-            defaultGatName={
-              activeUser.gatName || gats[activeUser.gatNumber]?.name
-            }
-            templates={templates}
+            recommendations={recommendations}
             monthKey={monthKey}
           />
 
@@ -1189,8 +1184,7 @@ export default function Home() {
             profiles={profiles}
             gats={gats}
             roles={roles}
-            templates={templates}
-            onProfilesChange={(updated) => {
+              onProfilesChange={(updated) => {
               setProfiles(updated);
               if (!activeUser) return;
               // Perfil ativo editado: a tela e a folha usam os dados novos.
@@ -1203,8 +1197,7 @@ export default function Home() {
             }}
             onGatsChange={(updated) => setGats(updated)}
             onRolesChange={(updated) => setRoles(updated)}
-            onTemplatesChange={(updated) => setTemplates(updated)}
-          />
+            />
 
           {/* Modal de Saída / Backup Obrigatório */}
           <ExitModal

@@ -37,10 +37,10 @@ telas do app original. Antes, depois, a referência lado a lado e os ajustes de
   atividade lançada para o formulário, para repetir em outra data.
 - Na folha, campo vazio de uma atividade (Unidade/Local, Descrição) sai como
   "-"; as linhas em branco continuam vazias para completar à mão.
-- Preenchimento rápido com quatro modelos: **Reunião Geral** (In Loco, UFG),
-  **Capacitação** (Síncrona, Online), **Visita Técnica** (In Loco; o local fica
-  para a pessoa preencher) e **Pesquisa Bibliográfica e Estudos Autônomos**
-  (Assíncrona, Online). O painel de configurações permite editar a lista.
+- Preenchimento rápido a partir do **histórico**: as atividades que a pessoa já
+  registrou (em qualquer folha) viram chips, sem repetir, das mais recentes para
+  as mais antigas. Escolher uma preenche o formulário com tudo menos a data; a
+  pessoa ainda clica em Adicionar. Não há mais modelos padrão.
 - Modalidade, perfil e preenchimento rápido como opções visíveis (grupos de
   rádio acessíveis por teclado e leitor de tela).
 - Cálculo da carga horária (CH) exata e acompanhamento da meta de 32 h no mês,
@@ -67,7 +67,9 @@ Fonte: Regimento Interno do PET-SD/UFG e o modelo oficial da ficha. Resumo em
   dia em que começou: 23:00–03:00 = `4h`. Vale até 12 h (um plantão das 19h às
   7h); acima disso, ou com fim igual ao início, o app pede para conferir.
 - O total do mês soma minutos e aparece como `34 horas` ou `33h30`.
-- Mínimo de **32 h no mês**; o excedente **não** passa para o mês seguinte.
+- Mínimo de **32 h no mês**, das quais **16 h em atividades Síncronas ou In
+  Loco**; o excedente **não** passa para o mês seguinte. A barra do mês mostra o
+  trecho síncrono em laranja mais escuro, com uma marca nas 16 h.
 - Modalidades: **Interação em tempo real (In Loco)**, **Interação em tempo real
   (Síncrona)** e **Assíncrona**. O formulário começa em Síncrona.
 - Atividades presenciais e in loco exigem registro fotográfico.
