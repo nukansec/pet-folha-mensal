@@ -1,7 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Download, FileText, ClipboardList, X, ArrowRight } from "lucide-react";
+import {
+  Download,
+  ExternalLink,
+  FileText,
+  ClipboardList,
+  PenLine,
+  Printer,
+  X,
+  ArrowRight,
+  Check,
+} from "lucide-react";
 import { PROGRAM } from "@/config/program";
 import { Modal } from "./Modal";
 
@@ -17,8 +27,13 @@ interface ExitModalProps {
   /** Resumo da CH ("CH completa" ou o que falta), abaixo do nome. */
   hoursStatus?: string;
   hasChanges?: boolean;
-  /** Texto do botão principal: Concluir usa o padrão; o menu do topo, "Trocar participante" ou "Sair". */
+  /** Texto do botão principal no menu do topo: "Trocar participante" ou "Sair". */
   leaveLabel?: string;
+  /**
+   * Concluir (botão do topo): o principal vira "Concluir" e volta para Minha
+   * frequência sem encerrar a sessão (sair e trocar ficam no menu do topo).
+   */
+  onConclude?: () => void;
 }
 
 export function ExitModal(props: ExitModalProps) {
@@ -37,6 +52,7 @@ function Conclusion({
   hoursStatus,
   hasChanges = false,
   leaveLabel = "Sair / trocar participante",
+  onConclude,
 }: ExitModalProps) {
   const [jsonTriggered, setJsonTriggered] = useState(false);
   const [pdfTriggered, setPdfTriggered] = useState(false);
@@ -107,8 +123,8 @@ function Conclusion({
           <div>
             <h3>Folha para assinatura</h3>
             <p>
-              Salve o PDF em papel Carta na horizontal (ou em Word, para
-              completar à mão) e assine pelo gov.br.
+              Imprima ou salve em PDF (papel Carta, horizontal), ou baixe em
+              Word para completar à mão.
             </p>
             {pdfTriggered && (
               <p role="status">
@@ -124,8 +140,9 @@ function Conclusion({
               className="secondary-button"
               disabled={busy}
               onClick={() => void download("pdf")}
+              title="Imprimir ou salvar em PDF (na janela de impressão, escolha Salvar como PDF)"
             >
-              Imprimir / salvar PDF
+              <Printer size={16} aria-hidden="true" /> Imprimir
             </button>
             {onDownloadDocx && (
               <button
@@ -133,19 +150,27 @@ function Conclusion({
                 disabled={busy}
                 onClick={() => void download("docx")}
               >
-                Baixar .docx (Word)
+                <Download size={16} aria-hidden="true" /> Baixar .docx
               </button>
             )}
-            <a
-              className="secondary-button"
-              href={PROGRAM.links.govSignature}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Assinar no gov.br (abre em nova aba)"
-            >
-              Assinar no gov.br
-            </a>
           </div>
+        </div>
+        {/* Assinatura separada: vem depois de gerar o PDF ou o .docx. */}
+        <div className="conclusion-option">
+          <PenLine size={24} aria-hidden="true" />
+          <div>
+            <h3>Assinatura eletrônica</h3>
+            <p>Assine o documento online após gerar o arquivo PDF ou .docx.</p>
+          </div>
+          <a
+            className="secondary-button"
+            href={PROGRAM.links.govSignature}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Assinar no gov.br (abre em nova aba)"
+          >
+            <ExternalLink size={16} aria-hidden="true" /> Assinar no gov.br
+          </a>
         </div>
         {PROGRAM.links.activityForm && (
           <div className="conclusion-option">
@@ -161,9 +186,12 @@ function Conclusion({
             </a>
           </div>
         )}
-        <p className="local-note">
-          Salve a cópia para proteger seus dados e continuar em outro aparelho.
-        </p>
+        {/* No Concluir, a Cópia de segurança já diz isso; sobra espaço no celular. */}
+        {!onConclude && (
+          <p className="local-note">
+            Salve a cópia para proteger seus dados e continuar em outro aparelho.
+          </p>
+        )}
         {exitWarning && (
           <div className="operation-notice" role="alert">
             <p>
@@ -185,9 +213,15 @@ function Conclusion({
           <button className="secondary-button" onClick={onClose}>
             Continuar editando
           </button>
-          <button className="primary-button" disabled={busy} onClick={leave}>
-            {leaveLabel} <ArrowRight size={18} />
-          </button>
+          {onConclude ? (
+            <button className="primary-button" disabled={busy} onClick={onConclude}>
+              <Check size={18} aria-hidden="true" /> Concluir
+            </button>
+          ) : (
+            <button className="primary-button" disabled={busy} onClick={leave}>
+              {leaveLabel} <ArrowRight size={18} />
+            </button>
+          )}
         </div>
       </section>
     </Modal>

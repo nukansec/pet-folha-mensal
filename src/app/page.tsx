@@ -1235,6 +1235,15 @@ export default function Home() {
             onDownloadJson={handleExportBackup}
             onDownloadPdf={printParticipantSheet}
             onDownloadDocx={handleDownloadDocx}
+            onConclude={
+              exitMode === "conclude"
+                ? () => {
+                    setIsExitModalOpen(false);
+                    setActiveTab("dashboard");
+                    window.scrollTo({ top: 0 });
+                  }
+                : undefined
+            }
             hoursStatus={
               exitMode !== "conclude"
                 ? undefined
