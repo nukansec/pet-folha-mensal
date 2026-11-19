@@ -351,16 +351,20 @@ test.describe("seletores em grupos de opção", () => {
     await modality.getByRole("radio", { name: "Interação em tempo real (Síncrona)", exact: true }).focus();
     await page.keyboard.press("ArrowLeft");
     await expect(modality.getByRole("radio", { name: "Interação em tempo real (In Loco)", exact: true })).toBeChecked();
-    // Chips: Tab entra no grupo pela opção marcada; seta escolhe o modelo.
+    // Primeira atividade (Assíncrona) entra no histórico do preenchimento rápido.
+    await modality.getByRole("radio", { name: "Assíncrona", exact: true }).click();
+    await page.getByLabel("Data", { exact: true }).fill("2026-11-01");
+    await page.getByLabel("Início", { exact: true }).fill("08:00");
+    await page.getByLabel("Fim", { exact: true }).fill("09:00");
+    await page.getByLabel("Unidade/Local", { exact: true }).fill("Online");
+    await page.getByLabel("Atividade desenvolvida", { exact: true }).fill("Pesquisa Bibliográfica e Estudos Autônomos");
+    await page.getByRole("button", { name: "Adicionar atividade", exact: true }).click();
+    // Chips: Tab entra no grupo pela opção marcada; seta escolhe a recomendação.
     const chips = page.getByRole("radiogroup", { name: /Preenchimento rápido/ });
     await chips.getByRole("radio", { name: "Em branco" }).focus();
     await page.keyboard.press("ArrowRight");
-    await expect(chips.getByRole("radio", { name: "Reunião Geral" })).toBeChecked();
-    await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Reunião Geral");
-    await page.keyboard.press("ArrowRight");
-    await page.keyboard.press("ArrowRight");
-    await page.keyboard.press("ArrowRight");
     await expect(chips.getByRole("radio", { name: "Pesquisa Bibliográfica e Estudos Autônomos" })).toBeChecked();
+    await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Pesquisa Bibliográfica e Estudos Autônomos");
     await expect(modality.getByRole("radio", { name: "Assíncrona", exact: true })).toBeChecked();
     await page.getByLabel("Data", { exact: true }).fill("2026-11-02");
     await page.getByLabel("Início", { exact: true }).fill("09:00");
@@ -369,7 +373,7 @@ test.describe("seletores em grupos de opção", () => {
     await page.getByRole("button", { name: "Adicionar atividade", exact: true }).click();
     const saved = await page.evaluate(() => {
       const key = Object.keys(localStorage).find((k) => k.startsWith("pet_folha_activities_v3_"))!;
-      return JSON.parse(localStorage.getItem(key)!)[0];
+      return JSON.parse(localStorage.getItem(key)!)[1];
     });
     expect(saved).toMatchObject({
       modality: "Interação em tempo real (In Loco)",
@@ -377,13 +381,13 @@ test.describe("seletores em grupos de opção", () => {
       local: "Online",
     });
     // Modal de edição usa o mesmo grupo e grava o nome completo.
-    await page.getByRole("button", { name: /^Editar atividade:/ }).click();
+    await page.getByRole("button", { name: /^Editar atividade:/ }).last().click();
     const edit = page.getByRole("dialog", { name: "Editar atividade", exact: true }).first();
     await edit.getByRole("radio", { name: "Assíncrona", exact: true }).check();
     await edit.getByRole("button", { name: /Salvar/ }).click();
     const edited = await page.evaluate(() => {
       const key = Object.keys(localStorage).find((k) => k.startsWith("pet_folha_activities_v3_"))!;
-      return JSON.parse(localStorage.getItem(key)!)[0];
+      return JSON.parse(localStorage.getItem(key)!)[1];
     });
     expect(edited.modality).toBe("Assíncrona");
   });
@@ -404,7 +408,20 @@ test.describe("seletores em grupos de opção", () => {
 
   test("no celular, modalidade em coluna e chips com rolagem horizontal sem rolar a página", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "só no celular");
-    await createProfile(page);
+    // Histórico com nomes longos: os chips passam da largura e rolam de lado.
+    await page.addInitScript(() => {
+      if (localStorage.getItem("test-seeded")) return;
+      const profile = { id: "p-chips", name: "Participante sintético", role: "Monitor(a)", gatNumber: "01", createdAt: "2026-10-01T00:00:00.000Z" };
+      localStorage.setItem("pet_folha_profiles_v3", JSON.stringify([profile]));
+      localStorage.setItem("pet_folha_active_profile_id_v3", profile.id);
+      const names = ["Pesquisa Bibliográfica e Estudos Autônomos", "Reunião Geral do GAT fictício", "Capacitação em saúde digital fictícia"];
+      localStorage.setItem("pet_folha_activities_v3_p-chips_2026-11", JSON.stringify(names.map((description, i) => ({
+        id: `c${i}`, date: `2026-11-0${i + 1}`, start: "08:00", end: "09:00", modality: "Assíncrona", description, local: "", descricao: "",
+      }))));
+      localStorage.setItem("test-seeded", "1");
+    });
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "Minha frequência", exact: true })).toBeVisible();
     const boxes = await page.getByRole("radiogroup", { name: "Modalidade", exact: true }).locator(".choice")
       .evaluateAll((items) => items.map((item) => item.getBoundingClientRect()));
     expect(new Set(boxes.map((box) => Math.round(box.left))).size).toBe(1);
@@ -438,7 +455,7 @@ test.describe("visão semanal", () => {
     const summary = page.getByRole("region", { name: "Resumo da frequência" });
     const toggle = summary.getByRole("radiogroup", { name: "Visão do resumo" });
     await expect(toggle.getByRole("radio", { name: "Mensal" })).toBeChecked();
-    await expect(summary.getByRole("progressbar")).toBeVisible();
+    await expect(summary.getByRole("progressbar", { name: /CH do mês/ })).toBeVisible();
     await toggle.getByRole("radio", { name: "Semanal" }).click();
     const bands = summary.getByRole("list", { name: /CH por semana/ }).getByRole("listitem");
     await expect(bands).toHaveCount(6);
@@ -457,7 +474,7 @@ test.describe("visão semanal", () => {
     await toggle.getByRole("radio", { name: "Semanal" }).focus();
     await page.keyboard.press("ArrowLeft");
     await expect(toggle.getByRole("radio", { name: "Mensal" })).toBeChecked();
-    await expect(summary.getByRole("progressbar")).toBeVisible();
+    await expect(summary.getByRole("progressbar", { name: /CH do mês/ })).toBeVisible();
     await page.keyboard.press("ArrowRight");
     await expect(bands).toHaveCount(6);
     // Faixas acompanham a troca de mês e novas atividades.

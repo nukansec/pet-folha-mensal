@@ -752,9 +752,10 @@ test("cópias com comprovantes levam os originais e a restauração reverte falh
 test("novidades mostram data de publicação nos dois temas", async ({ page }, testInfo) => {
   await page.goto("/");
   const section = page.getByRole("region", { name: "Novidades do site" });
-  await expect(section.getByRole("heading", { name: "Datas livres, folha em Word e assinatura gov.br" })).toBeVisible();
+  await expect(section.getByRole("heading", { name: "Meta síncrona e preenchimento pelo histórico" })).toBeVisible();
   await expect(section.getByText("Última atualização", { exact: false })).toContainText("19 de novembro de 2026");
   await section.getByText("Ver histórico de atualizações", { exact: true }).click();
+  await expect(section.getByRole("heading", { name: "Datas livres, folha em Word e assinatura gov.br" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Ajustes para o celular" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Perfis, menu do participante e visão semanal" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Ajustes no formulário e nova modalidade" })).toBeVisible();
@@ -872,65 +873,51 @@ test("sem texto cortado, foco visível e folha oficial em preto e branco", async
     expect(colored, theme).toEqual([]);
     await page.getByRole("button", { name: "Minha frequência", exact: true }).click();
   }
-  // Modelo rápido de nome longo, no celular.
+  // Recomendação do histórico (atividade já lançada), no celular.
   await page.setViewportSize({ width: 390, height: 1000 });
-  await page.getByRole("radio", { name: "Pesquisa Bibliográfica e Estudos Autônomos", exact: true }).check();
-  expect(await cutTexts(page), "modelo longo 390px").toEqual([]);
+  await page.getByRole("radio", { name: "Atividade sintética", exact: true }).check();
+  expect(await cutTexts(page), "recomendação 390px").toEqual([]);
 });
 
-test("modelos rápidos novos; modelo sem local deixa o campo vazio", async ({ page }) => {
-  await create(page);
-  const template = page.getByRole("radiogroup", { name: /Preenchimento rápido/ });
-  await expect(template.getByRole("radio")).toHaveCount(5);
-  await expect(template.locator(".choice-text")).toHaveText([
-    "Em branco",
-    "Reunião Geral",
-    "Capacitação",
-    "Visita Técnica",
-    "Pesquisa Bibliográfica e Estudos Autônomos",
-  ]);
-  await expect(template.getByRole("radio", { name: "Em branco" })).toBeChecked();
-  const modality = (name: string) => page.getByRole("radio", { name, exact: true });
-  await template.getByRole("radio", { name: "Reunião Geral" }).check();
-  await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("UFG");
-  await expect(modality("Interação em tempo real (In Loco)")).toBeChecked();
-  await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Reunião Geral");
-  await template.getByRole("radio", { name: "Visita Técnica" }).check();
-  await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("");
-  await expect(modality("Interação em tempo real (In Loco)")).toBeChecked();
-  await template.getByRole("radio", { name: "Pesquisa Bibliográfica e Estudos Autônomos" }).check();
-  await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("Online");
-  await expect(modality("Assíncrona")).toBeChecked();
-  // Digitar outra atividade volta a marcar "Em branco".
-  await page.getByLabel("Atividade desenvolvida", { exact: true }).fill("Outra atividade");
-  await expect(template.getByRole("radio", { name: "Em branco" })).toBeChecked();
-});
-
-test("lista antiga de modelos salva sem edição abre com os modelos novos", async ({ page }) => {
-  const legacy = [
-    { id: "tpl-reuniao-gat", name: "Reunião semanal do GAT {gatNumber}", modality: "Interação em tempo real (Síncrona)", local: "UFG", isGatSpecific: true },
-    { id: "tpl-reuniao-frente", name: "Reunião da frente de trabalho", modality: "Interação em tempo real (Síncrona)", local: "Google Meet", isGatSpecific: false },
-    { id: "tpl-ata", name: "Elaboração de ata", modality: "Assíncrona", local: "-", isGatSpecific: false },
-    { id: "tpl-estudos", name: "Grupo de estudos", modality: "Interação em tempo real (Síncrona)", local: "UFG", isGatSpecific: false },
-    { id: "tpl-capacitacao", name: "Capacitação", modality: "Interação em tempo real (Síncrona)", local: "UFG", isGatSpecific: false },
-    { id: "tpl-visita", name: "Visita técnica", modality: "Interação em tempo real (Síncrona)", local: "Unidade de saúde", isGatSpecific: false },
-    { id: "tpl-estudo-assincrono", name: "Pesquisa bibliográfica e estudo autônomo", modality: "Assíncrona", local: "-", isGatSpecific: false },
-  ];
-  await page.addInitScript((legacy) => {
+test("preenchimento rápido vem do histórico: sem modelos padrão; escolher preenche tudo menos a data", async ({ page }) => {
+  // Modelos antigos salvos neste navegador não aparecem mais (nem são apagados).
+  await page.addInitScript(() => {
     if (localStorage.getItem("test-seeded")) return;
-    localStorage.setItem("pet_folha_config_templates_v3", JSON.stringify(legacy));
+    localStorage.setItem("pet_folha_config_templates_v3", JSON.stringify([{ id: "tpl-x", name: "Modelo antigo", modality: "Assíncrona", local: "-" }]));
     localStorage.setItem("test-seeded", "1");
-  }, legacy);
+  });
   await create(page);
-  const options = page.getByRole("radiogroup", { name: /Preenchimento rápido/ }).locator(".choice-text");
-  await expect(options).toHaveCount(5);
-  await expect(options.nth(1)).toHaveText("Reunião Geral");
-  // Lista editada pela pessoa: fica a dela.
-  await page.evaluate((legacy) => {
-    localStorage.setItem("pet_folha_config_templates_v3", JSON.stringify([{ ...legacy[2], name: "Ata da reunião (editada)" }]));
-  }, legacy);
-  await page.reload();
-  await expect(page.getByRole("radiogroup", { name: /Preenchimento rápido/ }).locator(".choice-text")).toHaveText(["Em branco", "Ata da reunião (editada)"]);
+  await expect(page.getByRole("radiogroup", { name: /Preenchimento rápido/ })).toHaveCount(0);
+  await expect(page.getByText("As atividades que você registrar aparecem aqui", { exact: false })).toBeVisible();
+  await expect(page.getByText("Modelo antigo")).toHaveCount(0);
+
+  await add(page); // 02/11, 13:30–17:30, "Atividade sintética", Sala sintética
+  const quick = page.getByRole("radiogroup", { name: /Preenchimento rápido/ });
+  await expect(quick.locator(".choice-text")).toHaveText(["Em branco", "Atividade sintética"]);
+  await page.getByLabel("Data", { exact: true }).fill("2026-11-09");
+  await quick.getByRole("radio", { name: "Atividade sintética" }).check();
+  await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("Atividade sintética");
+  await expect(page.getByLabel("Unidade/Local", { exact: true })).toHaveValue("Sala sintética");
+  await expect(page.getByLabel("Início", { exact: true })).toHaveValue("13:30");
+  await expect(page.getByLabel("Fim", { exact: true })).toHaveValue("17:30");
+  await expect(page.getByLabel("Descrição", { exact: true })).toHaveValue("Pauta sintética de teste");
+  // A data escolhida não muda, e nada é gravado sem clicar em Adicionar.
+  await expect(page.getByLabel("Data", { exact: true })).toHaveValue("2026-11-09");
+  await expect(page.locator(".summary-total strong")).toHaveText("4");
+  // "Em branco" limpa o que a recomendação preencheu.
+  await quick.getByRole("radio", { name: "Em branco" }).check();
+  await expect(page.getByLabel("Atividade desenvolvida", { exact: true })).toHaveValue("");
+  await expect(page.getByLabel("Início", { exact: true })).toHaveValue("");
+  await quick.getByRole("radio", { name: "Atividade sintética" }).check();
+  await page.getByRole("button", { name: "Adicionar atividade", exact: true }).click();
+  await expect(page.locator(".summary-total strong")).toHaveText("8");
+  // Mesma atividade duas vezes: um chip só.
+  await expect(quick.locator(".choice-text")).toHaveText(["Em branco", "Atividade sintética"]);
+  // Digitar outra atividade volta a marcar "Em branco".
+  await quick.getByRole("radio", { name: "Atividade sintética" }).check();
+  await page.getByLabel("Atividade desenvolvida", { exact: true }).fill("Outra atividade");
+  await expect(quick.getByRole("radio", { name: "Em branco" })).toBeChecked();
+  expect(await page.evaluate(() => localStorage.getItem("pet_folha_config_templates_v3"))).toContain("Modelo antigo");
 });
 
 test("cartões .pdf e .json: mesma altura lado a lado, altura própria empilhados", async ({ page }, testInfo) => {
