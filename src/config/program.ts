@@ -68,6 +68,16 @@ export const PROGRAM = {
 
   /** Regimento, item 2: 32 h mensais; o excedente não passa para o mês seguinte. */
   monthlyTargetHours: 32,
+  /**
+   * Das 32 h do mês, no mínimo 16 h em atividades síncronas ou In Loco
+   * (informado em 19/11/2026). Conta pelo nome da modalidade, nunca pela
+   * posição na lista.
+   */
+  synchronousTargetHours: 16,
+  synchronousModalities: [
+    "Interação em tempo real (In Loco)",
+    "Interação em tempo real (Síncrona)",
+  ] as string[],
   /** Edital, item 9.1.4: no mínimo 8 h semanais. */
   weeklyReferenceHours: 8,
 

@@ -1301,3 +1301,50 @@ test("lista oferece Duplicar em cada atividade quando a página passa a função
   }));
   assert.doesNotMatch(without, /Duplicar/);
 });
+
+// ============================================================
+// Meta síncrona: 16 das 32 h em atividades síncronas ou In Loco
+// ============================================================
+test("meta síncrona: soma só Síncrona e In Loco, pelo nome da modalidade", () => {
+  const a = (start, end, modality) => ({ start, end, modality });
+  const list = [
+    a("08:00", "12:00", "Interação em tempo real (Síncrona)"),
+    a("23:00", "03:00", "Interação em tempo real (In Loco)"), // passa da meia-noite: 4h
+    a("08:00", "18:00", "Assíncrona"),
+    a("08:00", "09:00", "Modalidade personalizada"),
+  ];
+  assert.equal(calcModule.sumSynchronousMinutes(list), 480);
+  assert.equal(sumActivityMinutes(list), 1140);
+});
+
+test("barra do mês: trecho síncrono, marca das 16 h e segunda barra acessível", () => {
+  const { StatsGrid } = load("./src/components/StatsGrid.tsx");
+  isolatedStorage();
+  const sync = (date, start, end) => ({ date, start, end, modality: "Interação em tempo real (Síncrona)" });
+  const async = (date, start, end) => ({ date, start, end, modality: "Assíncrona" });
+  const props = (activities) => ({
+    totalMinutes: sumActivityMinutes(activities), activitiesCount: activities.length,
+    monthLabel: "Novembro/2026", monthKey: "2026-11", activities, targetHours: 32,
+  });
+  // 10 h síncronas + 14 h assíncronas = 24 h.
+  const partial = [sync("2026-11-03", "08:00", "18:00"), async("2026-11-04", "08:00", "22:00")];
+  const html = renderToStaticMarkup(React.createElement(StatsGrid, props(partial)));
+  assert.match(html, /class="progress-total" style="width:75%"/);
+  assert.match(html, /class="progress-sync" style="width:31\.25%"/);
+  assert.match(html, /class="progress-marker" style="left:50%"/);
+  assert.equal((html.match(/role="progressbar"/g) || []).length, 2);
+  assert.match(html, /aria-label="CH síncrona\/In Loco em relação ao mínimo de 16 h" aria-valuenow="10"/);
+  assert.match(html, /Síncronas\/In Loco: <strong>10h<\/strong> de 16 h/);
+  // 32 h, mas só 10 síncronas: a meta não fecha.
+  const unbalanced = [sync("2026-11-03", "08:00", "18:00"), async("2026-11-04", "00:00", "22:00")];
+  const html2 = renderToStaticMarkup(React.createElement(StatsGrid, props(unbalanced)));
+  assert.match(html2, /data-reached="false"/);
+  assert.match(html2, /32 h alcançadas; faltam 6h síncronas\/In Loco/);
+  // 16 síncronas + 16 assíncronas: fecha.
+  const done = [sync("2026-11-03", "06:00", "22:00"), async("2026-11-04", "06:00", "22:00")];
+  const html3 = renderToStaticMarkup(React.createElement(StatsGrid, props(done)));
+  assert.match(html3, /Mínimo mensal alcançado/);
+  // Sem atividade síncrona, não há trecho escuro.
+  const none = renderToStaticMarkup(React.createElement(StatsGrid, props([async("2026-11-04", "08:00", "10:00")])));
+  assert.doesNotMatch(none, /progress-sync/);
+});

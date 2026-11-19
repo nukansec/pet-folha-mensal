@@ -50,6 +50,14 @@ export function sumActivityMinutes(activities: Pick<Activity, "start" | "end">[]
   );
 }
 
+/** CH em atividades síncronas ou In Loco (PROGRAM.synchronousModalities). */
+export function sumSynchronousMinutes(
+  activities: Pick<Activity, "start" | "end" | "modality">[],
+): number {
+  const synchronous = new Set(PROGRAM.synchronousModalities);
+  return sumActivityMinutes(activities.filter((activity) => synchronous.has(activity.modality)));
+}
+
 /** Formato da coluna CH (h) da ficha: "2h", "1h30", "0h05". */
 /** Célula da folha: campo vazio sai como "-" (linha de atividade, não a em branco). */
 export function sheetCell(value: string | undefined | null): string {
