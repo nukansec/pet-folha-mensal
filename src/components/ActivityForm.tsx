@@ -8,6 +8,7 @@ import {
   cleanActivityDescription,
   getCurrentMonth,
   getDefaultActivityDate,
+  isDateAllowed,
 } from "@/lib/pet-calculator";
 import { Plus } from "lucide-react";
 import { ActivityFields, type ActivityDraft } from "./ActivityFields";
@@ -54,10 +55,11 @@ export function ActivityForm({
   function submit(event: FormEvent) {
     event.preventDefault();
     const activityName = cleanActivityDescription(draft.description);
-    if (!draft.date.startsWith(monthKey) || !activityName || minutes <= 0) {
+    const dateOk = isDateAllowed(draft.date);
+    if (!dateOk || !activityName || minutes <= 0) {
       setError(
-        !draft.date.startsWith(monthKey)
-          ? "Escolha uma data no mês desta folha."
+        !dateOk
+          ? "Informe uma data válida dentro da vigência do programa."
           : !activityName
             ? "Informe a atividade desenvolvida."
             : "O fim deve ser posterior ao início.",
