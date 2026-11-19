@@ -2,6 +2,18 @@
 export const RELEASES = [
   {
     date: "2026-11-18",
+    title: "Ajustes para o celular",
+    changes: [
+      "Editar uma atividade usa os mesmos campos do formulário, com os botões sempre à vista.",
+      "Nenhum rótulo parte palavra no meio, e o topo mostra o seu nome e o seu perfil em duas linhas.",
+      "Salvar, Restaurar e Concluir ficam do mesmo tamanho; o mês não aparece mais repetido no resumo.",
+      "Na folha oficial, a prévia cabe na tela com a faixa de logos, e dá para vê-la em tamanho real. A impressão continua igual.",
+      "Atualização de segurança do Next.js.",
+      "Nada muda nos seus registros: os dados salvos continuam abrindo iguais.",
+    ],
+  },
+  {
+    date: "2026-11-18",
     title: "Perfis, menu do participante e visão semanal",
     changes: [
       "Na entrada, cada perfil aparece num cartão com Abrir, Editar e Excluir. Antes de excluir, o app mostra o que será apagado e oferece uma cópia do perfil inteiro.",
