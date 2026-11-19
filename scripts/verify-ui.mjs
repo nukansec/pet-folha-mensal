@@ -876,12 +876,12 @@ test("cópia 1.4 inválida não grava nada", () => {
   const valid = JSON.parse(storage.exportProfileData(ana));
   const snapshot = JSON.stringify([...records]);
   const broken = [
-    { ...valid, months: [] },
     { ...valid, months: "x" },
     { ...valid, months: [valid.months[0], valid.months[0]] },
     { ...valid, months: [{ ...valid.months[0], monthKey: "2026-13" }] },
     { ...valid, months: [{ ...valid.months[0], attachments: undefined }] },
-    { ...valid, months: [{ ...valid.months[0], monthKey: "2026-11" }] },
+    // Datas livres aceitam um mês antes ou depois; outubro na folha de 2027-01 não.
+    { ...valid, months: [{ ...valid.months[0], monthKey: "2027-01" }] },
     { ...valid, months: [{ ...valid.months[0], activities: [{ id: "x" }] }] },
   ];
   for (const data of broken) {
@@ -924,6 +924,8 @@ test("entrada mostra perfis em cartões com Abrir, Editar e Excluir rotulados", 
 // E5: visão semanal (faixas de segunda a domingo cortadas pelo mês)
 // ============================================================
 const weeks = load("./src/lib/weeks.ts");
+const calendarBands = (monthKey, activities = [], today = "") =>
+  weeks.getMonthWeekBands(monthKey, activities, today);
 const bandLabels = (monthKey, activities = [], today = "") =>
   weeks.getMonthWeekBands(monthKey, activities, today).map((band) => band.label);
 
@@ -971,22 +973,32 @@ test("faixas de semana: mês que começa no sábado e fevereiros", () => {
   assert.deepEqual(weeks.getMonthWeekBands("x"), []);
 });
 
-test("faixas de semana: CH exata nos limites das faixas; outro mês é ignorado", () => {
+test("faixas de semana: CH exata nos limites; datas de outro mês estendem o período", () => {
   const a = (date, start, end) => ({ date, start, end });
-  const bands = weeks.getMonthWeekBands("2026-11", [
+  const inside = [
     a("2026-11-01", "08:00", "09:30"), // Dia 1 (domingo)
     a("2026-11-08", "16:30", "18:00"), // último dia de "2 a 8"
     a("2026-11-08", "18:00", "18:05"),
     a("2026-11-09", "11:00", "13:00"), // primeiro dia de "9 a 15"
     a("2026-11-30", "09:00", "17:00"), // Dia 30
-    a("2026-10-31", "09:00", "17:00"), // outro mês
-    a("2026-12-01", "09:00", "17:00"), // outro mês
     a("2026-11-10", "10:00", "09:00"), // fim antes do início vale 0
-  ]);
+  ];
+  const bands = calendarBands("2026-11", inside);
+  assert.deepEqual(bands.map((b) => b.label), ["Dia 1", "2 a 8", "9 a 15", "16 a 22", "23 a 29", "Dia 30"]);
   assert.deepEqual(bands.map((b) => b.minutes), [90, 95, 120, 0, 0, 480]);
   assert.equal(formatDuration(bands[1].minutes), "1h35");
+  // Datas livres: 31/10 (sábado) e 01/12 entram e o período passa do mês.
+  const all = [...inside, a("2026-10-31", "09:00", "17:00"), a("2026-12-01", "09:00", "17:00")];
+  const wide = calendarBands("2026-11", all);
+  assert.deepEqual(wide.map((b) => b.label), [
+    "31/10 a 01/11", "02/11 a 08/11", "09/11 a 15/11", "16/11 a 22/11", "23/11 a 29/11", "30/11 a 01/12",
+  ]);
+  assert.deepEqual(wide.map((b) => b.minutes), [570, 95, 120, 0, 0, 960]);
+  // A soma das faixas é sempre o total da folha.
+  assert.equal(wide.reduce((sum, b) => sum + b.minutes, 0), sumActivityMinutes(all));
+  // Data inválida não estende nem soma.
+  assert.equal(calendarBands("2026-11", [a("2026-02-30", "08:00", "09:00")]).length, 6);
 });
-
 test("semana atual vem da data de Brasília, não do fuso do aparelho", () => {
   // 02:30 UTC de 19/11 ainda é 23:30 de 18/11 em Brasília.
   assert.equal(weeks.todayInBrasilia(new Date("2026-11-19T02:30:00Z")), "2026-11-18");
@@ -1035,4 +1047,196 @@ test("regra de ouro: fixture da main abre igual pelo storage e nada é reescrito
   assert.deepEqual(storage.getProfileActivitySummary(profiles[0].id), { months: 2, activities: 4 });
   assert.deepEqual(storage.getProfileActivitySummary(profiles[1].id), { months: 1, activities: 1 });
   assert.equal(JSON.stringify([...records]), before);
+});
+
+// ============================================================
+// Datas livres (cada GAT fecha a folha num dia: 26 a 25, 20 a 19…)
+// ============================================================
+const calc = load("./src/lib/pet-calculator.ts");
+
+test("datas livres: limite só na vigência; mês aberto e data sugerida pelo fuso de Brasília", () => {
+  const br = (iso) => new Date(`${iso}T12:00:00-03:00`);
+  assert.equal(calc.DATE_LIMITS.min, "2025-07-01");
+  assert.equal(calc.DATE_LIMITS.max, "2027-08-31");
+  for (const ok of ["2026-10-26", "2026-11-20", "2025-07-20", "2027-08-31", "2027-02-28"])
+    assert.equal(calc.isDateAllowed(ok), true, ok);
+  for (const bad of ["", "2026-02-30", "2062-11-03", "2025-06-30", "2027-09-01", "03/11/2026"])
+    assert.equal(calc.isDateAllowed(bad), false, bad);
+  // 23:30 de 30/11 em Brasília é 01/12 em UTC: vale Brasília.
+  assert.equal(calc.getCurrentMonth(new Date("2026-11-30T23:30:00-03:00")), "2026-11");
+  assert.equal(calc.getDefaultActivityDate("2026-11", new Date("2026-11-30T23:30:00-03:00")), "2026-11-30");
+  assert.equal(calc.getDefaultActivityDate("2026-10", br("2026-11-02")), "2026-10-01");
+  assert.equal(calc.shiftMonthKey("2026-12", 1), "2027-01");
+  assert.equal(calc.shiftMonthKey("2027-01", -1), "2026-12");
+  // O formulário aceita a vigência inteira, não só o mês da folha.
+  const form = renderToStaticMarkup(
+    React.createElement(DialogProvider, null, React.createElement(ActivityForm, { monthKey: "2026-11", onSave: () => true, templates: [] })),
+  );
+  assert.match(form, /min="2025-07-01"/);
+  assert.match(form, /max="2027-08-31"/);
+});
+
+test("lançar 26/10 na folha de Novembro grava e soma nela", () => {
+  isolatedStorage();
+  storage.saveProfiles([sampleUser]);
+  const october = { ...sampleActivity, id: "out-26", date: "2026-10-26" };
+  storage.saveActivitiesForMonth(sampleUser.id, "2026-11", [october]);
+  assert.deepEqual(storage.getActivitiesForMonth(sampleUser.id, "2026-11").map((a) => a.date), ["2026-10-26"]);
+  assert.deepEqual(storage.getActivitiesForMonth(sampleUser.id, "2026-10"), []);
+  assert.deepEqual(storage.listProfileMonths(sampleUser.id), ["2026-11"]);
+  // A cópia 1.4 dessa folha restaura (antes era recusada por ter outubro).
+  const json = storage.exportProfileData(sampleUser);
+  const preview = storage.inspectUserData(json);
+  assert.equal(preview.success, true);
+  assert.deepEqual(preview.months.map((m) => m.monthKey), ["2026-11"]);
+});
+
+test("cópia do perfil sem nenhum mês restaura só a identificação", () => {
+  const records = isolatedStorage();
+  storage.saveProfiles([sampleUser]);
+  const json = storage.exportProfileData(sampleUser);
+  assert.deepEqual(JSON.parse(json).months, []);
+  storage.deleteUserProfile(sampleUser.id);
+  const preview = storage.inspectUserData(json);
+  assert.equal(preview.success, true);
+  assert.deepEqual(preview.months, []);
+  assert.equal(storage.applyUserData(preview).success, true);
+  assert.deepEqual(storage.getStoredProfiles().map((p) => p.id), [sampleUser.id]);
+  assert.equal([...records.keys()].some((key) => key.startsWith("pet_folha_activities_v3_")), false);
+});
+
+// ============================================================
+// Folha em Word (.docx) a partir do modelo oficial
+// ============================================================
+const docx = load("./src/lib/docx-export.ts");
+const fflate = load("fflate");
+const docxTemplate = new Uint8Array(
+  readFileSync(path.join(root, "public/templates/pet-sd-registro-de-frequencia-modelo-em-branco.docx")),
+);
+
+function docxXml(bytes) {
+  return fflate.strFromU8(fflate.unzipSync(bytes)["word/document.xml"]);
+}
+function assertBalanced(xml) {
+  for (const tag of ["w:tbl", "w:tr", "w:tc", "w:p", "w:r", "w:rPr", "w:pPr"]) {
+    const open = (xml.match(new RegExp(`<${tag}[ >]`, "g")) || []).length;
+    const close = (xml.match(new RegExp(`</${tag}>`, "g")) || []).length;
+    assert.equal(open, close, tag);
+  }
+}
+const cellText = (xml) => [...xml.matchAll(/<w:t[^>]*>([^<]*)<\/w:t>/g)].map((m) => m[1]).join("");
+
+test("docx: preenche identificação, perfil, atividades e total no modelo oficial", () => {
+  const acts = [
+    { ...sampleActivity, id: "a2", date: "2026-11-05", start: "11:00", end: "13:00", local: "UBS Fictícia", descricao: "" },
+    { ...sampleActivity, id: "a1", date: "2026-10-26", start: "16:30", end: "18:00", local: "UFG", descricao: "Ata fictícia" },
+  ];
+  const bytes = docx.fillSheetDocx(docxTemplate, {
+    user: { name: "Participante Fictício", gatNumber: "01", role: "Monitor(a)" },
+    monthLabel: "Novembro/2026",
+    activities: acts,
+  });
+  const files = fflate.unzipSync(bytes);
+  // Todas as partes do modelo continuam lá (fontes, imagem, cabeçalho).
+  assert.deepEqual(Object.keys(files).sort(), Object.keys(fflate.unzipSync(docxTemplate)).sort());
+  const xml = docxXml(bytes);
+  assertBalanced(xml);
+  assert.match(xml, />PARTICIPANTE FICTÍCIO</);
+  assert.match(xml, /<w:t xml:space="preserve">1<\/w:t>/);
+  assert.match(xml, />Novembro\/2026</);
+  assert.equal((xml.match(/\( X \)/g) || []).length, 1);
+  assert.match(xml, /\( X \) Monitor\(a\)/);
+  const tables = xml.match(/<w:tbl>[\s\S]*?<\/w:tbl>/g);
+  const rows = tables[1].match(/<w:tr\b[\s\S]*?<\/w:tr>/g);
+  // Títulos + 2 atividades (em ordem) + 10 em branco + total.
+  assert.equal(rows.length, 1 + 2 + 10 + 1);
+  assert.equal(
+    cellText(rows[1]),
+    "26/10UFG" + sampleActivity.description + "16:3018:001h30" + sampleActivity.modality + "Ata fictícia",
+  );
+  assert.match(cellText(rows[2]), /^05\/11UBS Fictícia/);
+  assert.equal(cellText(rows[3]), "");
+  assert.equal(cellText(rows.at(-1)), "Total de CH no mês: 3h30");
+  // Texto da célula usa a fonte do parágrafo (Times New Roman), não a padrão.
+  assert.match(rows[1], /<w:r><w:rPr><w:rFonts w:ascii="Times New Roman"/);
+});
+
+test("docx: escapa XML, quebra linhas e cresce além das 12 linhas do modelo", () => {
+  const tricky = {
+    ...sampleActivity,
+    description: 'Reunião <GAT> & "TI"',
+    descricao: "Linha 1\nLinha 2\tcom tab\u0007",
+  };
+  const many = Array.from({ length: 15 }, (_, i) => ({
+    ...sampleActivity,
+    id: `m${i}`,
+    date: `2026-11-${String(i + 1).padStart(2, "0")}`,
+  }));
+  const xml = docxXml(docx.fillSheetDocx(docxTemplate, {
+    user: { name: "Teste", gatNumber: "02", role: "Tutor(a)" },
+    monthLabel: "Novembro/2026",
+    activities: [tricky, ...many],
+  }));
+  assertBalanced(xml);
+  assert.match(xml, /Reunião &lt;GAT&gt; &amp; &quot;TI&quot;/);
+  assert.match(
+    xml,
+    /Linha 1<\/w:t><w:br\/><w:t xml:space="preserve">Linha 2<\/w:t><w:tab\/><w:t xml:space="preserve">com tab<\/w:t>/,
+  );
+  assert.doesNotMatch(xml, /\u0007/);
+  const rows = xml.match(/<w:tbl>[\s\S]*?<\/w:tbl>/g)[1].match(/<w:tr\b[\s\S]*?<\/w:tr>/g);
+  // 16 atividades + 3 linhas em branco para completar à mão.
+  assert.equal(rows.length, 1 + 16 + 3 + 1);
+  assert.equal(docx.xmlText("a\u0000b￾c"), "abc");
+  assert.equal(docx.sheetDocxFilename("ana-ficticia", "2026-11"), "folha-pet-sd-ana-ficticia-2026-11.docx");
+});
+
+test("docx: modelo diferente do esperado falha com erro, sem gerar arquivo quebrado", () => {
+  const data = { user: sampleUser, monthLabel: "x", activities: [] };
+  const broken = fflate.zipSync({ "word/document.xml": fflate.strToU8("<w:document><w:body/></w:document>") });
+  assert.throws(() => docx.fillSheetDocx(broken, data), /Modelo \.docx inesperado/);
+  const noDocument = fflate.zipSync({ "a.txt": new Uint8Array(1) });
+  assert.throws(() => docx.fillSheetDocx(noDocument, data), /sem word\/document\.xml/);
+});
+
+test("nome de arquivo sem acento nem caractere proibido", () => {
+  const { fileSlug } = load("./src/lib/download.ts");
+  assert.equal(fileSlug("Ana Fictícia"), "ana-ficticia");
+  assert.equal(fileSlug("  João / Silva: GAT?  "), "joao-silva-gat");
+  assert.equal(fileSlug("???"), "participante");
+});
+
+// ============================================================
+// Varredura de bugs: acessibilidade e fechamento da folha
+// ============================================================
+test("barra de progresso: aria-valuenow nunca passa de aria-valuemax", () => {
+  const { StatsGrid } = load("./src/components/StatsGrid.tsx");
+  isolatedStorage();
+  const html = renderToStaticMarkup(React.createElement(StatsGrid, {
+    totalMinutes: 1925,
+    activitiesCount: 1,
+    monthLabel: "Novembro/2026",
+    monthKey: "2026-11",
+    activities: [],
+    targetHours: 32,
+  }));
+  const now = Number(/aria-valuenow="([^"]+)"/.exec(html)[1]);
+  const max = Number(/aria-valuemax="([^"]+)"/.exec(html)[1]);
+  assert.ok(now <= max, `${now} > ${max}`);
+});
+
+test("editar atividade tem um só diálogo; concluir oferece Word e assinatura gov.br", () => {
+  const edit = render(
+    React.createElement(EditActivityModal, { activity: sampleActivity, onSave: noop, templates: [], isOpen: true, onClose: noop }),
+  );
+  assert.equal((edit.match(/role="dialog"/g) || []).length + (edit.match(/<dialog/g) || []).length, 1);
+  const base = { userName: sampleUser.name, onConfirmExit: noop, onDownloadJson: noop, onDownloadPdf: noop, isOpen: true, onClose: noop };
+  const exit = render(React.createElement(ExitModal, { ...base, onDownloadDocx: noop }));
+  assert.match(exit, /Baixar \.docx \(Word\)/);
+  assert.match(exit, /href="https:\/\/www\.gov\.br\/pt-br\/servicos\/assinatura-eletronica"/);
+  assert.match(exit, /target="_blank" rel="noopener noreferrer"/);
+  // Sem a função de Word, a opção não aparece (a assinatura continua).
+  const noDocx = render(React.createElement(ExitModal, base));
+  assert.doesNotMatch(noDocx, /Baixar \.docx/);
+  assert.match(noDocx, /Assinar no gov\.br/);
 });
