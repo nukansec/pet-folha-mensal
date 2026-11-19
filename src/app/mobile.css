@@ -114,6 +114,17 @@
   grid-template-columns: minmax(0, auto) minmax(0, 1fr);
   gap: 8px;
 }
+.dialog-footer > button[class] {
+  gap: 8px;
+  padding-inline: 12px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+@media (max-width: 399px) {
+  .dialog-footer > button svg {
+    display: none;
+  }
+}
 @media (min-width: 640px) {
   .dialog-footer.dialog-actions {
     display: flex;
