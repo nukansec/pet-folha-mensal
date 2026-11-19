@@ -164,6 +164,28 @@ export function StatsGrid({
                 );
               })}
             </ol>
+            {/* Meta síncrona também na Semanal: barra única de 16 h, mesma cor da Mensal. */}
+            <div
+              className="progress-track progress-track--sync"
+              role="progressbar"
+              aria-label={`CH síncrona/In Loco em relação ao mínimo de ${syncTargetHours} h`}
+              aria-valuenow={syncHours}
+              aria-valuemin={0}
+              aria-valuemax={Math.max(syncTargetHours, syncHours)}
+              aria-valuetext={`${formatTotalHours(syncMinutes)} de ${syncTargetHours} h`}
+            >
+              {syncMinutes > 0 && (
+                <span
+                  className="progress-sync"
+                  style={{ width: `${Math.min(100, (syncMinutes / syncTargetMinutes) * 100)}%` }}
+                />
+              )}
+            </div>
+            <p className="summary-sync" data-reached={syncReached}>
+              <span className="summary-swatch summary-swatch--sync" aria-hidden="true" />
+              Síncronas/In Loco no mês: <strong>{formatDuration(syncMinutes)}</strong> de{" "}
+              {syncTargetHours} h
+            </p>
             <p className="summary-rule">
               Semanas de segunda a domingo, com a CH exata de cada uma. Nas
               semanas parciais do início e do fim do mês, a semana continua no

@@ -2,6 +2,17 @@
 export const RELEASES = [
   {
     date: "2026-11-19",
+    title: "Concluir confere a CH e meta síncrona na visão Semanal",
+    changes: [
+      "Ao concluir com menos de 32 h, ou de 16 h síncronas/In Loco, o app avisa quanto falta e deixa gerar a folha assim mesmo.",
+      "A visão Semanal também mostra a barra das 16 h síncronas/In Loco.",
+      "Salvar cópia baixa o .json para continuar depois; PDF e Word ficam no Concluir e na Folha oficial.",
+      "Na Folha oficial, os botões ficaram iguais em Minha folha e no Modelo em branco: Imprimir (que também salva em PDF), Baixar .docx e Voltar.",
+      "Nada muda nos seus registros: os dados salvos continuam abrindo iguais.",
+    ],
+  },
+  {
+    date: "2026-11-19",
     title: "Meta síncrona e preenchimento pelo histórico",
     changes: [
       "A barra do mês mostra, em laranja mais escuro, as horas em atividades Síncronas ou In Loco, com a marca das 16 h obrigatórias.",

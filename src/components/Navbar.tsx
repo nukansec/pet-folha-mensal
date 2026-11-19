@@ -112,7 +112,7 @@ export function Navbar({
           </button>
         </nav>
         <div className="backup-tools" aria-label="Cópia de segurança">
-          <button onClick={onExportBackup} aria-label="Salvar cópia" title="Baixar a cópia de segurança (.json) deste perfil">
+          <button onClick={onExportBackup} aria-label="Salvar cópia" title="Baixar a cópia de segurança (.json) deste perfil. Para PDF ou Word, use Concluir ou a aba Folha oficial.">
             <Download size={17} aria-hidden="true" />
             <span>Salvar<span className="label-extra"> cópia</span></span>
           </button>

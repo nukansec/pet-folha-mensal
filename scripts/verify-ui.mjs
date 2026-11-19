@@ -1389,3 +1389,24 @@ test("barra do mês: trecho síncrono, marca das 16 h e segunda barra acessível
   const none = renderToStaticMarkup(React.createElement(StatsGrid, props([async("2026-11-04", "08:00", "10:00")])));
   assert.doesNotMatch(none, /progress-sync/);
 });
+
+test("visão Semanal também mostra a barra única das 16 h síncronas/In Loco", () => {
+  const { StatsGrid } = load("./src/components/StatsGrid.tsx");
+  const records = isolatedStorage();
+  records.set("pet_folha_summary_view", "weekly");
+  const activities = [
+    { date: "2026-11-03", start: "08:00", end: "12:00", modality: "Interação em tempo real (Síncrona)" },
+    { date: "2026-11-05", start: "08:00", end: "12:00", modality: "Interação em tempo real (In Loco)" },
+    { date: "2026-11-10", start: "08:00", end: "18:00", modality: "Assíncrona" },
+  ];
+  const html = renderToStaticMarkup(React.createElement(StatsGrid, {
+    totalMinutes: sumActivityMinutes(activities), activitiesCount: 3,
+    monthLabel: "Novembro/2026", monthKey: "2026-11", activities, targetHours: 32,
+  }));
+  assert.match(html, /class="week-band"/);
+  // 8 h de 16 h: metade da barra, no laranja escuro da Mensal.
+  assert.match(html, /class="progress-track progress-track--sync" role="progressbar" aria-label="CH síncrona\/In Loco em relação ao mínimo de 16 h" aria-valuenow="8"/);
+  assert.match(html, /class="progress-sync" style="width:50%"/);
+  assert.match(html, /Síncronas\/In Loco no mês: <strong>8h<\/strong> de 16 h/);
+  assert.equal((html.match(/role="progressbar"/g) || []).length, 1);
+});

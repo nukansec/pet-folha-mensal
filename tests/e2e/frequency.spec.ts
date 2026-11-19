@@ -43,6 +43,14 @@ async function create(page: Page) {
   ).toBeVisible();
 }
 
+/** Concluir com CH incompleta abre um aviso antes do modal; aceita e segue. */
+async function concluir(page: Page) {
+  await page.getByRole("button", { name: /^Concluir/ }).click();
+  const warning = page.getByRole("dialog", { name: "Folha com CH incompleta" });
+  if (await warning.waitFor({ timeout: 2000 }).then(() => true, () => false))
+    await warning.getByRole("button", { name: "Gerar assim mesmo", exact: true }).click();
+}
+
 async function add(page: Page) {
   await page.getByLabel("Data", { exact: true }).fill("2026-11-02");
   await page.getByLabel("Início", { exact: true }).fill("13:30");
@@ -96,7 +104,7 @@ test("perfil repetido retoma sem arquivo e preserva meses anteriores", async ({
   await expect(page.locator(".summary-total strong")).toHaveText("0");
   await page.getByLabel("Mês da folha").selectOption("2026-10");
   await expect(page.locator(".summary-total strong")).toHaveText("1h30");
-  await page.getByRole("button", { name: "Concluir", exact: true }).click();
+  await concluir(page);
   await page
     .getByRole("button", { name: "Sair / trocar participante", exact: true })
     .click();
@@ -174,7 +182,7 @@ test("lançar, editar, exportar, restaurar, imprimir e excluir", async ({
     };
   });
   await page
-    .getByRole("button", { name: "Imprimir / salvar PDF", exact: true })
+    .getByRole("button", { name: "Imprimir", exact: true })
     .click();
   await expect(page.locator("html")).toHaveAttribute(
     "data-print-opened",
@@ -385,7 +393,7 @@ test("folha extensa pagina, repete o cabeçalho da tabela e deixa assinaturas e 
     };
   });
   await page
-    .getByRole("button", { name: "Imprimir / salvar PDF", exact: true })
+    .getByRole("button", { name: "Imprimir", exact: true })
     .click();
   await expect(page.locator("html")).toHaveAttribute("data-print-opened", "true");
   const bytes = await page.pdf({ preferCSSPageSize: true });
@@ -567,7 +575,7 @@ test("avaliação do site abre o formulário em nova aba; sem formulário de reg
   await page.keyboard.press("Escape");
   // O PET-SD não tem formulário de registro: nada de Forms no painel nem no Concluir.
   await expect(page.getByRole("button", { name: /Forms/ })).toHaveCount(0);
-  await page.getByRole("button", { name: /^Concluir/ }).click();
+  await concluir(page);
   await expect(page.getByRole("link", { name: "Abrir formulário de atividades" })).toHaveCount(0);
 });
 
@@ -649,7 +657,7 @@ test("comprovantes opcionais persistem por mês e perfil e entram nas duas impre
       ).join(",") || "sem-comprovantes";
     };
   });
-  const print = () => page.getByRole("button", { name: "Imprimir / salvar PDF", exact: true }).click();
+  const print = () => page.getByRole("button", { name: "Imprimir", exact: true }).click();
   await print();
   await expect(page.locator("html")).toHaveAttribute("data-print-pages", "quadrada,paisagem,retrato");
   if (testInfo.project.name === "desktop") {
@@ -662,7 +670,7 @@ test("comprovantes opcionais persistem por mês e perfil e entram nas duas impre
   await expect(proofs(page)).toHaveCount(0);
   await print();
   await expect(page.locator("html")).toHaveAttribute("data-print-pages", "sem-comprovantes");
-  await page.getByRole("button", { name: /^Concluir/ }).click();
+  await concluir(page);
   await page.getByRole("dialog", { name: "Salvar folha e concluir" })
     .getByRole("button", { name: "Imprimir / salvar PDF", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-print-pages", "quadrada,paisagem,retrato");
@@ -675,7 +683,7 @@ test("comprovantes opcionais persistem por mês e perfil e entram nas duas impre
   await expect(proofs(page).getByRole("button", { name: "Abrir foto.png" })).toHaveCount(0);
   await expect(proofs(page).getByRole("button", { name: "Abrir relatorio.pdf" })).toBeVisible();
 
-  await page.getByRole("button", { name: /^Concluir/ }).click();
+  await concluir(page);
   await page.getByRole("button", { name: "Sair / trocar participante", exact: true }).click();
   await page.getByRole("button", { name: "Sair sem salvar cópia", exact: true }).click();
   await page.getByRole("button", { name: "Primeiro acesso", exact: true }).click();
@@ -752,9 +760,10 @@ test("cópias com comprovantes levam os originais e a restauração reverte falh
 test("novidades mostram data de publicação nos dois temas", async ({ page }, testInfo) => {
   await page.goto("/");
   const section = page.getByRole("region", { name: "Novidades do site" });
-  await expect(section.getByRole("heading", { name: "Meta síncrona e preenchimento pelo histórico" })).toBeVisible();
+  await expect(section.getByRole("heading", { name: "Concluir confere a CH e meta síncrona na visão Semanal" })).toBeVisible();
   await expect(section.getByText("Última atualização", { exact: false })).toContainText("19 de novembro de 2026");
   await section.getByText("Ver histórico de atualizações", { exact: true }).click();
+  await expect(section.getByRole("heading", { name: "Meta síncrona e preenchimento pelo histórico" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Datas livres, folha em Word e assinatura gov.br" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Ajustes para o celular" })).toBeVisible();
   await expect(section.getByRole("heading", { name: "Perfis, menu do participante e visão semanal" })).toBeVisible();
@@ -984,6 +993,10 @@ test("modais: botões ficam dentro da caixa; aviso de rascunho só com rascunho"
   // Descartar e seguir para o Concluir: o modal de conclusão também cabe.
   await page.getByRole("button", { name: /^Concluir/ }).click();
   await page.getByRole("button", { name: "Descartar preenchimento", exact: true }).click();
+  // CH incompleta: o aviso também cabe; depois, o modal de conclusão.
+  await expect(page.getByRole("dialog", { name: "Folha com CH incompleta" })).toBeVisible();
+  expect(await buttonsOutsideDialog(page), "aviso de CH").toEqual([]);
+  await page.getByRole("button", { name: "Gerar assim mesmo", exact: true }).click();
   expect(await buttonsOutsideDialog(page), "concluir").toEqual([]);
   await page.keyboard.press("Escape");
   // Confirmação de exclusão.
@@ -1007,6 +1020,11 @@ test("data livre: 26/10 na folha de Novembro, folha em Word e assinatura gov.br"
   const sheet = page.locator(".sheet-stage .official-sheet");
   await expect(sheet).toContainText("26/10");
   await expect(sheet).toContainText("Total de CH no mês: 1h30");
+  // Minha folha: Imprimir · Baixar .docx · Assinar no gov.br · Voltar (sem Baixar PDF).
+  await expect(page.locator(".sheet-actions > *")).toHaveText(["Imprimir", "Baixar .docx", "Assinar no gov.br", "Voltar"]);
+  await page.getByRole("button", { name: "Modelo em branco", exact: true }).click();
+  await expect(page.locator(".sheet-actions > *")).toHaveText(["Imprimir", "Baixar .docx", "Baixar PDF", "Voltar"]);
+  await page.getByRole("button", { name: "Minha folha", exact: true }).click();
   const gov = page.getByRole("link", { name: "Assinar no gov.br" });
   await expect(gov).toHaveAttribute("href", "https://www.gov.br/pt-br/servicos/assinatura-eletronica");
   await expect(gov).toHaveAttribute("target", "_blank");
@@ -1017,7 +1035,7 @@ test("data livre: 26/10 na folha de Novembro, folha em Word e assinatura gov.br"
     Object.defineProperty(window, "showSaveFilePicker", { configurable: true, value: undefined }),
   );
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Baixar .docx (Word)", exact: true }).click();
+  await page.getByRole("button", { name: "Baixar .docx", exact: true }).click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toBe("folha-pet-sd-participante-sintetico-2026-11.docx");
   const { unzipSync, strFromU8 } = await import("fflate");
@@ -1066,4 +1084,38 @@ test("atividade que passa da meia-noite conta no dia de início; Duplicar copia 
   await page.getByRole("button", { name: "Folha oficial", exact: true }).click();
   const firstRow = page.locator(".sheet-stage .pet-sheet-activities tbody tr").first();
   await expect(firstRow.locator("td")).toHaveText(["05/11", "-", "Plantão sintético", "23:00", "03:00", "4h", "Interação em tempo real (Síncrona)", "-"]);
+});
+
+test("Concluir com CH completa vai direto; Salvar cópia é só .json e indica onde baixar PDF e Word", async ({ page }) => {
+  // 16 h síncronas + 16 h assíncronas = 32 h, com a meta síncrona.
+  await page.addInitScript(() => {
+    if (localStorage.getItem("test-seeded")) return;
+    const profile = { id: "p-ch", name: "Participante sintético", role: "Monitor(a)", gatNumber: "01", createdAt: "2026-10-01T00:00:00.000Z" };
+    const act = (id: string, date: string, modality: string) => ({ id, date, start: "06:00", end: "14:00", modality, description: "Atividade sintética " + id, local: "", descricao: "" });
+    localStorage.setItem("pet_folha_profiles_v3", JSON.stringify([profile]));
+    localStorage.setItem("pet_folha_active_profile_id_v3", profile.id);
+    localStorage.setItem("pet_folha_activities_v3_p-ch_2026-11", JSON.stringify([
+      act("1", "2026-11-03", "Interação em tempo real (Síncrona)"),
+      act("2", "2026-11-04", "Interação em tempo real (In Loco)"),
+      act("3", "2026-11-05", "Assíncrona"),
+      act("4", "2026-11-06", "Assíncrona"),
+    ]));
+    localStorage.setItem("test-seeded", "1");
+  });
+  await page.goto("/");
+  await expect(page.locator(".summary-total strong")).toHaveText("32");
+  await expect(page.getByText("Mínimo mensal alcançado")).toBeVisible();
+  await page.getByRole("button", { name: /^Concluir/ }).click();
+  await expect(page.getByRole("dialog", { name: "Folha com CH incompleta" })).toHaveCount(0);
+  const conclusion = page.getByRole("dialog", { name: "Salvar folha e concluir" });
+  await expect(conclusion).toContainText("CH completa: 32 h no mês, com 16 h síncronas/In Loco.");
+  await page.keyboard.press("Escape");
+
+  await page.evaluate(() =>
+    Object.defineProperty(window, "showSaveFilePicker", { configurable: true, value: undefined }),
+  );
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Salvar cópia", exact: true }).click();
+  expect((await downloadPromise).suggestedFilename()).toMatch(/\.json$/);
+  await expect(page.getByText("Para PDF ou Word, use Concluir ou a aba Folha oficial.", { exact: false })).toBeVisible();
 });

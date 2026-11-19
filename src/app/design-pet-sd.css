@@ -431,6 +431,13 @@
   background: var(--brand-deep);
   box-shadow: 2px 0 0 var(--surface);
 }
+/* Visão Semanal: barra única das 16 h síncronas/In Loco, abaixo das faixas. */
+.progress-track--sync {
+  margin-top: 14px;
+}
+.progress-track--sync > .progress-sync {
+  box-shadow: none;
+}
 /* Marca do mínimo síncrono (16 de 32 h). */
 .progress-marker {
   position: absolute;

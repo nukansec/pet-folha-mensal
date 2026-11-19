@@ -19,7 +19,7 @@ const questions = [
   ],
   [
     "O que é o JSON e como restauro uma folha?",
-    "O JSON é a cópia editável da sua folha: guarda sua identificação, atividades e comprovantes. Use “Restaurar cópia” e selecione o arquivo .json salvo anteriormente. O PDF não restaura os registros.",
+    "O JSON é a cópia editável da sua folha: guarda sua identificação, atividades e comprovantes. Use “Restaurar cópia” e selecione o arquivo .json salvo anteriormente. O PDF e o Word não restauram os registros: para baixá-los, use “Concluir” ou a aba Folha oficial.",
   ],
   [
     "Onde ficam meus dados?",
@@ -39,7 +39,7 @@ const questions = [
   ],
   [
     "Como imprimo e assino?",
-    `Em “Imprimir / salvar PDF”, use papel Carta na horizontal, como no modelo oficial. Confira a folha e os comprovantes e assine pelo Gov.br. ${PROGRAM.deadline.label}`,
+    `Em “Imprimir” (na Folha oficial; para PDF, escolha “Salvar como PDF” como impressora), use papel Carta na horizontal, como no modelo oficial. Confira a folha e os comprovantes e assine pelo Gov.br. ${PROGRAM.deadline.label}`,
   ],
 ];
 

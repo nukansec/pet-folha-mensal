@@ -392,6 +392,13 @@ for (const vp of VIEWPORTS) {
     await step("concluir", async () => {
       await page.getByRole("button", { name: /^Concluir/ }).click();
       await page.locator("dialog[open]").waitFor({ timeout: 4000 });
+      // Com CH incompleta, o aviso vem antes do modal de conclusão.
+      const warning = page.getByRole("dialog", { name: "Folha com CH incompleta" });
+      if (await warning.isVisible()) {
+        await audit(page, "modal-ch-incompleta", vp, theme, { axe });
+        await warning.getByRole("button", { name: "Gerar assim mesmo", exact: true }).click();
+        await page.getByRole("dialog", { name: "Salvar folha e concluir" }).waitFor({ timeout: 4000 });
+      }
       await audit(page, "modal-concluir", vp, theme, { axe });
       await closeDialog(page);
     });
