@@ -1,5 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+import { PROGRAM } from "../../src/config/program";
+
+/** Comprovação fotográfica ligada? (PROGRAM.features; desligada em 20/11/2026). */
+const photoProof = PROGRAM.features.photoProof;
 
 const user = {
   id: "test-resume",
@@ -615,7 +619,8 @@ function proofs(page: Page) {
 
 async function openSheet(page: Page) {
   await page.getByRole("button", { name: "Folha oficial", exact: true }).click();
-  await expect(proofs(page).getByLabel("Adicionar comprovantes")).toBeEnabled();
+  if (photoProof) await expect(proofs(page).getByLabel("Adicionar comprovantes")).toBeEnabled();
+  else await expect(page.locator(".sheet-stage .official-sheet")).toBeVisible();
 }
 
 async function restoreCopy(page: Page, data: object, inputLabel = "Restaurar cópia de segurança") {
@@ -629,6 +634,7 @@ async function restoreCopy(page: Page, data: object, inputLabel = "Restaurar có
 }
 
 test("comprovantes opcionais persistem por mês e perfil e entram nas duas impressões", async ({ page }, testInfo) => {
+  test.skip(!photoProof, "Comprovação fotográfica desligada em src/config/program.ts (features.photoProof)");
   await create(page);
   await openSheet(page);
   await expect(proofs(page)).toContainText("Nenhum comprovante neste mês.");
@@ -694,6 +700,7 @@ test("comprovantes opcionais persistem por mês e perfil e entram nas duas impre
 });
 
 test("cópias com comprovantes levam os originais e a restauração reverte falhas", async ({ page, browser }, testInfo) => {
+  test.skip(!photoProof, "Comprovação fotográfica desligada em src/config/program.ts (features.photoProof)");
   await create(page);
   await add(page);
   await openSheet(page);
@@ -1118,4 +1125,21 @@ test("Concluir com CH completa vai direto; Salvar cópia é só .json e indica o
   await page.getByRole("button", { name: "Salvar cópia", exact: true }).click();
   expect((await downloadPromise).suggestedFilename()).toMatch(/\.json$/);
   await expect(page.getByText("Para PDF ou Word, use Concluir ou a aba Folha oficial.", { exact: false })).toBeVisible();
+});
+
+test("comprovação fotográfica desligada: sem seção na folha e impressão só com a folha", async ({ page }) => {
+  test.skip(photoProof, "Comprovação fotográfica ligada");
+  await create(page);
+  await add(page);
+  await page.getByRole("button", { name: "Folha oficial", exact: true }).click();
+  await expect(page.locator(".sheet-stage .official-sheet")).toBeVisible();
+  await expect(proofs(page)).toHaveCount(0);
+  await expect(page.getByText("Adicionar comprovantes")).toHaveCount(0);
+  await page.evaluate(() => {
+    window.print = () => {
+      document.documentElement.dataset.printProofs = String(document.querySelectorAll(".print-attachment-page").length);
+    };
+  });
+  await page.getByRole("button", { name: "Imprimir", exact: true }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-print-proofs", "0");
 });
