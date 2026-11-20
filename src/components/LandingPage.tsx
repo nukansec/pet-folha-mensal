@@ -428,7 +428,7 @@ export function LandingPage({
             <FileText size={24} aria-hidden="true" />
             <div>
               <h3><span className="file-extension">.pdf</span> Folha para assinar</h3>
-              <p>Em <strong>Folha oficial</strong>, use <strong>Imprimir</strong> (com “Salvar como PDF”) para gerar o documento de assinatura. O PDF não permite restaurar as atividades no sistema.</p>
+              <p>Em <strong>Folha oficial</strong>, use <strong>Imprimir</strong> com o destino “Salvar como PDF” para gerar o documento de assinatura. O PDF não permite restaurar as atividades no sistema.</p>
             </div>
           </div>
           <div className="file-guide-item">

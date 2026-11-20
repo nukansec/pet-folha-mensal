@@ -39,7 +39,7 @@ const questions = [
   ],
   [
     "Como imprimo e assino?",
-    `Em “Imprimir” (na Folha oficial; para PDF, escolha “Salvar como PDF” como impressora), use papel Carta na horizontal, como no modelo oficial. Confira a folha e os comprovantes e assine pelo Gov.br. ${PROGRAM.deadline.label}`,
+    `Na Folha oficial, clique em “Imprimir”. Para o PDF, em Destino escolha “Salvar como PDF”: a folha sai em Carta deitada, como o modelo oficial. Não use “Microsoft Print to PDF”, que gira a folha para retrato. Em Mais definições, desmarque “Cabeçalhos e rodapés”. Confira a folha e os comprovantes e assine pelo Gov.br. ${PROGRAM.deadline.label}`,
   ],
 ];
 

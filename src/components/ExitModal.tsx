@@ -121,8 +121,8 @@ function Conclusion({
           <div>
             <h3>Folha para assinatura</h3>
             <p>
-              Imprima ou salve em PDF (papel Carta, horizontal), ou baixe em
-              Word para completar à mão.
+              Imprima ou salve em PDF (destino “Salvar como PDF”, não
+              “Microsoft Print to PDF”), ou baixe em Word para completar à mão.
             </p>
             {pdfTriggered && (
               <p role="status">
