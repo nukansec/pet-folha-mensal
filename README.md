@@ -50,8 +50,10 @@ prazo, assinaturas e página de instruções, em papel Carta na horizontal.
 - **Salvar cópia** guarda o trabalho para continuar depois, em `.json`, o único
   formato que **Restaurar cópia** lê: a do mês (formato 1.3) e a do perfil
   inteiro (1.4, oferecida antes de excluir).
-- **Concluir** fecha o mês: se faltar CH, avisa quanto falta sem impedir e
-  depois oferece PDF, Word, gov.br e a cópia.
+- **Concluir** fecha o mês: se faltar CH, avisa quanto falta sem impedir; depois
+  oferece a cópia, Imprimir e Baixar .docx, e à parte a assinatura no gov.br.
+  O botão final "Concluir" encerra a sessão e volta para a tela de entrada
+  (sem cópia salva, avisa antes).
 
 ## Regras de carga horária (CH)
 

@@ -104,10 +104,9 @@ test("perfil repetido retoma sem arquivo e preserva meses anteriores", async ({
   await expect(page.locator(".summary-total strong")).toHaveText("0");
   await page.getByLabel("Mês da folha").selectOption("2026-10");
   await expect(page.locator(".summary-total strong")).toHaveText("1h30");
-  await concluir(page);
-  await page
-    .getByRole("button", { name: "Sair / trocar participante", exact: true })
-    .click();
+  // Sair fica no menu do participante (Concluir não encerra mais a sessão).
+  await page.getByRole("button", { name: /menu do participante/ }).click();
+  await page.getByRole("menuitem", { name: "Sair" }).click();
   await page.getByRole("button", { name: `Abrir folha de ${user.name}`, exact: true }).click();
   await page.reload();
   const stored = await page.evaluate(
@@ -672,7 +671,7 @@ test("comprovantes opcionais persistem por mês e perfil e entram nas duas impre
   await expect(page.locator("html")).toHaveAttribute("data-print-pages", "sem-comprovantes");
   await concluir(page);
   await page.getByRole("dialog", { name: "Salvar folha e concluir" })
-    .getByRole("button", { name: "Imprimir / salvar PDF", exact: true }).click();
+    .getByRole("button", { name: "Imprimir", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-print-pages", "quadrada,paisagem,retrato");
   await page.getByRole("button", { name: "Continuar editando", exact: true }).click();
 
@@ -683,8 +682,9 @@ test("comprovantes opcionais persistem por mês e perfil e entram nas duas impre
   await expect(proofs(page).getByRole("button", { name: "Abrir foto.png" })).toHaveCount(0);
   await expect(proofs(page).getByRole("button", { name: "Abrir relatorio.pdf" })).toBeVisible();
 
-  await concluir(page);
-  await page.getByRole("button", { name: "Sair / trocar participante", exact: true }).click();
+  await page.getByRole("button", { name: /menu do participante/ }).click();
+  await page.getByRole("menuitem", { name: "Sair" }).click();
+  await page.getByRole("button", { name: "Sair", exact: true }).click();
   await page.getByRole("button", { name: "Sair sem salvar cópia", exact: true }).click();
   await page.getByRole("button", { name: "Primeiro acesso", exact: true }).click();
   await page.getByLabel("Nome completo", { exact: true }).fill("Outro participante");
