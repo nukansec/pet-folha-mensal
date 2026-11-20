@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Download, Trash2, X } from "lucide-react";
 import type { UserProfile } from "@/types";
+import { PROGRAM } from "@/config/program";
 import { pluralize } from "@/lib/pet-calculator";
 import { Modal } from "./Modal";
 
@@ -74,11 +75,14 @@ export function DeleteProfileModal({
             {pluralize(summary.activities, "atividade", "atividades")} em{" "}
             {pluralize(summary.months, "mês", "meses")};
           </li>
-          <li>
-            {summary.attachments === null
-              ? "os comprovantes (o navegador não conseguiu contá-los agora)."
-              : `${pluralize(summary.attachments, "comprovante", "comprovantes")}.`}
-          </li>
+          {/* Comprovação desligada: só cita comprovantes se houver algum guardado. */}
+          {(PROGRAM.features.photoProof || summary.attachments !== 0) && (
+            <li>
+              {summary.attachments === null
+                ? "os comprovantes (o navegador não conseguiu contá-los agora)."
+                : `${pluralize(summary.attachments, "comprovante", "comprovantes")}.`}
+            </li>
+          )}
         </ul>
         <p className="access-hint">Os outros perfis deste navegador não mudam.</p>
         <div className="conclusion-option">
@@ -86,8 +90,9 @@ export function DeleteProfileModal({
           <div>
             <h3>Salvar cópia antes</h3>
             <p>
-              Um arquivo .json com o perfil inteiro: todos os meses e
-              comprovantes. Com ele, “Restaurar cópia” traz tudo de volta.
+              Um arquivo .json com o perfil inteiro: todos os meses
+              {PROGRAM.features.photoProof ? " e comprovantes" : ""}. Com ele,
+              “Restaurar cópia” traz tudo de volta.
             </p>
             {copied && (
               <p role="status">Cópia acionada. Confira o arquivo antes de excluir.</p>

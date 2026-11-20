@@ -494,7 +494,8 @@ export default function Home() {
 
       if (!stillCurrent()) return false;
 
-      if (!blank) {
+      // Comprovação fotográfica desligada (PROGRAM.features): só a folha.
+      if (!blank && PROGRAM.features.photoProof) {
         const attachments = await listAttachments(scope).catch(() => null);
         if (!attachments) {
           const proceed = await confirm({
@@ -1168,7 +1169,7 @@ export default function Home() {
                   isBlankTemplate={showBlankTemplate}
                 />
               </SheetPreview>
-              {!showBlankTemplate && (
+              {!showBlankTemplate && PROGRAM.features.photoProof && (
                 <MonthlyAttachments
                   key={JSON.stringify([activeUser.id, monthKey, formRevision])}
                   profileId={activeUser.id}

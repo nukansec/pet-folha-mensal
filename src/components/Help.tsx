@@ -19,7 +19,7 @@ const questions = [
   ],
   [
     "O que é o JSON e como restauro uma folha?",
-    "O JSON é a cópia editável da sua folha: guarda sua identificação, atividades e comprovantes. Use “Restaurar cópia” e selecione o arquivo .json salvo anteriormente. O PDF e o Word não restauram os registros: para baixá-los, use “Concluir” ou a aba Folha oficial.",
+    `O JSON é a cópia editável da sua folha: guarda sua identificação, atividades${PROGRAM.features.photoProof ? " e comprovantes" : ""}. Use “Restaurar cópia” e selecione o arquivo .json salvo anteriormente. O PDF e o Word não restauram os registros: para baixá-los, use “Concluir” ou a aba Folha oficial.`,
   ],
   [
     "Onde ficam meus dados?",
@@ -35,7 +35,9 @@ const questions = [
   ],
   [
     "Preciso comprovar as atividades?",
-    "Atividades presenciais e in loco precisam de registro fotográfico. Na aba “Folha oficial”, anexe as fotos (JPEG ou PNG) ou um PDF abaixo da prévia; eles saem nas páginas seguintes do PDF. Os produtos das atividades síncronas e assíncronas vão para o Drive oficial do grupo.",
+    PROGRAM.features.photoProof
+      ? "Atividades presenciais e in loco precisam de registro fotográfico. Na aba “Folha oficial”, anexe as fotos (JPEG ou PNG) ou um PDF abaixo da prévia; eles saem nas páginas seguintes do PDF. Os produtos das atividades síncronas e assíncronas vão para o Drive oficial do grupo."
+      : "Atividades presenciais e in loco precisam de registro fotográfico, entregue conforme a orientação do seu GAT: no momento, o app não anexa fotos à folha. Os produtos das atividades síncronas e assíncronas vão para o Drive oficial do grupo.",
   ],
   [
     "Como imprimo e assino?",
