@@ -27,13 +27,11 @@ interface ExitModalProps {
   /** Resumo da CH ("CH completa" ou o que falta), abaixo do nome. */
   hoursStatus?: string;
   hasChanges?: boolean;
-  /** Texto do botão principal no menu do topo: "Trocar participante" ou "Sair". */
-  leaveLabel?: string;
   /**
-   * Concluir (botão do topo): o principal vira "Concluir" e volta para Minha
-   * frequência sem encerrar a sessão (sair e trocar ficam no menu do topo).
+   * Texto do botão principal: "Concluir" (encerra a sessão e volta à entrada),
+   * ou, pelo menu do topo, "Trocar participante" ou "Sair".
    */
-  onConclude?: () => void;
+  leaveLabel?: string;
 }
 
 export function ExitModal(props: ExitModalProps) {
@@ -51,9 +49,9 @@ function Conclusion({
   userName,
   hoursStatus,
   hasChanges = false,
-  leaveLabel = "Sair / trocar participante",
-  onConclude,
+  leaveLabel = "Concluir",
 }: ExitModalProps) {
+  const concluding = leaveLabel === "Concluir";
   const [jsonTriggered, setJsonTriggered] = useState(false);
   const [pdfTriggered, setPdfTriggered] = useState(false);
   const [docxTriggered, setDocxTriggered] = useState(false);
@@ -187,7 +185,7 @@ function Conclusion({
           </div>
         )}
         {/* No Concluir, a Cópia de segurança já diz isso; sobra espaço no celular. */}
-        {!onConclude && (
+        {!concluding && (
           <p className="local-note">
             Salve a cópia para proteger seus dados e continuar em outro aparelho.
           </p>
@@ -199,7 +197,11 @@ function Conclusion({
               Deseja sair mesmo assim?
             </p>
             <button className="secondary-button" onClick={onConfirmExit}>
-              {leaveLabel === "Trocar participante" ? "Trocar sem salvar cópia" : "Sair sem salvar cópia"}
+              {leaveLabel === "Trocar participante"
+                ? "Trocar sem salvar cópia"
+                : concluding
+                  ? "Concluir sem salvar cópia"
+                  : "Sair sem salvar cópia"}
             </button>
             <button
               className="secondary-button"
@@ -213,15 +215,17 @@ function Conclusion({
           <button className="secondary-button" onClick={onClose}>
             Continuar editando
           </button>
-          {onConclude ? (
-            <button className="primary-button" disabled={busy} onClick={onConclude}>
-              <Check size={18} aria-hidden="true" /> Concluir
-            </button>
-          ) : (
-            <button className="primary-button" disabled={busy} onClick={leave}>
-              {leaveLabel} <ArrowRight size={18} />
-            </button>
-          )}
+          <button className="primary-button" disabled={busy} onClick={leave}>
+            {concluding ? (
+              <>
+                <Check size={18} aria-hidden="true" /> Concluir
+              </>
+            ) : (
+              <>
+                {leaveLabel} <ArrowRight size={18} />
+              </>
+            )}
+          </button>
         </div>
       </section>
     </Modal>
