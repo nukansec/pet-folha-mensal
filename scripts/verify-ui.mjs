@@ -1418,3 +1418,21 @@ test("visão Semanal também mostra a barra única das 16 h síncronas/In Loco",
   assert.match(html, /Síncronas\/In Loco no mês: <strong>8h<\/strong> de 16 h/);
   assert.equal((html.match(/role="progressbar"/g) || []).length, 1);
 });
+
+test("comprovação fotográfica desligada: textos não pedem anexos e o que existir continua citado", () => {
+  const { PROGRAM } = load("./src/config/program.ts");
+  assert.equal(PROGRAM.features.photoProof, false);
+  const faq = render(React.createElement(FAQ));
+  assert.match(faq, /o app não anexa fotos à folha/);
+  assert.doesNotMatch(faq, /anexe as fotos/);
+  assert.doesNotMatch(faq, /atividades e comprovantes/);
+  const { DeleteProfileModal } = load("./src/components/DeleteProfileModal.tsx");
+  const props = (attachments) => ({
+    isOpen: true, profile: sampleUser, summary: { months: 1, activities: 2, attachments },
+    onClose: noop, onConfirm: noop, onSaveCopy: noop,
+  });
+  // Sem comprovantes guardados: o modal não fala neles.
+  assert.doesNotMatch(render(React.createElement(DeleteProfileModal, props(0))), /comprovante/);
+  // Com comprovantes de antes (dados preservados), avisa que também saem.
+  assert.match(render(React.createElement(DeleteProfileModal, props(2))), /2 comprovantes\./);
+});

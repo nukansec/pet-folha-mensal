@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { PROGRAM } from "../../src/config/program";
 
 /**
  * Regra de ouro dos dados: o estado criado pela main de 18/11/2026 (commit
@@ -105,7 +106,11 @@ test("dados da versão atual da main abrem iguais e não são reescritos", async
   await expect(sheet).toContainText("Total de CH no mês: 7h45");
   await expect(sheet).toContainText("( X ) Monitor(a)");
   await expect(sheet).toContainText("Interação em tempo real (In Loco)");
-  await expect(page.getByRole("region", { name: "Comprovação fotográfica" })).toContainText("foto-ficticia.png");
+  // Comprovação desligada (PROGRAM.features.photoProof): a seção some, mas o
+  // comprovante continua guardado (o snapshot do IndexedDB abaixo não muda).
+  if (PROGRAM.features.photoProof)
+    await expect(page.getByRole("region", { name: "Comprovação fotográfica" })).toContainText("foto-ficticia.png");
+  else await expect(page.getByRole("region", { name: "Comprovação fotográfica" })).toHaveCount(0);
   await page.getByRole("button", { name: "Minha frequência", exact: true }).click();
   await page.getByLabel("Mês da folha").selectOption("2026-10");
   await expect(page.locator(".summary-total strong")).toHaveText("1h30");

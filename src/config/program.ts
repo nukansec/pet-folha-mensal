@@ -78,6 +78,18 @@ export const PROGRAM = {
     "Interação em tempo real (In Loco)",
     "Interação em tempo real (Síncrona)",
   ] as string[],
+  /**
+   * Recursos que podem ser ligados e desligados sem apagar código.
+   * photoProof: anexar fotos/PDF de comprovação na Folha oficial e imprimi-los
+   * depois da folha. Desligado em 20/11/2026 (não é usado agora e confundia na
+   * página). Desligado, a seção some e a impressão não leva comprovantes; os
+   * que já existirem continuam guardados (IndexedDB) e nas cópias .json, e
+   * saem junto ao excluir o perfil. Para reativar: true.
+   */
+  features: {
+    photoProof: false as boolean,
+  },
+
   /** Edital, item 9.1.4: no mínimo 8 h semanais. */
   weeklyReferenceHours: 8,
 

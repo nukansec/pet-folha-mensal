@@ -31,7 +31,9 @@ SEIDIGI/SGTES-MS nº 1/2025; Ministério da Saúde, UFG e SMS Goiânia). Fork de
    In Loco (`synchronousTargetHours` e `synchronousModalities` na config, por
    nome); o excedente não passa para o mês seguinte.
 4. **Modalidades**: as da config (padrão: "Interação em tempo real (Síncrona)" e
-   "Assíncrona"). Atividades presenciais e in loco exigem comprovação fotográfica.
+   "Assíncrona"). Atividades presenciais e in loco exigem comprovação fotográfica;
+   o anexo de comprovantes no app está desligado (`features.photoProof`), mas o
+   código, os dados salvos e os testes ficam prontos para religar.
 5. **Prazo**: o rodapé da folha reproduz o texto do modelo (1º dia útil do mês
    seguinte); o prazo exibido no app vem da config.
 6. **Datas livres**: cada GAT fecha a folha num dia (26 a 25, 20 a 19…). A data

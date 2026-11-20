@@ -196,6 +196,12 @@ em branco ao lado foi exportado pelo Word a partir desse `.docx`.
   de 16 h síncronas/In Loco, um aviso ("Folha com CH incompleta") deixa voltar
   ou gerar assim mesmo. Salvar cópia continua só `.json` e indica onde baixar
   PDF e Word. A visão Semanal ganhou a barra única das 16 h síncronas/In Loco.
+- **D21 — Comprovação fotográfica desligada (20/11/2026).** O anexo de fotos e
+  PDFs não é usado agora e confundia na Folha oficial. `PROGRAM.features.photoProof
+  = false` esconde a seção, tira os comprovantes da impressão e os textos que
+  pedem anexos. Comprovantes já salvos continuam no IndexedDB e nas cópias
+  `.json` e saem junto ao excluir o perfil. Os testes do recurso ficam pulados
+  (com motivo) enquanto a chave estiver desligada; para religar, `true`.
 - **Pendente — faixas semanais pelo prazo do programa.** Quando o prazo exato
   das atividades for confirmado, as faixas da visão Semanal passam a seguir o
   período da folha em vez do mês do calendário (ver ADR 0002: hoje a data é

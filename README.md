@@ -44,7 +44,9 @@ prazo, assinaturas e página de instruções, em papel Carta na horizontal.
 - **Imprimir** (também salva em PDF), **Baixar .docx** preenchido no modelo
   oficial, para editar ou completar à mão, e **Assinar no gov.br**. O modelo em
   branco está disponível em `.docx` e PDF.
-- Comprovação fotográfica: fotos e PDFs anexados saem nas páginas seguintes.
+- Comprovação fotográfica (fotos e PDFs anexados, impressos nas páginas
+  seguintes): **desligada por enquanto** em `PROGRAM.features.photoProof`. O
+  código continua pronto para voltar; comprovantes já salvos não são apagados.
 
 **Salvar cópia × Concluir**
 - **Salvar cópia** guarda o trabalho para continuar depois, em `.json`, o único
