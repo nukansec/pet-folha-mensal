@@ -116,7 +116,7 @@ test.describe("menu do participante", () => {
     expect((await download).suggestedFilename()).toMatch(/^backup-frequencia-.*-2026-11\.json$/);
   });
 
-  test("Concluir avisa a CH incompleta e volta para Minha frequência sem encerrar a sessão", async ({ page }) => {
+  test("Concluir avisa a CH incompleta, separa a assinatura e volta para a tela de entrada", async ({ page }) => {
     await createProfile(page);
     await page.getByRole("button", { name: /^Concluir/ }).click();
     // Sem atividades: avisa que a CH está incompleta, sem impedir.
@@ -133,8 +133,9 @@ test.describe("menu do participante", () => {
     await page.getByRole("button", { name: /menu do participante/ }).waitFor();
     await conclusion.getByRole("button", { name: "Concluir", exact: true }).click();
     await expect(conclusion).toHaveCount(0);
-    await expect(page.getByRole("heading", { name: "Minha frequência", exact: true })).toBeVisible();
-    await expect(page.getByText("Sessão encerrada com sucesso.")).toHaveCount(0);
+    await expect(page.getByText("Sessão encerrada com sucesso.")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Minha frequência", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /menu do participante/ })).toHaveCount(0);
   });
 
   test("GAT do modal de identificação fica em uma linha, com o nome inteiro no title", async ({ page }) => {
