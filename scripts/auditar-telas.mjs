@@ -277,6 +277,60 @@ function inspect() {
     const r = header.getBoundingClientRect();
     if (r.height < 8 || header.naturalWidth === 0) add("logos-folha", header, `logos ${Math.round(r.width)}×${Math.round(r.height)}, natural ${header.naturalWidth}`);
   }
+
+  // 8. Texto de clicável: vazando da caixa ou colado na borda. Mede o texto
+  // real (Range sobre os nós de texto) contra a caixa interna (sem a borda).
+  // Só vale para clicáveis com caixa visível (borda ou fundo); link de texto
+  // corrido não tem borda para encostar.
+  const clickables = [...scope.querySelectorAll("button, a[href], [role='button'], [role='menuitem'], label.choice, summary")]
+    // Fora: links de pular navegação (escondidos até o foco) e o que está fora da tela.
+    .filter((el) => !el.closest("dialog:not([open]), .official-sheet, .sr-only, .skip-link") && visible(el))
+    .filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.right > 0 && r.top < vh && r.left < vw; });
+  for (const el of clickables) {
+    const style = getComputedStyle(el);
+    const bordered = parseFloat(style.borderTopWidth) > 0 || parseFloat(style.borderLeftWidth) > 0;
+    const filled = style.backgroundColor !== "rgba(0, 0, 0, 0)" && style.backgroundColor !== "transparent";
+    if (!bordered && !filled) continue;
+    const texts = [];
+    const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let node = tw.nextNode(); node; node = tw.nextNode()) {
+      if (!node.data.trim() || node.parentElement?.closest(".sr-only")) continue;
+      // Reticências intencionais (texto inteiro no title), no pai ou num
+      // ancestral até o próprio clicável: o corte é a regra.
+      let cutByEllipsis = false;
+      for (let a = node.parentElement; a && a !== el.parentElement; a = a.parentElement) {
+        const s = getComputedStyle(a);
+        if (s.textOverflow === "ellipsis" && /hidden|clip/.test(s.overflowX)) cutByEllipsis = true;
+      }
+      if (cutByEllipsis) continue;
+      range.selectNodeContents(node);
+      texts.push(...[...range.getClientRects()].filter((r) => r.width > 0 && r.height > 0));
+    }
+    if (!texts.length) continue;
+    const box = el.getBoundingClientRect();
+    const inner = {
+      left: box.left + parseFloat(style.borderLeftWidth),
+      right: box.right - parseFloat(style.borderRightWidth),
+      top: box.top + parseFloat(style.borderTopWidth),
+      bottom: box.bottom - parseFloat(style.borderBottomWidth),
+    };
+    const t0 = {
+      left: Math.min(...texts.map((r) => r.left)),
+      right: Math.max(...texts.map((r) => r.right)),
+      top: Math.min(...texts.map((r) => r.top)),
+      bottom: Math.max(...texts.map((r) => r.bottom)),
+    };
+    const gap = {
+      left: t0.left - inner.left,
+      right: inner.right - t0.right,
+      top: t0.top - inner.top,
+      bottom: inner.bottom - t0.bottom,
+    };
+    const fmt = `esq ${gap.left.toFixed(1)} dir ${gap.right.toFixed(1)} topo ${gap.top.toFixed(1)} base ${gap.bottom.toFixed(1)} px`;
+    if (Math.min(gap.left, gap.right, gap.top, gap.bottom) < -0.5) add("texto-vaza-clicavel", el, fmt);
+    else if (Math.min(gap.left, gap.right) < 6 || Math.min(gap.top, gap.bottom) < 2) add("texto-colado-na-borda", el, fmt);
+  }
+
   return out;
 }
 

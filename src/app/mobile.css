@@ -540,3 +540,70 @@
     justify-content: center;
   }
 }
+
+/* ---------- Texto dos clicáveis: nunca vaza nem cola na borda ----------
+   Verificado por scripts/auditar-telas.mjs (checagens texto-vaza-clicavel e
+   texto-colado-na-borda): pelo menos 6 px de folga nas laterais. */
+
+/* Abas do topo: cada aba com a largura do próprio rótulo ("Minha frequência"
+   é maior que "Folha oficial"); com metade fixa, o rótulo maior colava. */
+@media (max-width: 767px) {
+  .workspace-tabs button {
+    flex: 1 1 auto;
+    padding-inline: 10px;
+  }
+}
+
+/* Entrada: abaixo de 360 px as três opções não cabem lado a lado ("Continuar"
+   e "Restaurar" são uma palavra só e não quebram): uma por linha. */
+@media (max-width: 359px) {
+  .ui-segmented {
+    flex-direction: column;
+  }
+  .screen-only .ui-segmented button {
+    padding: 10px 12px;
+  }
+}
+
+/* Folha oficial: abaixo de 380 px, um botão por linha ("Assinar no gov.br"
+   não cabe em meia linha). */
+@media (max-width: 379px) {
+  .sheet-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Zoom de 200% ou tela muito estreita (< 300 px de CSS): grupos empilham e o
+   rótulo pode quebrar linha em vez de sair da caixa. */
+@media (max-width: 299px) {
+  .workspace-tabs,
+  .backup-tools {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .workspace-tabs button,
+  .backup-tools button,
+  .sheet-actions > :is(a, button),
+  .dialog-actions button,
+  .conclusion-actions button {
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: center;
+    min-width: 0;
+  }
+  /* Palavras longas ("preenchimento", "Coordenador(a)") cabem inteiras com
+     fonte e folga um pouco menores, em vez de partir no meio. */
+  /* Especificidade (0,3,1) para vencer o mínimo de 16 px dos botões e o
+     .screen-only .text-sm (0,3,0) de globals.css, sem !important. */
+  .screen-only .dialog-actions button[type="button"] {
+    padding-inline: 10px;
+    font-size: 14px;
+  }
+  .choice-group--cards > label.choice {
+    padding-inline: 8px;
+  }
+  .choice-group--cards .choice-text {
+    font-size: 13px;
+  }
+}

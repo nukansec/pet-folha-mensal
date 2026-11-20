@@ -1148,10 +1148,14 @@ export default function Home() {
                   </button>
                 </div>
                 <p className="sheet-hint">
-                  Na janela de impressão, escolha papel <strong>Carta</strong> e
-                  orientação <strong>Horizontal</strong>, como no modelo oficial.
-                  Para guardar em PDF, escolha <strong>Salvar como PDF</strong>{" "}
-                  como impressora.
+                  {/* "Microsoft Print to PDF" e outras impressoras do sistema
+                      giram a página deitada para caber no papel em pé; o
+                      destino interno do navegador respeita a página do app. */}
+                  Para o PDF, em <strong>Destino</strong> escolha{" "}
+                  <strong>Salvar como PDF</strong>: a folha sai em Carta deitada,
+                  como o modelo. Não use “Microsoft Print to PDF”, que gira a
+                  folha. Em Mais definições, desmarque{" "}
+                  <strong>Cabeçalhos e rodapés</strong>.
                 </p>
               </div>
 

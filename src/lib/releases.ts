@@ -7,6 +7,8 @@ export const RELEASES = [
       "Ao concluir com menos de 32 h, ou de 16 h síncronas/In Loco, o app avisa quanto falta e deixa gerar a folha assim mesmo.",
       "A visão Semanal também mostra a barra das 16 h síncronas/In Loco.",
       "Na visão Semanal, as faixas dizem “Dias 2 a 8” e “Dia 1 (semana parcial)”, e as barras ficam alinhadas.",
+      "Para salvar a folha em PDF, use o destino “Salvar como PDF”: a “Microsoft Print to PDF” gira a folha para retrato. As instruções na tela foram atualizadas.",
+      "Botões revisados em todas as telas: o texto não passa mais da borda em celulares estreitos nem com o zoom do navegador em 200%.",
       "No Concluir, os botões seguem o padrão da Folha oficial (Imprimir, Baixar .docx), a assinatura no gov.br tem seção própria e o botão final “Concluir” encerra a sessão e volta para a tela de entrada.",
       "Salvar cópia baixa o .json para continuar depois; PDF e Word ficam no Concluir e na Folha oficial.",
       "Na Folha oficial, os botões ficaram iguais em Minha folha e no Modelo em branco: Imprimir (que também salva em PDF), Baixar .docx e Voltar.",
